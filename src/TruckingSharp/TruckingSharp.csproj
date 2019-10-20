@@ -12,12 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Helpers\" />
-    <Folder Include="PlayersCommands\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\sampgamemode.Database\TruckingSharp.Database.csproj" />
+    <ProjectReference Include="..\TruckingSharp.Database\TruckingSharp.Database.csproj" />
   </ItemGroup>
 
 </Project>

@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29318.209
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TruckingSharp", "TruckingSharp.csproj", "{02DC02FB-8BF7-4E8F-867C-190FDC62648D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TruckingSharp.Database", "..\sampgamemode.Database\TruckingSharp.Database.csproj", "{7231E991-83B5-4704-A8DF-959B815A4444}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TruckingSharp.Database", "..\TruckingSharp.Database\TruckingSharp.Database.csproj", "{2CC4071E-9B20-4403-83FB-8DF6F0CC4A83}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{02DC02FB-8BF7-4E8F-867C-190FDC62648D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02DC02FB-8BF7-4E8F-867C-190FDC62648D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02DC02FB-8BF7-4E8F-867C-190FDC62648D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7231E991-83B5-4704-A8DF-959B815A4444}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7231E991-83B5-4704-A8DF-959B815A4444}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7231E991-83B5-4704-A8DF-959B815A4444}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7231E991-83B5-4704-A8DF-959B815A4444}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CC4071E-9B20-4403-83FB-8DF6F0CC4A83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CC4071E-9B20-4403-83FB-8DF6F0CC4A83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CC4071E-9B20-4403-83FB-8DF6F0CC4A83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CC4071E-9B20-4403-83FB-8DF6F0CC4A83}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
