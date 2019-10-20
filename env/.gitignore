@@ -1,0 +1,9 @@
+*.exe
+*.dll
+*.so
+*.pdb
+*.json
+
+server_log.txt
+
+dotnet/
