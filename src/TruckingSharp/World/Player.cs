@@ -126,7 +126,11 @@ namespace TruckingSharp.World
                         IsLoggedIn = true;
 
                         _updateMoneyTimer = new Timer(500, true);
-                        _updateMoneyTimer.Tick += (obj, evv) => base.Money = Account.Money;
+                        _updateMoneyTimer.Tick += (obj, evv) =>
+                        {
+                            if (Money < Account.Money || Money > Account.Money)
+                                base.Money = Account.Money;
+                        };
 
                         base.Money = Account.Money;
                     }
