@@ -1,5 +1,5 @@
-﻿using TruckingSharp.Database.Entities;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using TruckingSharp.Database.Entities;
 
 namespace TruckingSharp.Database.Repositories.Interfaces
 {

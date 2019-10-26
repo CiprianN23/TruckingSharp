@@ -1,10 +1,10 @@
-﻿using TruckingSharp.World;
-using SampSharp.GameMode.SAMP.Commands.PermissionCheckers;
+﻿using SampSharp.GameMode.SAMP.Commands.PermissionCheckers;
 using SampSharp.GameMode.World;
+using TruckingSharp.World;
 
 namespace TruckingSharp.Commands.Permissions
 {
-    class LoggedPermission : IPermissionChecker
+    internal class LoggedPermission : IPermissionChecker
     {
         public string Message => "You are not logged in";
 

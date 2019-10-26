@@ -1,10 +1,4 @@
-﻿using TruckingSharp.Constants;
-using TruckingSharp.Data;
-using TruckingSharp.Database;
-using TruckingSharp.Database.Entities;
-using TruckingSharp.Database.UnitsOfWork;
-using TruckingSharp.Extensions.PlayersExtensions;
-using SampSharp.GameMode.Definitions;
+﻿using SampSharp.GameMode.Definitions;
 using SampSharp.GameMode.Display;
 using SampSharp.GameMode.Events;
 using SampSharp.GameMode.Pools;
@@ -12,6 +6,12 @@ using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.World;
 using System;
 using System.Threading.Tasks;
+using TruckingSharp.Constants;
+using TruckingSharp.Data;
+using TruckingSharp.Database;
+using TruckingSharp.Database.Entities;
+using TruckingSharp.Database.UnitsOfWork;
+using TruckingSharp.Extensions.PlayersExtensions;
 
 namespace TruckingSharp.World
 {
@@ -67,11 +67,11 @@ namespace TruckingSharp.World
                             case PlayerClasses.Police:
                                 policePlayers++;
                                 break;
+
                             default:
                                 normalPlayers++;
                                 break;
                         }
-
                     }
                 }
 
@@ -101,7 +101,6 @@ namespace TruckingSharp.World
                 RegisterPlayer();
             else
                 LoginPlayer();
-
         }
 
         private void LoginPlayer()
@@ -111,7 +110,6 @@ namespace TruckingSharp.World
             dialog.Show(this);
             dialog.Response += async (sender, ev) =>
             {
-
                 if (ev.DialogButton == DialogButton.Left)
                 {
                     if (LoginTries >= Configuration.MaxLogins)
@@ -173,6 +171,19 @@ namespace TruckingSharp.World
             });
         }
 
+        public override async void GiveMoney(int money)
+        {
+            var account = Account;
+
+            account.Money += money;
+
+            Money = account.Money;
+
+            using var uow = new UnitOfWork(DapperConnection.ConnectionString);
+            await uow.PlayerAccountRepository.UpdateAsync(account).ConfigureAwait(false);
+            uow.CommitAsync();
+        }
+
         public override void OnDisconnected(DisconnectEventArgs e)
         {
             base.OnDisconnected(e);
@@ -227,7 +238,6 @@ namespace TruckingSharp.World
                 await Task.Delay(10);
                 Kick();
             }
-
         }
 
         public override void OnEnterVehicle(EnterVehicleEventArgs e)

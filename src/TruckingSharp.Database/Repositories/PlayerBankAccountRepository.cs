@@ -1,9 +1,9 @@
 ﻿using Dapper;
 using Dapper.Contrib.Extensions;
 using MySql.Data.MySqlClient;
+using System.Collections.Generic;
 using TruckingSharp.Database.Entities;
 using TruckingSharp.Database.Repositories.Interfaces;
-using System.Collections.Generic;
 
 namespace TruckingSharp.Database.Repositories
 {

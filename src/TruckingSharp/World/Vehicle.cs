@@ -1,6 +1,6 @@
-﻿using TruckingSharp.Constants;
-using SampSharp.GameMode.Pools;
+﻿using SampSharp.GameMode.Pools;
 using SampSharp.GameMode.World;
+using TruckingSharp.Constants;
 
 namespace TruckingSharp.World
 {

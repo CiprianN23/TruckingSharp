@@ -1,6 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
-using TruckingSharp.Database.Repositories;
 using System;
+using TruckingSharp.Database.Repositories;
 
 namespace TruckingSharp.Database.UnitsOfWork
 {
@@ -76,11 +76,11 @@ namespace TruckingSharp.Database.UnitsOfWork
 
         protected virtual void Dispose(bool disposing)
         {
-            // Check to see if Dispose has already been called. 
+            // Check to see if Dispose has already been called.
             if (!this.disposed)
             {
-                // If disposing equals true, dispose all managed 
-                // and unmanaged resources. 
+                // If disposing equals true, dispose all managed
+                // and unmanaged resources.
                 if (disposing)
                 {
                     // Dispose managed resources.
@@ -95,18 +95,16 @@ namespace TruckingSharp.Database.UnitsOfWork
                         _connection.Dispose();
                         _connection = null;
                     }
-
                 }
 
-                // Call the appropriate methods to clean up 
-                // unmanaged resources here. 
-                // If disposing is false, 
+                // Call the appropriate methods to clean up
+                // unmanaged resources here.
+                // If disposing is false,
                 // only the following code is executed.
                 _playerAccountRepository = null;
 
                 // Note disposing has been done.
                 disposed = true;
-
             }
         }
 

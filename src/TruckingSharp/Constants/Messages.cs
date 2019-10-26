@@ -22,7 +22,6 @@
         public const string CommandOnlyIfNotDoingAJob = "You can not use this command while doing a job.";
         public const string CommandOnlyIfNotJailed = "You can not use this command when you are in jail.";
 
-
         public const string TruckerClass = "Truck Driver";
         public const string BusDriverClass = "Bus Driver";
         public const string PilotClass = "Pilot";

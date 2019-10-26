@@ -1,7 +1,7 @@
-﻿using TruckingSharp.Extensions.PlayersExtensions;
-using TruckingSharp.World;
-using SampSharp.GameMode;
+﻿using SampSharp.GameMode;
 using SampSharp.GameMode.Controllers;
+using TruckingSharp.Extensions.PlayersExtensions;
+using TruckingSharp.World;
 
 namespace TruckingSharp.Controllers
 {

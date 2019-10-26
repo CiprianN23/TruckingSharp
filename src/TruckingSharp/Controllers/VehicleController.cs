@@ -1,9 +1,9 @@
-﻿using TruckingSharp.World;
-using SampSharp.GameMode.Controllers;
+﻿using SampSharp.GameMode.Controllers;
+using TruckingSharp.World;
 
 namespace TruckingSharp.Controllers
 {
-    class VehicleController : BaseVehicleController
+    internal class VehicleController : BaseVehicleController
     {
         public override void RegisterTypes()
         {

@@ -1,8 +1,8 @@
-﻿using TruckingSharp.Database;
+﻿using SampSharp.GameMode.Display;
+using SampSharp.GameMode.SAMP;
+using TruckingSharp.Database;
 using TruckingSharp.Database.UnitsOfWork;
 using TruckingSharp.World;
-using SampSharp.GameMode.Display;
-using SampSharp.GameMode.SAMP;
 
 namespace TruckingSharp.Extensions.PlayersExtensions
 {
@@ -34,6 +34,7 @@ namespace TruckingSharp.Extensions.PlayersExtensions
                             moneyDepositDialog.Show(player);
                             moneyDepositDialog.Response += MoneyDepositDialog_Response;
                             break;
+
                         case 1:
                             if (player.BankAccount.Money <= 0)
                             {
@@ -49,6 +50,7 @@ namespace TruckingSharp.Extensions.PlayersExtensions
                             moneyWithdrawDialog.Show(player);
                             moneyWithdrawDialog.Response += MoneyWithdrawDialog_Response;
                             break;
+
                         case 2:
                             if (player.BankAccount.Money < 1)
                             {
@@ -64,6 +66,7 @@ namespace TruckingSharp.Extensions.PlayersExtensions
                             moneyTransferDialog.Show(player);
                             moneyTransferDialog.Response += MoneyTransferDialog_Response;
                             break;
+
                         case 3:
                             string hasMoneyMessage = string.Empty;
                             if (player.BankAccount.Money > 0)

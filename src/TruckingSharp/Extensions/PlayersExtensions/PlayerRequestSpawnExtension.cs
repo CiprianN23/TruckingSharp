@@ -1,12 +1,12 @@
-﻿using TruckingSharp.Constants;
-using TruckingSharp.Data;
-using TruckingSharp.Data.ClassesSpawn;
-using TruckingSharp.World;
-using SampSharp.GameMode;
+﻿using SampSharp.GameMode;
 using SampSharp.GameMode.Events;
 using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.World;
 using System;
+using TruckingSharp.Constants;
+using TruckingSharp.Data;
+using TruckingSharp.Data.ClassesSpawn;
+using TruckingSharp.World;
 
 namespace TruckingSharp.Extensions.PlayersExtensions
 {

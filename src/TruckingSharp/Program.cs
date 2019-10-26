@@ -1,9 +1,9 @@
-﻿using TruckingSharp.Database;
-using SampSharp.Core;
+﻿using SampSharp.Core;
+using TruckingSharp.Database;
 
 namespace TruckingSharp
 {
-    class Program
+    internal class Program
     {
         private static void Main()
         {

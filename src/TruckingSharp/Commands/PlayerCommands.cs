@@ -1,4 +1,10 @@
-﻿using TruckingSharp.Commands.Permissions;
+﻿using SampSharp.GameMode;
+using SampSharp.GameMode.Display;
+using SampSharp.GameMode.SAMP;
+using SampSharp.GameMode.SAMP.Commands;
+using SampSharp.GameMode.World;
+using System.Text;
+using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
 using TruckingSharp.Data;
 using TruckingSharp.Data.ClassesSpawn;
@@ -7,12 +13,6 @@ using TruckingSharp.Database.Entities;
 using TruckingSharp.Database.UnitsOfWork;
 using TruckingSharp.Extensions.PlayersExtensions;
 using TruckingSharp.World;
-using SampSharp.GameMode;
-using SampSharp.GameMode.Display;
-using SampSharp.GameMode.SAMP;
-using SampSharp.GameMode.SAMP.Commands;
-using SampSharp.GameMode.World;
-using System.Text;
 
 namespace TruckingSharp.Commands
 {
@@ -176,6 +176,7 @@ namespace TruckingSharp.Commands
 
                     dialogSpawns.Response += (sender, e) => DialogSpawns_Response(sender, e, Data.PlayerClasses.TruckDriver);
                     break;
+
                 case Data.PlayerClasses.BusDriver:
                     dialogSpawns.AddItem("Los Santos");
                     dialogSpawns.AddItem("San Fierro");
@@ -183,6 +184,7 @@ namespace TruckingSharp.Commands
 
                     dialogSpawns.Response += (sender, e) => DialogSpawns_Response(sender, e, Data.PlayerClasses.BusDriver);
                     break;
+
                 case Data.PlayerClasses.Pilot:
                     dialogSpawns.AddItem("Los Santos");
                     dialogSpawns.AddItem("San Fierro");
@@ -190,6 +192,7 @@ namespace TruckingSharp.Commands
 
                     dialogSpawns.Response += (sender, e) => DialogSpawns_Response(sender, e, Data.PlayerClasses.Pilot);
                     break;
+
                 case Data.PlayerClasses.Police:
                     dialogSpawns.AddItem("Los Santos");
                     dialogSpawns.AddItem("San Fierro");
@@ -197,6 +200,7 @@ namespace TruckingSharp.Commands
 
                     dialogSpawns.Response += (sender, e) => DialogSpawns_Response(sender, e, Data.PlayerClasses.Police);
                     break;
+
                 case Data.PlayerClasses.Courier:
                     dialogSpawns.AddItem("Los Santos");
                     dialogSpawns.AddItem("San Fierro");
@@ -207,12 +211,10 @@ namespace TruckingSharp.Commands
             }
 
             dialogSpawns.Show(sender);
-
         }
 
         private static void DialogSpawns_Response(object sender, SampSharp.GameMode.Events.DialogResponseEventArgs e, PlayerClasses classId)
         {
-
             if (e.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
             {
                 var player = e.Player;
@@ -225,24 +227,28 @@ namespace TruckingSharp.Commands
                             _ => TruckerSpawn.TruckerSpawns[e.ListItem].Position,
                         };
                         break;
+
                     case Data.PlayerClasses.BusDriver:
                         player.Position = e.ListItem switch
                         {
                             _ => BusDriverSpawn.BusDriverSpawns[e.ListItem].Position,
                         };
                         break;
+
                     case Data.PlayerClasses.Pilot:
                         player.Position = e.ListItem switch
                         {
                             _ => PilotSpawn.PilotSpawns[e.ListItem].Position,
                         };
                         break;
+
                     case Data.PlayerClasses.Police:
                         player.Position = e.ListItem switch
                         {
                             _ => PoliceSpawn.PoliceSpawns[e.ListItem].Position,
                         };
                         break;
+
                     case Data.PlayerClasses.Courier:
                         player.Position = e.ListItem switch
                         {
@@ -345,24 +351,31 @@ namespace TruckingSharp.Commands
                 case PlayerClasses.TruckDriver:
                     className = Messages.TruckerClass;
                     break;
+
                 case PlayerClasses.BusDriver:
                     className = Messages.BusDriverClass;
                     break;
+
                 case PlayerClasses.Pilot:
                     className = Messages.PilotClass;
                     break;
+
                 case PlayerClasses.Police:
                     className = Messages.PoliceClass;
                     break;
+
                 case PlayerClasses.Mafia:
                     className = Messages.MafiaClass;
                     break;
+
                 case PlayerClasses.Courier:
                     className = Messages.CourierClass;
                     break;
+
                 case PlayerClasses.Assistance:
                     className = Messages.AssistanceClass;
                     break;
+
                 case PlayerClasses.RoadWorker:
                     className = Messages.RoadWorkerClass;
                     break;
@@ -378,7 +391,6 @@ namespace TruckingSharp.Commands
                     player.SendClientMessage(Color.Gray, $"({className} chat) {{D0D0D0}}{sender.Name}: {{FFFFFF}}{message}");
                 }
             }
-
         }
 
         [Command("rules", Shortcut = "rules")]
@@ -400,21 +412,20 @@ namespace TruckingSharp.Commands
             {
                 if (e.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left && sender.Account.RulesRead == 0)
                 {
-                    var account = sender.Account;
+                    sender.GiveMoney(5000);
 
-                    account.Money += 5000;
+                    var account = sender.Account;
                     account.RulesRead = 1;
 
-                    sender.Money = account.Money;
-
                     using var uow = new UnitOfWork(DapperConnection.ConnectionString);
-                    await uow.PlayerAccountRepository.UpdateAsync(account);
+                    await uow.PlayerAccountRepository.UpdateAsync(account).ConfigureAwait(false);
                     uow.CommitAsync();
 
                     sender.SendClientMessage(Color.FromInteger(65280, ColorFormat.RGB), "You have earned {FFFF00}$5000{00FF00} for accepting the rules");
                 }
             };
         }
+
         [Command("changepassword", Shortcut = "changepassword")]
         public static void OnChangedPasswordCommand(Player sender)
         {
@@ -469,14 +480,12 @@ namespace TruckingSharp.Commands
                         }
                     };
                 }
-
             };
         }
 
         [Command("bank", Shortcut = "bank")]
         public static void OnBankCommand(Player sender)
         {
-
             if (!sender.IsLoggedInBankAccount)
             {
                 if (sender.BankAccount == null)
@@ -534,7 +543,6 @@ namespace TruckingSharp.Commands
             {
                 sender.ShowBankAccountOptions();
             }
-
         }
     }
 }

@@ -1,10 +1,10 @@
-﻿using TruckingSharp.Controllers;
-using TruckingSharp.Data;
-using SampSharp.GameMode; // Contains BaseMode class
+﻿using SampSharp.GameMode; // Contains BaseMode class
 using SampSharp.GameMode.Controllers; // Contains ControllerCollection class
 using SampSharp.GameMode.Definitions;
 using SampSharp.GameMode.World;
 using System;
+using TruckingSharp.Controllers;
+using TruckingSharp.Data;
 
 namespace TruckingSharp
 {
@@ -45,7 +45,7 @@ namespace TruckingSharp
             controllers.Override(new VehicleController());
         }
 
-        #endregion
+        #endregion Overrides of BaseMode
 
         private void CreateClasses()
         {
@@ -118,7 +118,7 @@ namespace TruckingSharp
             JobVehicles.TruckerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.DFT30, new Vector3(-545.0, -475.0, 26.0), 180.0f, -1, -1, 600));
             JobVehicles.TruckerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Flatbed, new Vector3(-550.0, -475.0, 26.0), 180.0f, -1, -1, 600));
 
-            #endregion
+            #endregion Fallen Tree Depot
 
             #region Flint Trucking Depot
 
@@ -132,7 +132,7 @@ namespace TruckingSharp
             JobVehicles.TruckerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Flatbed, new Vector3(-56.0, -1146.0, 1.25), 335.0f, -1, -1, 600));
             JobVehicles.TruckerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Flatbed, new Vector3(-61.0, -1144.0, 1.25), 335.0f, -1, -1, 600));
 
-            #endregion
+            #endregion Flint Trucking Depot
 
             #region LVA Freight Depot
 
@@ -159,7 +159,7 @@ namespace TruckingSharp
             JobVehicles.TruckerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Tanker, new Vector3(1490.0, 1065.0, 11.0), 90.0f, -1, -1, 600));
             JobVehicles.TruckerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Roadtrain, new Vector3(1490.0, 1070.0, 11.0), 90.0f, -1, -1, 600));
 
-            #endregion
+            #endregion LVA Freight Depot
 
             #region Doherty Depot
 
@@ -185,7 +185,7 @@ namespace TruckingSharp
             JobVehicles.TruckerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Tanker, new Vector3(-2144.0, -206.0, 35.5), 270.0f, -1, -1, 600));
             JobVehicles.TruckerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Roadtrain, new Vector3(-2144.0, -211.0, 35.5), 270.0f, -1, -1, 600));
 
-            #endregion
+            #endregion Doherty Depot
 
             #region El Corona Depot
 
@@ -203,7 +203,7 @@ namespace TruckingSharp
             JobVehicles.TruckerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Tanker, new Vector3(1770.0, -2070.0, 14.0), 0.0f, -1, -1, 600));
             JobVehicles.TruckerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Roadtrain, new Vector3(1775.0, -2070.0, 14.0), 0.0f, -1, -1, 600));
 
-            #endregion
+            #endregion El Corona Depot
 
             #region Las Payasdas Depot
 
@@ -242,9 +242,9 @@ namespace TruckingSharp
             JobVehicles.TruckerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Tanker, new Vector3(-512.0, 2555.0, 54.0), 90.0f, -1, -1, 600));
             JobVehicles.TruckerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Roadtrain, new Vector3(-512.0, 2550.0, 54.0), 90.0f, -1, -1, 600));
 
-            #endregion
+            #endregion Las Payasdas Depot
 
-            #region  Quarry Top
+            #region Quarry Top
 
             JobVehicles.TruckerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.CementTruck, new Vector3(340.0, 850.0, 21.0), 0.0f, -1, -1, 600));
             JobVehicles.TruckerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.CementTruck, new Vector3(335.0, 860.0, 21.0), 0.0f, -1, -1, 600));
@@ -252,7 +252,7 @@ namespace TruckingSharp
             JobVehicles.TruckerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.CementTruck, new Vector3(325.0, 880.0, 21.0), 0.0f, -1, -1, 600));
             JobVehicles.TruckerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.CementTruck, new Vector3(320.0, 890.0, 21.0), 0.0f, -1, -1, 600));
 
-            #endregion
+            #endregion Quarry Top
 
             #region Shady Creek Depot
 
@@ -269,7 +269,7 @@ namespace TruckingSharp
             JobVehicles.TruckerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Tanker, new Vector3(-1574.15, -2733.32, 49.0), 145.0f, -1, -1, 600));
             JobVehicles.TruckerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Roadtrain, new Vector3(-1578.25, -2730.45, 49.0), 145.0f, -1, -1, 600));
 
-            #endregion
+            #endregion Shady Creek Depot
         }
 
         private void SpawnBuses()
@@ -300,9 +300,11 @@ namespace TruckingSharp
             JobVehicles.BusDriverJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Coach, new Vector3(1085.0, 1275.0, 11.0), 90.0f, -1, -1, 600));
             JobVehicles.BusDriverJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Coach, new Vector3(1085.0, 1280.0, 11.0), 90.0f, -1, -1, 600));
         }
+
         private void SpawnPoliceCars()
         {
             #region Los Santos Police Impound
+
             JobVehicles.PoliceJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.PoliceCarLSPD, new Vector3(1555.0, -1710.75, 6.0), 0.0f, 0, 1, 600));
             JobVehicles.PoliceJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.HPV1000, new Vector3(1560.0, -1710.75, 6.0), 0.0f, 0, 1, 600));
             JobVehicles.PoliceJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.PoliceRanger, new Vector3(1565.0, -1710.75, 6.0), 0.0f, 0, 1, 600));
@@ -312,9 +314,11 @@ namespace TruckingSharp
             JobVehicles.PoliceJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.PoliceCarLSPD, new Vector3(1585.0, -1710.75, 6.0), 0.0f, 0, 1, 600));
             JobVehicles.PoliceJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.HPV1000, new Vector3(1590.0, -1710.75, 6.0), 0.0f, 0, 1, 600));
             JobVehicles.PoliceJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.PoliceRanger, new Vector3(1595.0, -1710.75, 6.0), 0.0f, 0, 1, 600));
-            #endregion
+
+            #endregion Los Santos Police Impound
 
             #region San Fierro Police Impound
+
             JobVehicles.PoliceJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.PoliceCarSFPD, new Vector3(-1573.0, 701.0, -5.0), 90.0f, 0, 1, 600));
             JobVehicles.PoliceJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.HPV1000, new Vector3(-1573.0, 706.0, -5.0), 90.0f, 0, 1, 600));
             JobVehicles.PoliceJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.PoliceRanger, new Vector3(-1573.0, 711.0, -5.0), 90.0f, 0, 1, 600));
@@ -324,9 +328,11 @@ namespace TruckingSharp
             JobVehicles.PoliceJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.PoliceCarSFPD, new Vector3(-1573.0, 731.0, -5.0), 90.0f, 0, 1, 600));
             JobVehicles.PoliceJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.HPV1000, new Vector3(-1573.0, 736.0, -5.0), 90.0f, 0, 1, 600));
             JobVehicles.PoliceJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.PoliceRanger, new Vector3(-1573.0, 741.0, -5.0), 90.0f, 0, 1, 600));
-            #endregion
+
+            #endregion San Fierro Police Impound
 
             #region Las Venturas Police Impound
+
             JobVehicles.PoliceJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.PoliceCarLVPD, new Vector3(2282.0, 2477.0, 11.0), 180.0f, 0, 1, 600));
             JobVehicles.PoliceJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.HPV1000, new Vector3(2277.0, 2477.0, 11.0), 180.0f, 0, 1, 600));
             JobVehicles.PoliceJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.PoliceRanger, new Vector3(2272.0, 2477.0, 11.0), 180.0f, 0, 1, 600));
@@ -340,9 +346,10 @@ namespace TruckingSharp
             JobVehicles.PoliceJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.PoliceCarLVPD, new Vector3(2262.0, 2443.0, 11.0), 0.0f, 0, 1, 600));
             JobVehicles.PoliceJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.HPV1000, new Vector3(2257.0, 2443.0, 11.0), 0.0f, 0, 1, 600));
             JobVehicles.PoliceJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.PoliceRanger, new Vector3(2252.0, 2443.0, 11.0), 0.0f, 0, 1, 600));
-            #endregion
 
+            #endregion Las Venturas Police Impound
         }
+
         private void SpawnMafiaCars()
         {
             JobVehicles.MafiaJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Sandking, new Vector3(2811.0, 900.0, 10.8), 0.0f, 0, 0, 600));
@@ -360,6 +367,7 @@ namespace TruckingSharp
             JobVehicles.MafiaJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Roadtrain, new Vector3(2822, 966.0, 10.8), 180.0f, 0, 0, 600));
             JobVehicles.MafiaJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Roadtrain, new Vector3(2827, 966.0, 10.8), 180.0f, 0, 0, 600));
         }
+
         private void SpawnPilotPlanes()
         {
             JobVehicles.PilotJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Shamal, new Vector3(1990.0, -2295.0, 14.5), 90.0f, -1, -1, 300));
@@ -393,6 +401,7 @@ namespace TruckingSharp
             JobVehicles.PilotJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Maverick, new Vector3(1650.0, 1542, 10.9), 90.0f, -1, -1, 300));
             JobVehicles.PilotJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Maverick, new Vector3(1635.0, 1534, 10.9), 0.0f, -1, -1, 300));
         }
+
         private void SpawnAssistanceVehicles()
         {
             JobVehicles.AssistanceJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Towtruck, new Vector3(220.0, 34.0, 2.6), 270.0f, -1, -1, 300));
@@ -404,6 +413,7 @@ namespace TruckingSharp
             JobVehicles.AssistanceJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Towtruck, new Vector3(220.0, 4.0, 2.6), 270.0f, -1, -1, 300));
             JobVehicles.AssistanceJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Towtruck, new Vector3(220.0, -1.0, 2.6), 270.0f, -1, -1, 300));
         }
+
         private void SpawnCourierVehicles()
         {
             JobVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Burrito, new Vector3(784.0, -610.0, 16.4), 0.0f, -1, -1, 300));
@@ -437,6 +447,7 @@ namespace TruckingSharp
             JobVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Faggio, new Vector3(1077.5, 1915.25, 10.9), 0.0f, -1, -1, 300));
             JobVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Faggio, new Vector3(1087.5, 1915.25, 10.9), 0.0f, -1, -1, 300));
         }
+
         private void SpawnRoadworkerVehicles()
         {
             JobVehicles.RoadworkerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.UtilityVan, new Vector3(-1895.0, -1705.0, 21.5), 180.0f, -1, -1, 300));

@@ -1,8 +1,8 @@
-﻿using TruckingSharp.Constants;
+﻿using SampSharp.GameMode;
+using SampSharp.GameMode.Events;
+using TruckingSharp.Constants;
 using TruckingSharp.Data;
 using TruckingSharp.World;
-using SampSharp.GameMode;
-using SampSharp.GameMode.Events;
 
 namespace TruckingSharp.Extensions.PlayersExtensions
 {
@@ -29,36 +29,43 @@ namespace TruckingSharp.Extensions.PlayersExtensions
                     player.GameText(Messages.TruckerClass, 3000, 4);
                     player.PlayerClass = PlayerClasses.TruckDriver;
                     break;
+
                 case 8:
                 case 9:
                     player.GameText(Messages.BusDriverClass, 3000, 4);
                     player.PlayerClass = PlayerClasses.BusDriver;
                     break;
+
                 case 10:
                     player.GameText(Messages.PilotClass, 3000, 4);
                     player.PlayerClass = PlayerClasses.Pilot;
                     break;
+
                 case 11:
                 case 12:
                 case 13:
                     player.GameText(Messages.PoliceClass, 3000, 4);
                     player.PlayerClass = PlayerClasses.Police;
                     break;
+
                 case 14:
                 case 15:
                 case 16:
                     player.GameText(Messages.MafiaClass, 3000, 4);
                     player.PlayerClass = PlayerClasses.Mafia;
                     break;
+
                 case 17:
                 case 18:
                     player.GameText(Messages.CourierClass, 3000, 4);
                     player.PlayerClass = PlayerClasses.Courier;
                     break;
+
                 case 19:
                     player.GameText(Messages.AssistanceClass, 3000, 4);
                     player.PlayerClass = PlayerClasses.Assistance;
                     break;
+
                 case 20:
                 case 21:
                 case 22:
