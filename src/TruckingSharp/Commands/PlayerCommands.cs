@@ -471,7 +471,7 @@ namespace TruckingSharp.Commands
                                     var account = sender.Account;
                                     account.Password = BCrypt.Net.BCrypt.HashPassword(e.InputText);
                                     using var uow = new UnitOfWork(DapperConnection.ConnectionString);
-                                    await uow.PlayerAccountRepository.UpdateAsync(account);
+                                    await uow.PlayerAccountRepository.UpdateAsync(account).ConfigureAwait(false);
                                     uow.CommitAsync();
 
                                     sender.SendClientMessage(Color.GreenYellow, "You password was changed successfully.");

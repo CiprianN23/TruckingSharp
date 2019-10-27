@@ -91,16 +91,14 @@ namespace TruckingSharp.Extensions.PlayersExtensions
             {
                 var player = e.Player as Player;
 
-                using var uow = new UnitOfWork(DapperConnection.ConnectionString);
-
                 if (player.BankAccount.Money > 0)
                 {
-                    var playerAccount = player.Account;
-                    playerAccount.Money += player.BankAccount.Money;
-                    uow.PlayerAccountRepository.Update(playerAccount);
+                    player.GiveMoney(player.BankAccount.Money);
 
                     player.SendClientMessage(Color.GreenYellow, "There was still some money in your bank account, it has been added to your account.");
                 }
+
+                using var uow = new UnitOfWork(DapperConnection.ConnectionString);
 
                 var playerBankAccount = player.BankAccount;
                 uow.PlayerBankAccountRepository.Delete(playerBankAccount);
@@ -214,11 +212,9 @@ namespace TruckingSharp.Extensions.PlayersExtensions
                     var playerBankAccount = player.BankAccount;
                     playerBankAccount.Money -= withdrawMoney;
 
-                    var playerAccount = player.Account;
-                    playerAccount.Money += withdrawMoney;
+                    player.GiveMoney(withdrawMoney);
 
                     using var uow = new UnitOfWork(DapperConnection.ConnectionString);
-                    uow.PlayerAccountRepository.Update(playerAccount);
                     uow.PlayerBankAccountRepository.Update(playerBankAccount);
                     uow.Commit();
 
@@ -258,11 +254,9 @@ namespace TruckingSharp.Extensions.PlayersExtensions
                     var playerBankAccount = player.BankAccount;
                     playerBankAccount.Money += depositMoney;
 
-                    var playerAccount = player.Account;
-                    playerAccount.Money -= depositMoney;
+                    player.GiveMoney(depositMoney);
 
                     using var uow = new UnitOfWork(DapperConnection.ConnectionString);
-                    uow.PlayerAccountRepository.Update(playerAccount);
                     uow.PlayerBankAccountRepository.Update(playerBankAccount);
                     uow.Commit();
 

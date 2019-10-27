@@ -123,13 +123,6 @@ namespace TruckingSharp.World
                         ToggleSpectating(false);
                         IsLoggedIn = true;
 
-                        _updateMoneyTimer = new Timer(500, true);
-                        _updateMoneyTimer.Tick += (obj, evv) =>
-                        {
-                            if (Money < Account.Money || Money > Account.Money)
-                                base.Money = Account.Money;
-                        };
-
                         base.Money = Account.Money;
                     }
                     else
@@ -171,7 +164,7 @@ namespace TruckingSharp.World
             });
         }
 
-        public override async void GiveMoney(int money)
+        public override void GiveMoney(int money)
         {
             var account = Account;
 
@@ -180,8 +173,8 @@ namespace TruckingSharp.World
             Money = account.Money;
 
             using var uow = new UnitOfWork(DapperConnection.ConnectionString);
-            await uow.PlayerAccountRepository.UpdateAsync(account).ConfigureAwait(false);
-            uow.CommitAsync();
+            uow.PlayerAccountRepository.Update(account);
+            uow.Commit();
         }
 
         public override void OnDisconnected(DisconnectEventArgs e)
@@ -301,20 +294,13 @@ namespace TruckingSharp.World
 
         public override void OnText(TextEventArgs e)
         {
-            if (IsLoggedIn == false)
+            if (!IsLoggedIn)
                 return;
 
             if (Account.Muted > 0)
                 return;
 
             base.OnText(e);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            _updateMoneyTimer.Dispose();
-
-            base.Dispose(disposing);
         }
     }
 }
