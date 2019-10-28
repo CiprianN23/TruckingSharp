@@ -3,6 +3,7 @@ using SampSharp.GameMode.Display;
 using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.SAMP.Commands;
 using SampSharp.GameMode.World;
+using System;
 using System.Text;
 using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
@@ -19,43 +20,151 @@ namespace TruckingSharp.Commands
     [CommandGroup("player", PermissionChecker = typeof(LoggedPermission))]
     public class PlayerCommands
     {
-        [Command("me", Shortcut = "me")]
-        public static void OnMeCommand(BasePlayer sender, string action)
+        [Command("admins", Shortcut = "admins")]
+        public static void OnAdminsCommand(BasePlayer sender)
         {
-            if (action.Length > 101)
+            var dialogAdmins = new ListDialog("Online admins:", "Close");
+
+            foreach (Player player in Player.All)
             {
-                sender.SendClientMessage(Color.Silver, Messages.MessageTooLongWithLimit, 101);
-                return;
+                if (!player.IsLoggedIn)
+                    continue;
+
+                if (player.IsAdmin)
+                {
+                    dialogAdmins.AddItem($"{AdminRanks.AdminLevelNames[player.Account.AdminLevel]}: {player.Name} (id: {player.Id}), admin-level: {player.Account.AdminLevel} (RCON admin)");
+                    continue;
+                }
+
+                if (player.Account.AdminLevel > 0)
+                {
+                    dialogAdmins.AddItem($"{AdminRanks.AdminLevelNames[player.Account.AdminLevel]}: {player.Name} (id: {player.Id}), admin-level: {player.Account.AdminLevel}");
+                }
             }
 
-            BasePlayer.SendClientMessageToAll(Color.LightYellow, $"* {sender.Name} {action} {{808080}}(/me)");
+            if (dialogAdmins.Items.Count > 0)
+                dialogAdmins.Show(sender);
+            else
+                sender.SendClientMessage(Color.Red, "No admin online.");
         }
 
-        [Command("pm", Shortcut = "pm")]
-        public static void OnPmCommand(BasePlayer sender, Player target, string message)
+        [Command("bank", Shortcut = "bank")]
+        public static void OnBankCommand(Player sender)
         {
-            if (sender == target)
+            if (!sender.IsLoggedInBankAccount)
             {
-                sender.SendClientMessage(Color.Red, Messages.NoPrivMessageToYou);
-                return;
-            }
+                if (sender.BankAccount == null)
+                {
+                    var registerNewBankAccountDialog = new InputDialog("Enter a password", "Please enter a password to register your bank account:", true, "Accept", "Cancel");
+                    registerNewBankAccountDialog.Show(sender);
+                    registerNewBankAccountDialog.Response += (senderObject, e) =>
+                    {
+                        if (e.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
+                        {
+                            if (e.InputText.Length < 1 || e.InputText.Length > 20)
+                            {
+                                sender.SendClientMessage(Color.Red, "Invalid password length. Password must be between 1 and 20 characters.");
+                                registerNewBankAccountDialog.Show(sender);
+                                return;
+                            }
 
-            if (!target.IsLoggedIn)
+                            var hash = BCrypt.Net.BCrypt.HashPassword(e.InputText);
+                            var newBankAccount = new PlayerBankAccount { Password = hash, PlayerId = sender.Account.Id };
+                            using var uow = new UnitOfWork(DapperConnection.ConnectionString);
+                            uow.PlayerBankAccountRepository.Add(newBankAccount);
+                            uow.Commit();
+
+                            sender.SendClientMessage(Color.GreenYellow, "Bank account created successfully.");
+                        }
+                    };
+                }
+                else
+                {
+                    var loginBankAccount = new InputDialog("Enter a password", "Enter a password to login to your bank account:", true, "Accept", "Cancel");
+                    loginBankAccount.Show(sender);
+                    loginBankAccount.Response += (senderObject, e) =>
+                    {
+                        if (e.InputText.Length < 1 || e.InputText.Length > 20)
+                        {
+                            sender.SendClientMessage(Color.Red, "Invalid password lenght. Password must be between 1 adn 20 characters.");
+                            loginBankAccount.Show(sender);
+                            return;
+                        }
+
+                        if (!BCrypt.Net.BCrypt.Verify(e.InputText, sender.BankAccount.Password))
+                        {
+                            sender.SendClientMessage(Color.Red, "Incorrect password. Try again.");
+                            loginBankAccount.Show(sender);
+                            return;
+                        }
+
+                        sender.IsLoggedInBankAccount = true;
+                        sender.SendClientMessage(Color.GreenYellow, "You have successfully logged in your bank account.");
+                        sender.ShowBankAccountOptions();
+                    };
+                }
+            }
+            else
             {
-                sender.SendClientMessage(Color.Orange, Messages.PlayerNotLoggedIn);
-                return;
+                sender.ShowBankAccountOptions();
             }
+        }
 
-            if (message.Length > 102)
+        [Command("changepassword", Shortcut = "changepassword")]
+        public static void OnChangedPasswordCommand(Player sender)
+        {
+            var oldPasswordDialog = new InputDialog("Enter your old password", "Enter your old password:", true, "Next", "Close");
+            oldPasswordDialog.Show(sender);
+            oldPasswordDialog.Response += (senderObject, ev) =>
             {
-                sender.SendClientMessage(Color.Silver, Messages.MessageTooLongWithLimit, 102);
-                return;
-            }
+                if (ev.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
+                {
+                    if (!BCrypt.Net.BCrypt.Verify(ev.InputText, sender.Account.Password))
+                    {
+                        sender.SendClientMessage(Color.Red, "The password doesn't match.");
+                        oldPasswordDialog.Show(sender);
+                        return;
+                    }
 
-            sender.SendClientMessage(Color.LightGoldenrodYellow, Messages.PrivMessageTo, target.Name, target.Id, message);
-            target.SendClientMessage(Color.LightGoldenrodYellow, Messages.PrivMessageFrom, sender.Name, sender.Id, message);
+                    var newPasswordDialog = new InputDialog("Enter your new password", "Enter your new password:", true, "Next", "Close");
+                    newPasswordDialog.Show(sender);
+                    newPasswordDialog.Response += (objectSender, e) =>
+                    {
+                        if (e.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
+                        {
+                            if (e.InputText.Length < 1)
+                            {
+                                sender.SendClientMessage(Color.Red, "The password can't be empty.");
+                                newPasswordDialog.Show(sender);
+                                return;
+                            }
 
-            target.PlaySound(1085, Vector3.Zero);
+                            if (BCrypt.Net.BCrypt.Verify(e.InputText, sender.Account.Password))
+                            {
+                                sender.SendClientMessage(Color.Red, "The password can't be same as old one.");
+                                newPasswordDialog.Show(sender);
+                                return;
+                            }
+
+                            var confirmPasswordDialog = new MessageDialog("Confirm password change", "Are you sure you want to change your password?", "Yes", "No");
+                            confirmPasswordDialog.Show(sender);
+                            confirmPasswordDialog.Response += async (objectSender1, evv) =>
+                            {
+                                if (evv.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
+                                {
+                                    var account = sender.Account;
+                                    account.Password = BCrypt.Net.BCrypt.HashPassword(e.InputText);
+                                    using var uow = new UnitOfWork(DapperConnection.ConnectionString);
+                                    await uow.PlayerAccountRepository.UpdateAsync(account).ConfigureAwait(false);
+                                    uow.CommitAsync();
+
+                                    sender.SendClientMessage(Color.GreenYellow, "You password was changed successfully.");
+                                }
+                            };
+                        }
+                    };
+                }
+            };
         }
 
         [Command("detach", Shortcut = "detach")]
@@ -86,6 +195,60 @@ namespace TruckingSharp.Commands
             sender.SendClientMessage(Color.Blue, Messages.TrailerDetached);
         }
 
+        [Command("eject", Shortcut = "eject")]
+        public static void OnEjectCommand(BasePlayer sender, Player target)
+        {
+            if (sender == target)
+            {
+                sender.SendClientMessage(Color.Red, "You can't eject yourself from the vehicle.");
+                return;
+            }
+
+            if (!target.IsLoggedIn)
+            {
+                sender.SendClientMessage(Color.Red, "Thatp layer is not logged in.");
+                return;
+            }
+
+            if (sender.VehicleSeat != 0)
+            {
+                sender.SendClientMessage(Color.Red, "You are not the driver of the vehicle.");
+                return;
+            }
+
+            if (target.Vehicle != sender.Vehicle)
+            {
+                sender.SendClientMessage(Color.Red, "That player is not in your vehicle.");
+                return;
+            }
+
+            target.RemoveFromVehicle();
+            target.SendClientMessage(Color.Red, $"You have been ejected from vehicle by {{FFFF00}} {sender.Name}");
+
+            sender.SendClientMessage(Color.White, $"You have ejected {{FFFF00}}{target.Name}{{00FF00}} from your vehicle.");
+        }
+
+        [Command("engine", Shortcut = "engine")]
+        public static void OnEngineCommand(BasePlayer sender)
+        {
+            if (sender.State != SampSharp.GameMode.Definitions.PlayerState.Driving)
+            {
+                sender.SendClientMessage(Color.Red, "You are not driving the car.");
+                return;
+            }
+
+            if (sender.Vehicle.Engine)
+            {
+                sender.SendClientMessage(Color.Green, "You have turned off the engine.");
+                sender.Vehicle.Engine = false;
+            }
+            else
+            {
+                sender.SendClientMessage(Color.Green, "You have turned on the engine.");
+                sender.Vehicle.Engine = true;
+            }
+        }
+
         [Command("flip", Shortcut = "flip")]
         public static void OnFlipCommand(BasePlayer sender)
         {
@@ -106,31 +269,6 @@ namespace TruckingSharp.Commands
             sender.Vehicle.Angle = 0.0f;
 
             sender.SendClientMessage(Color.Blue, Messages.VehicleFlipped);
-        }
-
-        [Command("reclass", Shortcut = "reclass")]
-        public static void OnReclassCommand(Player sender)
-        {
-            if (sender.IsPlayerInBuilding())
-            {
-                sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedInsideBuilding);
-                return;
-            }
-
-            if (sender.State != SampSharp.GameMode.Definitions.PlayerState.OnFoot)
-            {
-                sender.SendClientMessage(Color.Red, Messages.MustBeOnFoot);
-                return;
-            }
-
-            if (sender.Account.Wanted != 0)
-            {
-                sender.SendClientMessage(Color.Red, Messages.MustBeInnocent);
-                return;
-            }
-
-            sender.ForceClassSelection();
-            sender.Health = 0.0f;
         }
 
         [Command("gobase", Shortcut = "gobase")]
@@ -213,132 +351,43 @@ namespace TruckingSharp.Commands
             dialogSpawns.Show(sender);
         }
 
-        private static void DialogSpawns_Response(object sender, SampSharp.GameMode.Events.DialogResponseEventArgs e, PlayerClasses classId)
+        [Command("me", Shortcut = "me")]
+        public static void OnMeCommand(BasePlayer sender, string action)
         {
-            if (e.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
+            if (action.Length > 101)
             {
-                var player = e.Player;
-
-                switch (classId)
-                {
-                    case Data.PlayerClasses.TruckDriver:
-                        player.Position = e.ListItem switch
-                        {
-                            _ => TruckerSpawn.TruckerSpawns[e.ListItem].Position,
-                        };
-                        break;
-
-                    case Data.PlayerClasses.BusDriver:
-                        player.Position = e.ListItem switch
-                        {
-                            _ => BusDriverSpawn.BusDriverSpawns[e.ListItem].Position,
-                        };
-                        break;
-
-                    case Data.PlayerClasses.Pilot:
-                        player.Position = e.ListItem switch
-                        {
-                            _ => PilotSpawn.PilotSpawns[e.ListItem].Position,
-                        };
-                        break;
-
-                    case Data.PlayerClasses.Police:
-                        player.Position = e.ListItem switch
-                        {
-                            _ => PoliceSpawn.PoliceSpawns[e.ListItem].Position,
-                        };
-                        break;
-
-                    case Data.PlayerClasses.Courier:
-                        player.Position = e.ListItem switch
-                        {
-                            _ => CourierSpawn.CourierSpawns[e.ListItem].Position,
-                        };
-                        break;
-                }
-            }
-        }
-
-        [Command("engine", Shortcut = "engine")]
-        public static void OnEngineCommand(BasePlayer sender)
-        {
-            if (sender.State != SampSharp.GameMode.Definitions.PlayerState.Driving)
-            {
-                sender.SendClientMessage(Color.Red, "You are not driving the car.");
+                sender.SendClientMessage(Color.Silver, Messages.MessageTooLongWithLimit, 101);
                 return;
             }
 
-            if (sender.Vehicle.Engine)
-            {
-                sender.SendClientMessage(Color.Green, "You have turned off the engine.");
-                sender.Vehicle.Engine = false;
-            }
-            else
-            {
-                sender.SendClientMessage(Color.Green, "You have turned on the engine.");
-                sender.Vehicle.Engine = true;
-            }
+            BasePlayer.SendClientMessageToAll(Color.LightYellow, $"* {sender.Name} {action} {{808080}}(/me)");
         }
 
-        [Command("admins", Shortcut = "admins")]
-        public static void OnAdminsCommand(BasePlayer sender)
-        {
-            var dialogAdmins = new ListDialog("Online admins:", "Close");
-
-            foreach (Player player in Player.All)
-            {
-                if (!player.IsLoggedIn)
-                    continue;
-
-                if (player.IsAdmin)
-                {
-                    dialogAdmins.AddItem($"{AdminRanks.AdminLevelNames[player.Account.AdminLevel]}: {player.Name} (id: {player.Id}), admin-level: {player.Account.AdminLevel} (RCON admin)");
-                    continue;
-                }
-
-                if (player.Account.AdminLevel > 0)
-                {
-                    dialogAdmins.AddItem($"{AdminRanks.AdminLevelNames[player.Account.AdminLevel]}: {player.Name} (id: {player.Id}), admin-level: {player.Account.AdminLevel}");
-                }
-            }
-
-            if (dialogAdmins.Items.Count > 0)
-                dialogAdmins.Show(sender);
-            else
-                sender.SendClientMessage(Color.Red, "No admin online.");
-        }
-
-        [Command("eject", Shortcut = "eject")]
-        public static void OnEjectCommand(BasePlayer sender, Player target)
+        [Command("pm", Shortcut = "pm")]
+        public static void OnPmCommand(BasePlayer sender, Player target, string message)
         {
             if (sender == target)
             {
-                sender.SendClientMessage(Color.Red, "You can't eject yourself from the vehicle.");
+                sender.SendClientMessage(Color.Red, Messages.NoPrivMessageToYou);
                 return;
             }
 
             if (!target.IsLoggedIn)
             {
-                sender.SendClientMessage(Color.Red, "Thatp layer is not logged in.");
+                sender.SendClientMessage(Color.Orange, Messages.PlayerNotLoggedIn);
                 return;
             }
 
-            if (sender.VehicleSeat != 0)
+            if (message.Length > 102)
             {
-                sender.SendClientMessage(Color.Red, "You are not the driver of the vehicle.");
+                sender.SendClientMessage(Color.Silver, Messages.MessageTooLongWithLimit, 102);
                 return;
             }
 
-            if (target.Vehicle != sender.Vehicle)
-            {
-                sender.SendClientMessage(Color.Red, "That player is not in your vehicle.");
-                return;
-            }
+            sender.SendClientMessage(Color.LightGoldenrodYellow, Messages.PrivMessageTo, target.Name, target.Id, message);
+            target.SendClientMessage(Color.LightGoldenrodYellow, Messages.PrivMessageFrom, sender.Name, sender.Id, message);
 
-            target.RemoveFromVehicle();
-            target.SendClientMessage(Color.Red, $"You have been ejected from vehicle by {{FFFF00}} {sender.Name}");
-
-            sender.SendClientMessage(Color.White, $"You have ejected {{FFFF00}}{target.Name}{{00FF00}} from your vehicle.");
+            target.PlaySound(1085, Vector3.Zero);
         }
 
         [Command("radio", Shortcut = "radio")]
@@ -393,6 +442,57 @@ namespace TruckingSharp.Commands
             }
         }
 
+        [Command("reclass", Shortcut = "reclass")]
+        public static void OnReclassCommand(Player sender)
+        {
+            if (sender.IsPlayerInBuilding())
+            {
+                sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedInsideBuilding);
+                return;
+            }
+
+            if (sender.State != SampSharp.GameMode.Definitions.PlayerState.OnFoot)
+            {
+                sender.SendClientMessage(Color.Red, Messages.MustBeOnFoot);
+                return;
+            }
+
+            if (sender.Account.Wanted != 0)
+            {
+                sender.SendClientMessage(Color.Red, Messages.MustBeInnocent);
+                return;
+            }
+
+            sender.ForceClassSelection();
+            sender.Health = 0.0f;
+        }
+
+        [Command("report", Shortcut = "report")]
+        public static void OnReportCommand(BasePlayer sender, Player target, string reason)
+        {
+            if (sender == target)
+            {
+                sender.SendClientMessage(Color.Red, "You can't report yourself.");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(reason))
+            {
+                sender.SendClientMessage(Color.Red, "Reason can't be empty.");
+                return;
+            }
+
+            if (!target.IsLoggedIn)
+            {
+                sender.SendClientMessage(Color.Red, "That player is not logged in.");
+                return;
+            }
+
+            Report.SendReportToAdmins(target, reason);
+
+            sender.SendClientMessage(Color.GreenYellow, $"You have reported {{FFFF00}}{target.Name}");
+        }
+
         [Command("rules", Shortcut = "rules")]
         public static async void OnRulesCommandAsync(Player sender)
         {
@@ -426,122 +526,49 @@ namespace TruckingSharp.Commands
             };
         }
 
-        [Command("changepassword", Shortcut = "changepassword")]
-        public static void OnChangedPasswordCommand(Player sender)
+        private static void DialogSpawns_Response(object sender, SampSharp.GameMode.Events.DialogResponseEventArgs e, PlayerClasses classId)
         {
-            var oldPasswordDialog = new InputDialog("Enter your old password", "Enter your old password:", true, "Next", "Close");
-            oldPasswordDialog.Show(sender);
-            oldPasswordDialog.Response += (senderObject, ev) =>
+            if (e.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
             {
-                if (ev.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
+                var player = e.Player;
+
+                switch (classId)
                 {
-                    if (!BCrypt.Net.BCrypt.Verify(ev.InputText, sender.Account.Password))
-                    {
-                        sender.SendClientMessage(Color.Red, "The password doesn't match.");
-                        oldPasswordDialog.Show(sender);
-                        return;
-                    }
-
-                    var newPasswordDialog = new InputDialog("Enter your new password", "Enter your new password:", true, "Next", "Close");
-                    newPasswordDialog.Show(sender);
-                    newPasswordDialog.Response += (objectSender, e) =>
-                    {
-                        if (e.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
+                    case Data.PlayerClasses.TruckDriver:
+                        player.Position = e.ListItem switch
                         {
-                            if (e.InputText.Length < 1)
-                            {
-                                sender.SendClientMessage(Color.Red, "The password can't be empty.");
-                                newPasswordDialog.Show(sender);
-                                return;
-                            }
+                            _ => TruckerSpawn.TruckerSpawns[e.ListItem].Position,
+                        };
+                        break;
 
-                            if (BCrypt.Net.BCrypt.Verify(e.InputText, sender.Account.Password))
-                            {
-                                sender.SendClientMessage(Color.Red, "The password can't be same as old one.");
-                                newPasswordDialog.Show(sender);
-                                return;
-                            }
+                    case Data.PlayerClasses.BusDriver:
+                        player.Position = e.ListItem switch
+                        {
+                            _ => BusDriverSpawn.BusDriverSpawns[e.ListItem].Position,
+                        };
+                        break;
 
-                            var confirmPasswordDialog = new MessageDialog("Confirm password change", "Are you sure you want to change your password?", "Yes", "No");
-                            confirmPasswordDialog.Show(sender);
-                            confirmPasswordDialog.Response += async (objectSender1, evv) =>
-                            {
-                                if (evv.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
-                                {
-                                    var account = sender.Account;
-                                    account.Password = BCrypt.Net.BCrypt.HashPassword(e.InputText);
-                                    using var uow = new UnitOfWork(DapperConnection.ConnectionString);
-                                    await uow.PlayerAccountRepository.UpdateAsync(account).ConfigureAwait(false);
-                                    uow.CommitAsync();
+                    case Data.PlayerClasses.Pilot:
+                        player.Position = e.ListItem switch
+                        {
+                            _ => PilotSpawn.PilotSpawns[e.ListItem].Position,
+                        };
+                        break;
 
-                                    sender.SendClientMessage(Color.GreenYellow, "You password was changed successfully.");
-                                }
-                            };
-                        }
-                    };
+                    case Data.PlayerClasses.Police:
+                        player.Position = e.ListItem switch
+                        {
+                            _ => PoliceSpawn.PoliceSpawns[e.ListItem].Position,
+                        };
+                        break;
+
+                    case Data.PlayerClasses.Courier:
+                        player.Position = e.ListItem switch
+                        {
+                            _ => CourierSpawn.CourierSpawns[e.ListItem].Position,
+                        };
+                        break;
                 }
-            };
-        }
-
-        [Command("bank", Shortcut = "bank")]
-        public static void OnBankCommand(Player sender)
-        {
-            if (!sender.IsLoggedInBankAccount)
-            {
-                if (sender.BankAccount == null)
-                {
-                    var registerNewBankAccountDialog = new InputDialog("Enter a password", "Please enter a password to register your bank account:", true, "Accept", "Cancel");
-                    registerNewBankAccountDialog.Show(sender);
-                    registerNewBankAccountDialog.Response += (senderObject, e) =>
-                    {
-                        if (e.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
-                        {
-                            if (e.InputText.Length < 1 || e.InputText.Length > 20)
-                            {
-                                sender.SendClientMessage(Color.Red, "Invalid password length. Password must be between 1 and 20 characters.");
-                                registerNewBankAccountDialog.Show(sender);
-                                return;
-                            }
-
-                            var hash = BCrypt.Net.BCrypt.HashPassword(e.InputText);
-                            var newBankAccount = new PlayerBankAccount { Password = hash, PlayerId = sender.Account.Id };
-                            using var uow = new UnitOfWork(DapperConnection.ConnectionString);
-                            uow.PlayerBankAccountRepository.Add(newBankAccount);
-                            uow.Commit();
-
-                            sender.SendClientMessage(Color.GreenYellow, "Bank account created successfully.");
-                        }
-                    };
-                }
-                else
-                {
-                    var loginBankAccount = new InputDialog("Enter a password", "Enter a password to login to your bank account:", true, "Accept", "Cancel");
-                    loginBankAccount.Show(sender);
-                    loginBankAccount.Response += (senderObject, e) =>
-                    {
-                        if (e.InputText.Length < 1 || e.InputText.Length > 20)
-                        {
-                            sender.SendClientMessage(Color.Red, "Invalid password lenght. Password must be between 1 adn 20 characters.");
-                            loginBankAccount.Show(sender);
-                            return;
-                        }
-
-                        if (!BCrypt.Net.BCrypt.Verify(e.InputText, sender.BankAccount.Password))
-                        {
-                            sender.SendClientMessage(Color.Red, "Incorrect password. Try again.");
-                            loginBankAccount.Show(sender);
-                            return;
-                        }
-
-                        sender.IsLoggedInBankAccount = true;
-                        sender.SendClientMessage(Color.GreenYellow, "You have successfully logged in your bank account.");
-                        sender.ShowBankAccountOptions();
-                    };
-                }
-            }
-            else
-            {
-                sender.ShowBankAccountOptions();
             }
         }
     }

@@ -4,13 +4,13 @@ using TruckingSharp.World;
 
 namespace TruckingSharp.Commands.Permissions
 {
-    internal class LoggedPermission : IPermissionChecker
+    public class LevelOneAdminPermission : IPermissionChecker
     {
-        public string Message => "You are not logged in.";
+        public string Message => "You are not an admin.";
 
         public bool Check(BasePlayer player)
         {
-            return player is Player playerData && playerData.IsLoggedIn;
+            return player is Player playerData && playerData.IsLoggedIn && playerData.Account.AdminLevel >= 1;
         }
     }
 }
