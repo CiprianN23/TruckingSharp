@@ -57,7 +57,7 @@ namespace TruckingSharp.Database.UnitsOfWork
             finally
             {
                 await _transaction.DisposeAsync();
-                _transaction = await _connection.BeginTransactionAsync();
+                _transaction = await _connection.BeginTransactionAsync().ConfigureAwait(false);
                 ResetRepositories();
             }
         }

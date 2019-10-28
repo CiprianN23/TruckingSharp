@@ -115,7 +115,7 @@ namespace TruckingSharp.World
                     if (LoginTries >= Configuration.MaxLogins)
                     {
                         SendClientMessage(Color.OrangeRed, "You exceed maximum login tries. You have been kicked!");
-                        await Task.Delay(Configuration.KickDelay);
+                        await Task.Delay(Configuration.KickDelay).ConfigureAwait(false);
                         Kick();
                     }
                     else if (BCrypt.Net.BCrypt.Verify(ev.InputText, Account.Password))
@@ -228,7 +228,7 @@ namespace TruckingSharp.World
             if (!IsLoggedIn)
             {
                 SendClientMessage(Color.Red, Messages.FailedToLoginProperly);
-                await Task.Delay(10);
+                await Task.Delay(Configuration.KickDelay).ConfigureAwait(false);
                 Kick();
             }
         }

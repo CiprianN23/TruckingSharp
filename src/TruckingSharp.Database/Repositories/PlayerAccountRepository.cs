@@ -55,7 +55,7 @@ namespace TruckingSharp.Database.Repositories
 
         public async Task<bool> UpdateAsync(PlayerAccount entity)
         {
-            return await Connection.UpdateAsync(entity, transaction: _transaction);
+            return await Connection.UpdateAsync(entity, transaction: _transaction).ConfigureAwait(false);
         }
     }
 }
