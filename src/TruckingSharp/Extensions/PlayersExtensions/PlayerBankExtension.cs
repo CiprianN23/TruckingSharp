@@ -254,7 +254,7 @@ namespace TruckingSharp.Extensions.PlayersExtensions
                     var playerBankAccount = player.BankAccount;
                     playerBankAccount.Money += depositMoney;
 
-                    player.GiveMoney(depositMoney);
+                    player.GiveMoney(-depositMoney);
 
                     using var uow = new UnitOfWork(DapperConnection.ConnectionString);
                     uow.PlayerBankAccountRepository.Update(playerBankAccount);
