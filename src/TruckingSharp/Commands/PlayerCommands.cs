@@ -506,7 +506,7 @@ namespace TruckingSharp.Commands
 
             var dialogRules = new MessageDialog("Rules of the server:", Rules.ToString(), "Accept", "Cancel");
 
-            await dialogRules.ShowAsync(sender).ConfigureAwait(false);
+            await dialogRules.ShowAsync(sender);
 
             dialogRules.Response += async (senderObject, e) =>
             {
