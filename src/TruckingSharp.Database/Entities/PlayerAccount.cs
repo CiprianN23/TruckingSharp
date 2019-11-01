@@ -16,7 +16,7 @@ namespace TruckingSharp.Database.Entities
         public int Score { get; set; }
         public byte AdminLevel { get; set; }
         public byte RulesRead { get; set; }
-        public byte Muted { get; set; }
+        public DateTime Muted { get; set; }
         public int Jailed { get; set; }
         public int Wanted { get; set; }
         public int Bans { get; set; }
