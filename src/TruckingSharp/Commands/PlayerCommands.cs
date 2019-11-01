@@ -3,7 +3,6 @@ using SampSharp.GameMode.Display;
 using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.SAMP.Commands;
 using SampSharp.GameMode.World;
-using System;
 using System.Text;
 using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
@@ -45,7 +44,7 @@ namespace TruckingSharp.Commands
             if (dialogAdmins.Items.Count > 0)
                 dialogAdmins.Show(sender);
             else
-                sender.SendClientMessage(Color.Red, "No admin online.");
+                sender.SendClientMessage(Color.Red, Messages.NoAdminOnline);
         }
 
         [Command("bank", Shortcut = "bank")]
@@ -63,7 +62,7 @@ namespace TruckingSharp.Commands
                         {
                             if (e.InputText.Length < 1 || e.InputText.Length > 20)
                             {
-                                sender.SendClientMessage(Color.Red, "Invalid password length. Password must be between 1 and 20 characters.");
+                                sender.SendClientMessage(Color.Red, Messages.InvalidPasswordLenght, 1, 20);
                                 registerNewBankAccountDialog.Show(sender);
                                 return;
                             }
@@ -74,7 +73,7 @@ namespace TruckingSharp.Commands
                             uow.PlayerBankAccountRepository.Add(newBankAccount);
                             uow.Commit();
 
-                            sender.SendClientMessage(Color.GreenYellow, "Bank account created successfully.");
+                            sender.SendClientMessage(Color.GreenYellow, Messages.BankAccountCreatedSuccessfully);
                         }
                     };
                 }
@@ -86,20 +85,20 @@ namespace TruckingSharp.Commands
                     {
                         if (e.InputText.Length < 1 || e.InputText.Length > 20)
                         {
-                            sender.SendClientMessage(Color.Red, "Invalid password lenght. Password must be between 1 adn 20 characters.");
+                            sender.SendClientMessage(Color.Red, Messages.InvalidPasswordLenght, 1, 20);
                             loginBankAccount.Show(sender);
                             return;
                         }
 
                         if (!BCrypt.Net.BCrypt.Verify(e.InputText, sender.BankAccount.Password))
                         {
-                            sender.SendClientMessage(Color.Red, "Incorrect password. Try again.");
+                            sender.SendClientMessage(Color.Red, Messages.InvalidPasswordInputed);
                             loginBankAccount.Show(sender);
                             return;
                         }
 
                         sender.IsLoggedInBankAccount = true;
-                        sender.SendClientMessage(Color.GreenYellow, "You have successfully logged in your bank account.");
+                        sender.SendClientMessage(Color.GreenYellow, Messages.BankAccountLoggedInSuccessfully);
                         sender.ShowBankAccountOptions();
                     };
                 }
@@ -121,7 +120,7 @@ namespace TruckingSharp.Commands
                 {
                     if (!BCrypt.Net.BCrypt.Verify(ev.InputText, sender.Account.Password))
                     {
-                        sender.SendClientMessage(Color.Red, "The password doesn't match.");
+                        sender.SendClientMessage(Color.Red, Messages.PasswordsDontMatch);
                         oldPasswordDialog.Show(sender);
                         return;
                     }
@@ -134,14 +133,14 @@ namespace TruckingSharp.Commands
                         {
                             if (e.InputText.Length < 1)
                             {
-                                sender.SendClientMessage(Color.Red, "The password can't be empty.");
+                                sender.SendClientMessage(Color.Red, Messages.PasswordCanNotBeEmptyOrNull);
                                 newPasswordDialog.Show(sender);
                                 return;
                             }
 
                             if (BCrypt.Net.BCrypt.Verify(e.InputText, sender.Account.Password))
                             {
-                                sender.SendClientMessage(Color.Red, "The password can't be same as old one.");
+                                sender.SendClientMessage(Color.Red, Messages.PasswordCanNotBeAsTheOldOne);
                                 newPasswordDialog.Show(sender);
                                 return;
                             }
@@ -158,7 +157,7 @@ namespace TruckingSharp.Commands
                                     await uow.PlayerAccountRepository.UpdateAsync(account).ConfigureAwait(false);
                                     uow.CommitAsync();
 
-                                    sender.SendClientMessage(Color.GreenYellow, "You password was changed successfully.");
+                                    sender.SendClientMessage(Color.GreenYellow, Messages.PasswordChangedSuccessfully);
                                 }
                             };
                         }
@@ -178,7 +177,7 @@ namespace TruckingSharp.Commands
 
             if (sender.IsPlayerDriving())
             {
-                sender.SendClientMessage(Color.Red, Messages.CommandOnlyAvailableAsDriver);
+                sender.SendClientMessage(Color.Red, Messages.CommandAllowedOnlyAsDriver);
                 return;
             }
 
@@ -200,25 +199,25 @@ namespace TruckingSharp.Commands
         {
             if (sender == target)
             {
-                sender.SendClientMessage(Color.Red, "You can't eject yourself from the vehicle.");
+                sender.SendClientMessage(Color.Red, Messages.CommandNotAallowedOnSelf);
                 return;
             }
 
             if (!target.IsLoggedIn)
             {
-                sender.SendClientMessage(Color.Red, "Thatp layer is not logged in.");
+                sender.SendClientMessage(Color.Red, Messages.PlayerNotLoggedIn);
                 return;
             }
 
             if (sender.VehicleSeat != 0)
             {
-                sender.SendClientMessage(Color.Red, "You are not the driver of the vehicle.");
+                sender.SendClientMessage(Color.Red, Messages.CommandAllowedOnlyAsDriver);
                 return;
             }
 
             if (target.Vehicle != sender.Vehicle)
             {
-                sender.SendClientMessage(Color.Red, "That player is not in your vehicle.");
+                sender.SendClientMessage(Color.Red, Messages.PlayerNotInVehicle);
                 return;
             }
 
@@ -231,20 +230,20 @@ namespace TruckingSharp.Commands
         [Command("engine", Shortcut = "engine")]
         public static void OnEngineCommand(BasePlayer sender)
         {
-            if (sender.State != SampSharp.GameMode.Definitions.PlayerState.Driving)
+            if (!sender.IsPlayerDriving())
             {
-                sender.SendClientMessage(Color.Red, "You are not driving the car.");
+                sender.SendClientMessage(Color.Red, Messages.CommandAllowedOnlyAsDriver);
                 return;
             }
 
             if (sender.Vehicle.Engine)
             {
-                sender.SendClientMessage(Color.Green, "You have turned off the engine.");
+                sender.SendClientMessage(Color.Green, Messages.VehicleEngineTurnedOff);
                 sender.Vehicle.Engine = false;
             }
             else
             {
-                sender.SendClientMessage(Color.Green, "You have turned on the engine.");
+                sender.SendClientMessage(Color.Green, Messages.VehicleEngineTurnedOn);
                 sender.Vehicle.Engine = true;
             }
         }
@@ -260,7 +259,7 @@ namespace TruckingSharp.Commands
 
             if (sender.IsPlayerDriving())
             {
-                sender.SendClientMessage(Color.Red, Messages.CommandOnlyAvailableAsDriver);
+                sender.SendClientMessage(Color.Red, Messages.CommandAllowedOnlyAsDriver);
                 return;
             }
 
@@ -472,19 +471,19 @@ namespace TruckingSharp.Commands
         {
             if (sender == target)
             {
-                sender.SendClientMessage(Color.Red, "You can't report yourself.");
+                sender.SendClientMessage(Color.Red, Messages.CommandNotAallowedOnSelf);
                 return;
             }
 
             if (string.IsNullOrEmpty(reason))
             {
-                sender.SendClientMessage(Color.Red, "Reason can't be empty.");
+                sender.SendClientMessage(Color.Red, Messages.ReasonCanNotBeEmptyOrNull);
                 return;
             }
 
             if (!target.IsLoggedIn)
             {
-                sender.SendClientMessage(Color.Red, "That player is not logged in.");
+                sender.SendClientMessage(Color.Red, Messages.PlayerNotLoggedIn);
                 return;
             }
 
@@ -506,7 +505,7 @@ namespace TruckingSharp.Commands
 
             var dialogRules = new MessageDialog("Rules of the server:", Rules.ToString(), "Accept", "Cancel");
 
-            await dialogRules.ShowAsync(sender);
+            await dialogRules.ShowAsync(sender).ConfigureAwait(false);
 
             dialogRules.Response += async (senderObject, e) =>
             {
@@ -524,6 +523,40 @@ namespace TruckingSharp.Commands
                     sender.SendClientMessage(Color.FromInteger(65280, ColorFormat.RGB), "You have earned {FFFF00}$5000{00FF00} for accepting the rules");
                 }
             };
+        }
+
+        [Command("givecash", Shortcut = "givecash")]
+        public static void OnGiveCashCommand(Player sender, Player target, int money)
+        {
+            if (sender == target)
+            {
+                sender.SendClientMessage(Color.Red, Messages.CommandNotAallowedOnSelf);
+                return;
+            }
+
+            if (!target.IsLoggedIn)
+            {
+                sender.SendClientMessage(Color.Red, Messages.PlayerNotLoggedIn);
+                return;
+            }
+
+            if(money <= 0)
+            {
+                sender.SendClientMessage(Color.Red, Messages.ValueNeedToBePositive);
+                return;
+            }
+
+            if(sender.Account.Money < money)
+            {
+                sender.SendClientMessage(Color.Red, Messages.NotEnoughMoney);
+                return;
+            }
+
+            sender.GiveMoney(-money);
+            target.GiveMoney(money);
+
+            target.SendClientMessage($"{{00FF00}}You have received {{FFFF00}}${money}{{00FF00}} from {{FFFF00}}{sender.Name}");
+            sender.SendClientMessage($"{{00FF00}}You gave {{FFFF00}}${money}{{00FF00}} to {{FFFF00}}{target.Name}");
         }
 
         private static void DialogSpawns_Response(object sender, SampSharp.GameMode.Events.DialogResponseEventArgs e, PlayerClasses classId)

@@ -1,4 +1,5 @@
-﻿using SampSharp.GameMode.Definitions;
+﻿using SampSharp.GameMode;
+using SampSharp.GameMode.Definitions;
 using SampSharp.GameMode.Display;
 using SampSharp.GameMode.Events;
 using SampSharp.GameMode.Pools;
@@ -18,6 +19,8 @@ namespace TruckingSharp.World
     [PooledType]
     public class Player : BasePlayer
     {
+        public PlayerClasses PlayerClass;
+
         public PlayerAccount Account
         {
             get
@@ -36,15 +39,18 @@ namespace TruckingSharp.World
             }
         }
 
-        public int LoginTries { get; private set; }
-        public bool IsLoggedIn { get; set; }
-
-        private Timer _updateMoneyTimer;
-
         public bool IsDoingJob { get; set; }
+        public bool IsLoggedIn { get; set; }
         public bool IsLoggedInBankAccount { get; set; }
-
-        public PlayerClasses PlayerClass;
+        public int LoginTries { get; private set; }
+        public int Warnings { get; set; }
+        public int FrozenTime { get; set; }
+        public Vector3 SpectatePosition { get; set; }
+        public bool IsSpectating { get; set; }
+        public SpectateTypes SpectateType { get; set; }
+        public Player SpectatedPlayer { get; set; }
+        public BaseVehicle SpectatedVehicle { get; set; }
+        public Timer SpectateTimer { get; set; }
 
         public void CheckIfPlayerCanJoinPolice()
         {
@@ -89,18 +95,220 @@ namespace TruckingSharp.World
             }
         }
 
-        public override void OnConnected(EventArgs e)
+        public override void GiveMoney(int money)
+        {
+            var account = Account;
+
+            account.Money += money;
+
+            Money = account.Money;
+
+            using var uow = new UnitOfWork(DapperConnection.ConnectionString);
+            uow.PlayerAccountRepository.Update(account);
+            uow.Commit();
+        }
+
+        public override void OnClickPlayer(ClickPlayerEventArgs e)
+        {
+            base.OnClickPlayer(e);
+
+            // TODO: Show player stats
+        }
+
+        public override async void OnConnected(EventArgs e)
         {
             ToggleSpectating(true);
 
             base.OnConnected(e);
 
+            await Task.Delay(100).ConfigureAwait(false);
             SendClientMessageToAll(Color.Blue, Messages.PlayerJoinedTheServer, Name, Id);
 
             if (Account == null)
                 RegisterPlayer();
             else
                 LoginPlayer();
+
+            SpectateTimer = new Timer(500, true);
+            SpectateTimer.Tick += SpectateTimer_Tick;
+        }
+
+        private void SpectateTimer_Tick(object sender, EventArgs e)
+        {
+            if (SpectatedPlayer == null)
+                return;
+
+            if(State == PlayerState.Spectating)
+            {
+                VirtualWorld = SpectatedPlayer.VirtualWorld;
+                Interior = SpectatedPlayer.Interior;
+
+                if(SpectateType == SpectateTypes.Player)
+                {
+                    if(SpectatedPlayer.VehicleSeat != -1)
+                    {
+                        SpectateVehicle(SpectatedPlayer.Vehicle);
+                        SpectatedVehicle = SpectatedPlayer.Vehicle;
+                        SpectateType = SpectateTypes.Vehicle;
+                        SendClientMessage($"{{00FF00}}Player {{FFFF00}}{SpectatedPlayer.Name}{{00FF00}} has entered a vehicle, changing spectate mode to match");
+                    }
+                }
+                else
+                {
+                    if(SpectatedPlayer.VehicleSeat == -1)
+                    {
+                        SpectatePlayer(SpectatedPlayer);
+                        SpectateType = SpectateTypes.Player;
+                        SendClientMessage($"{{00FF00}}Player {{FFFF00}}{SpectatedPlayer.Name}{{00FF00}} has exited a vehicle, changing spectate mode to match");
+                    }
+                }
+            }
+        }
+
+        public override void OnDeath(DeathEventArgs e)
+        {
+            base.OnDeath(e);
+
+            // TODO: Cancel jobs
+            // TODO: Leave convoy
+            // TODO: Wanted for killer
+        }
+
+        public override void OnDisconnected(DisconnectEventArgs e)
+        {
+            base.OnDisconnected(e);
+
+            SendClientMessageToAll(Color.Blue, Messages.PlayerLeftTheServer, Name, Id);
+
+            foreach(Player player in All)
+            {
+                if (!player.IsLoggedIn)
+                    continue;
+
+                if (player.State == PlayerState.Spectating && player.SpectatedPlayer == this)
+                {
+                    player.ToggleSpectating(false);
+                    player.SpectatedPlayer = null;
+                    player.SpectatedVehicle = null;
+                    player.SendClientMessage(Color.Red, "Target player has logged off, ending specate mode.");
+                }
+            }
+
+            // TODO: Cancel jobs/leave convoy
+            // TODO Destroy rented  vehicle
+        }
+
+        public override void OnEnterVehicle(EnterVehicleEventArgs e)
+        {
+            base.OnEnterVehicle(e);
+
+            // TODO: Check fuel/no engine
+        }
+
+        public override void OnExitVehicle(PlayerVehicleEventArgs e)
+        {
+            base.OnExitVehicle(e);
+
+            e.Vehicle.Engine = false;
+            e.Vehicle.Lights = false;
+
+            // TODO: Cancel pilot job
+        }
+
+        public override void OnKeyStateChanged(KeyStateChangedEventArgs e)
+        {
+            base.OnKeyStateChanged(e);
+
+            // TODO: Police fine/warn to stop
+            // TODO: Assistance repair vehicle/own vehicle
+            // TODO: Tow vehicle with tow truck
+            // TODO: Refuel with horn key
+        }
+
+        public override async void OnRequestClass(RequestClassEventArgs e)
+        {
+            base.OnRequestClass(e);
+
+            if (!IsLoggedIn)
+            {
+                SendClientMessage(Color.Red, Messages.FailedToLoginProperly);
+                await Task.Delay(Configuration.KickDelay).ConfigureAwait(false);
+                Kick();
+            }
+        }
+
+        public override void OnSpawned(SpawnEventArgs e)
+        {
+            base.OnSpawned(e);
+
+            VirtualWorld = 0;
+            Interior = 0;
+            ToggleClock(false);
+            ResetWeapons();
+
+            if (Account.RulesRead == 0)
+                SendClientMessage(Color.Red, Messages.RulesNotYetAccepted);
+
+            if(IsSpectating)
+            {
+                Position = SpectatePosition;
+
+                SpectatePosition = Vector3.Zero;
+                IsSpectating = false;
+            }
+
+            // TODO: No-job textdraw
+            // TODO Send player to jail
+        }
+
+        public override void OnStateChanged(StateEventArgs e)
+        {
+            base.OnStateChanged(e);
+
+            if (e.NewState == PlayerState.Driving)
+            {
+                if (PlayerClass != PlayerClasses.Police)
+                {
+                    if (JobVehicles.PoliceJobVehicles.Contains(Vehicle))
+                    {
+                        RemoveFromVehicle();
+                        Vehicle.Engine = false;
+                        Vehicle.Lights = false;
+                        SendClientMessage(Color.Red, "You can't use police vehicles.");
+                    }
+                }
+
+                if (PlayerClass != PlayerClasses.Pilot)
+                {
+                    if (JobVehicles.PilotJobVehicles.Contains(Vehicle))
+                    {
+                        RemoveFromVehicle();
+                        Vehicle.Engine = false;
+                        Vehicle.Lights = false;
+                        SendClientMessage(Color.Red, "You can't use pilot vehicles.");
+                    }
+                }
+            }
+
+            // TODO: Kick player out of vehicle if vehicle is owned by other/clmaped
+        }
+
+        public override void OnText(TextEventArgs e)
+        {
+            if (!IsLoggedIn)
+            {
+                e.SendToPlayers = false;
+                return;
+            }
+
+            if (Account.Muted > DateTime.Now)
+            {
+                e.SendToPlayers = false;
+                ShowRemainingMuteTime();
+                return;
+            }
+
+            base.OnText(e);
         }
 
         private void LoginPlayer()
@@ -164,143 +372,10 @@ namespace TruckingSharp.World
             });
         }
 
-        public override void GiveMoney(int money)
+        public void ShowRemainingMuteTime()
         {
-            var account = Account;
-
-            account.Money += money;
-
-            Money = account.Money;
-
-            using var uow = new UnitOfWork(DapperConnection.ConnectionString);
-            uow.PlayerAccountRepository.Update(account);
-            uow.Commit();
-        }
-
-        public override void OnDisconnected(DisconnectEventArgs e)
-        {
-            base.OnDisconnected(e);
-
-            SendClientMessageToAll(Color.Blue, Messages.PlayerLeftTheServer, Name, Id);
-
-            // TODO: Cancel jobs/leave convoy
-            // TODO Cancel spectate
-            // TODO Destroy rented  vehicle
-        }
-
-        public override void OnClickPlayer(ClickPlayerEventArgs e)
-        {
-            base.OnClickPlayer(e);
-
-            // TODO: Show player stats
-        }
-
-        public override void OnSpawned(SpawnEventArgs e)
-        {
-            base.OnSpawned(e);
-
-            VirtualWorld = 0;
-            Interior = 0;
-            ToggleClock(false);
-            ResetWeapons();
-
-            if (Account.RulesRead == 0)
-                SendClientMessage(Color.Red, Messages.RulesNotYetAccepted);
-
-            // TODO: No-job textdraw
-            // TODO: Respawn player after spectate
-            // TODO Send player to jail
-        }
-
-        public override void OnDeath(DeathEventArgs e)
-        {
-            base.OnDeath(e);
-
-            // TODO: Cancel jobs
-            // TODO: Leave convoy
-            // TODO: Wanted for killer
-        }
-
-        public override async void OnRequestClass(RequestClassEventArgs e)
-        {
-            base.OnRequestClass(e);
-
-            if (!IsLoggedIn)
-            {
-                SendClientMessage(Color.Red, Messages.FailedToLoginProperly);
-                await Task.Delay(Configuration.KickDelay).ConfigureAwait(false);
-                Kick();
-            }
-        }
-
-        public override void OnEnterVehicle(EnterVehicleEventArgs e)
-        {
-            base.OnEnterVehicle(e);
-
-            // TODO: Check fuel/no engine
-        }
-
-        public override void OnExitVehicle(PlayerVehicleEventArgs e)
-        {
-            base.OnExitVehicle(e);
-
-            e.Vehicle.Engine = false;
-            e.Vehicle.Lights = false;
-
-            // TODO: Cancel pilot job
-        }
-
-        public override void OnStateChanged(StateEventArgs e)
-        {
-            base.OnStateChanged(e);
-
-            if (e.NewState == PlayerState.Driving)
-            {
-                if (PlayerClass != PlayerClasses.Police)
-                {
-                    if (JobVehicles.PoliceJobVehicles.Contains(Vehicle))
-                    {
-                        RemoveFromVehicle();
-                        Vehicle.Engine = false;
-                        Vehicle.Lights = false;
-                        SendClientMessage(Color.Red, "You can't use police vehicles.");
-                    }
-                }
-
-                if (PlayerClass != PlayerClasses.Pilot)
-                {
-                    if (JobVehicles.PilotJobVehicles.Contains(Vehicle))
-                    {
-                        RemoveFromVehicle();
-                        Vehicle.Engine = false;
-                        Vehicle.Lights = false;
-                        SendClientMessage(Color.Red, "You can't use pilot vehicles.");
-                    }
-                }
-            }
-
-            // TODO: Kick player out of vehicle if vehicle is owned by other/clmaped
-        }
-
-        public override void OnKeyStateChanged(KeyStateChangedEventArgs e)
-        {
-            base.OnKeyStateChanged(e);
-
-            // TODO: Police fine/warn to stop
-            // TODO: Assistance repair vehicle/own vehicle
-            // TODO: Tow vehicle with tow truck
-            // TODO: Refuel with horn key
-        }
-
-        public override void OnText(TextEventArgs e)
-        {
-            if (!IsLoggedIn)
-                return;
-
-            if (Account.Muted > 0)
-                return;
-
-            base.OnText(e);
+            var remainingMuteTime = Account.Muted - DateTime.Now;
+            SendClientMessage(Color.Silver, $"Mute time remaining: Minutes: {remainingMuteTime.Minutes}, Seconds: {remainingMuteTime.Seconds}");
         }
     }
 }
