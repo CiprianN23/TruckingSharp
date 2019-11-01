@@ -19,6 +19,7 @@ namespace TruckingSharp.Controllers
             baseGameMode.PlayerCommandText += (sender, args) => (sender as Player)?.OnPlayerCommandTextSendToAdmins(args);
             baseGameMode.PlayerRequestClass += (sender, args) => (sender as Player)?.SetClassSelection(args);
             baseGameMode.PlayerRequestSpawn += (sender, args) => (sender as Player)?.SetClassSpawn(args);
+            baseGameMode.PlayerSpawned += (sender, args) => (sender as Player)?.SetPlayerClassColor(args);
 
             base.RegisterEvents(baseGameMode);
         }
