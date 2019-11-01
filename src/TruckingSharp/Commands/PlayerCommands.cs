@@ -12,6 +12,7 @@ using TruckingSharp.Database;
 using TruckingSharp.Database.Entities;
 using TruckingSharp.Database.UnitsOfWork;
 using TruckingSharp.Extensions.PlayersExtensions;
+using TruckingSharp.Services;
 using TruckingSharp.World;
 
 namespace TruckingSharp.Commands
@@ -67,7 +68,7 @@ namespace TruckingSharp.Commands
                                 return;
                             }
 
-                            var hash = BCrypt.Net.BCrypt.HashPassword(e.InputText);
+                            var hash = PasswordHashingService.GetPasswordHash(e.InputText);
                             var newBankAccount = new PlayerBankAccount { Password = hash, PlayerId = sender.Account.Id };
                             using var uow = new UnitOfWork(DapperConnection.ConnectionString);
                             uow.PlayerBankAccountRepository.Add(newBankAccount);
@@ -90,7 +91,7 @@ namespace TruckingSharp.Commands
                             return;
                         }
 
-                        if (!BCrypt.Net.BCrypt.Verify(e.InputText, sender.BankAccount.Password))
+                        if (!PasswordHashingService.VerifyPasswordHash(e.InputText, sender.BankAccount.Password))
                         {
                             sender.SendClientMessage(Color.Red, Messages.InvalidPasswordInputed);
                             loginBankAccount.Show(sender);
@@ -118,7 +119,7 @@ namespace TruckingSharp.Commands
             {
                 if (ev.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
                 {
-                    if (!BCrypt.Net.BCrypt.Verify(ev.InputText, sender.Account.Password))
+                    if (!PasswordHashingService.VerifyPasswordHash(ev.InputText, sender.Account.Password))
                     {
                         sender.SendClientMessage(Color.Red, Messages.PasswordsDontMatch);
                         oldPasswordDialog.Show(sender);
@@ -138,7 +139,7 @@ namespace TruckingSharp.Commands
                                 return;
                             }
 
-                            if (BCrypt.Net.BCrypt.Verify(e.InputText, sender.Account.Password))
+                            if (PasswordHashingService.VerifyPasswordHash(e.InputText, sender.Account.Password))
                             {
                                 sender.SendClientMessage(Color.Red, Messages.PasswordCanNotBeAsTheOldOne);
                                 newPasswordDialog.Show(sender);
@@ -152,7 +153,7 @@ namespace TruckingSharp.Commands
                                 if (evv.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
                                 {
                                     var account = sender.Account;
-                                    account.Password = BCrypt.Net.BCrypt.HashPassword(e.InputText);
+                                    account.Password = PasswordHashingService.GetPasswordHash(e.InputText);
                                     using var uow = new UnitOfWork(DapperConnection.ConnectionString);
                                     await uow.PlayerAccountRepository.UpdateAsync(account).ConfigureAwait(false);
                                     uow.CommitAsync();

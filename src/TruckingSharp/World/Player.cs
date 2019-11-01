@@ -6,6 +6,7 @@ using SampSharp.GameMode.Pools;
 using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.World;
 using System;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using TruckingSharp.Constants;
 using TruckingSharp.Data;
@@ -13,6 +14,7 @@ using TruckingSharp.Database;
 using TruckingSharp.Database.Entities;
 using TruckingSharp.Database.UnitsOfWork;
 using TruckingSharp.Extensions.PlayersExtensions;
+using TruckingSharp.Services;
 
 namespace TruckingSharp.World
 {
@@ -326,7 +328,7 @@ namespace TruckingSharp.World
                         await Task.Delay(Configuration.KickDelay).ConfigureAwait(false);
                         Kick();
                     }
-                    else if (BCrypt.Net.BCrypt.Verify(ev.InputText, Account.Password))
+                    else if (PasswordHashingService.VerifyPasswordHash(ev.InputText, Account.Password))
                     {
                         ToggleSpectating(false);
                         IsLoggedIn = true;
@@ -356,8 +358,10 @@ namespace TruckingSharp.World
             {
                 if (ev.DialogButton == DialogButton.Left)
                 {
+
+                    var hash = PasswordHashingService.GetPasswordHash(ev.InputText);
+
                     using var uow = new UnitOfWork(DapperConnection.ConnectionString);
-                    var hash = BCrypt.Net.BCrypt.HashPassword(ev.InputText);
 
                     var newAccount = new PlayerAccount { Name = Name, Password = hash };
 
@@ -368,7 +372,9 @@ namespace TruckingSharp.World
                     LoginPlayer();
                 }
                 else
+                {
                     Kick();
+                }
             });
         }
 

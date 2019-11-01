@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BCrypt.Net-Core" Version="1.6.0" />
     <PackageReference Include="SampSharp.GameMode" Version="0.8.0" />
     <PackageReference Include="SampSharp.Streamer" Version="0.8.0" />
   </ItemGroup>
