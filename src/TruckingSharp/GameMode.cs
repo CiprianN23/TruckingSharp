@@ -32,7 +32,7 @@ namespace TruckingSharp
             DisableInteriorEnterExits();
             UsePlayerPedAnimations();
 
-            SetGameModeText($"Trucking# {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()}");
+            SetGameModeText($"v {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}");
 
             // TODO: Timers for timed messgaes/random bonus mission/global timer
 
