@@ -8,54 +8,76 @@ using TruckingSharp.Database.Repositories.Interfaces;
 
 namespace TruckingSharp.Database.Repositories
 {
-    public class PlayerAccountRepository : IPlayerAccountRepository
+    public class PlayerAccountRepository : IRepository<PlayerAccount>
     {
-        private MySqlTransaction _transaction;
-        private MySqlConnection Connection => _transaction.Connection;
+        private MySqlConnection _connection;
 
-        public PlayerAccountRepository(MySqlTransaction transaction)
+        public PlayerAccountRepository()
         {
-            _transaction = transaction;
+            _connection = new MySqlConnection(DapperConnection.ConnectionString);
         }
+
+        public PlayerAccountRepository(string connectionString)
+        {
+            _connection = new MySqlConnection(connectionString);
+        }
+
+        #region Sync
 
         public long Add(PlayerAccount entity)
         {
-            return Connection.Insert(entity, transaction: _transaction);
+            return _connection.Insert(entity);
         }
 
         public bool Delete(PlayerAccount entity)
         {
-            return Connection.Delete(entity, transaction: _transaction);
+            return _connection.Delete(entity);
         }
 
         public IEnumerable<PlayerAccount> GetAll()
         {
-            return Connection.Query<PlayerAccount>("SELECT * FROM accounts;", transaction: _transaction);
-        }
-
-        public IEnumerable<PlayerAccount> GetBestPlayers(int amountOfPlayers)
-        {
-            throw new System.NotImplementedException();
+            return _connection.GetAll<PlayerAccount>();
         }
 
         public PlayerAccount Find(int id)
         {
-            return Connection.QueryFirstOrDefault<PlayerAccount>("SELECT * FROM accounts WHERE Id = @Id;", new { Id = id }, transaction: _transaction);
+            return _connection.QueryFirstOrDefault<PlayerAccount>("SELECT * FROM accounts WHERE Id = @Id;", new { Id = id });
         }
 
         public PlayerAccount Find(string name)
         {
-            return Connection.QueryFirstOrDefault<PlayerAccount>("SELECT * FROM accounts WHERE Name = @Name;", new { Name = name }, transaction: _transaction);
+            return _connection.QueryFirstOrDefault<PlayerAccount>("SELECT * FROM accounts WHERE Name = @Name;", new { Name = name });
         }
 
         public bool Update(PlayerAccount entity)
         {
-            return Connection.Update(entity, transaction: _transaction);
+            return _connection.Update(entity);
         }
+
+        #endregion Sync
+
+        #region Async
 
         public async Task<bool> UpdateAsync(PlayerAccount entity)
         {
-            return await Connection.UpdateAsync(entity, transaction: _transaction).ConfigureAwait(false);
+            return await _connection.UpdateAsync(entity);
         }
+
+        public async Task<IEnumerable<PlayerAccount>> GetAllAsync()
+        {
+            return await _connection.GetAllAsync<PlayerAccount>();
+        }
+
+        public async Task<long> AddAsync(PlayerAccount entity)
+        {
+            return await _connection.InsertAsync(entity);
+        }
+
+        public async Task<bool> DeleteAsync(PlayerAccount entity)
+        {
+            return await _connection.DeleteAsync(entity);
+        }
+
+        #endregion Async
     }
 }

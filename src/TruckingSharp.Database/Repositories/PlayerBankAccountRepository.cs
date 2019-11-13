@@ -2,6 +2,7 @@
 using Dapper.Contrib.Extensions;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TruckingSharp.Database.Entities;
 using TruckingSharp.Database.Repositories.Interfaces;
 
@@ -9,47 +10,69 @@ namespace TruckingSharp.Database.Repositories
 {
     public class PlayerBankAccountRepository : IRepository<PlayerBankAccount>
     {
-        private MySqlTransaction _transaction;
-        private MySqlConnection Connection => _transaction.Connection;
+        private MySqlConnection _connection;
 
-        public PlayerBankAccountRepository(MySqlTransaction transaction)
+        public PlayerBankAccountRepository()
         {
-            _transaction = transaction;
+            _connection = new MySqlConnection(DapperConnection.ConnectionString);
         }
+
+        public PlayerBankAccountRepository(string connectionString)
+        {
+            _connection = new MySqlConnection(connectionString);
+        }
+
+        #region Sync
 
         public IEnumerable<PlayerBankAccount> GetAll()
         {
-            return Connection.Query<PlayerBankAccount>("SELECT * FROM bankaccounts;", transaction: _transaction);
+            return _connection.GetAll<PlayerBankAccount>();
         }
 
         public PlayerBankAccount Find(int id)
         {
-            return Connection.QueryFirstOrDefault<PlayerBankAccount>("SELECT * FROM bankaccounts WHERE PlayerId = @Id;", new { Id = id }, transaction: _transaction);
-        }
-
-        public PlayerBankAccount Find(string name)
-        {
-            throw new System.NotImplementedException();
+            return _connection.QueryFirstOrDefault<PlayerBankAccount>("SELECT * FROM bankaccounts WHERE PlayerId = @Id;", new { Id = id });
         }
 
         public long Add(PlayerBankAccount entity)
         {
-            return Connection.Insert(entity, transaction: _transaction);
+            return _connection.Insert(entity);
         }
 
         public bool Update(PlayerBankAccount entity)
         {
-            return Connection.Update(entity, transaction: _transaction);
+            return _connection.Update(entity);
         }
 
         public bool Delete(PlayerBankAccount entity)
         {
-            return Connection.Delete(entity, transaction: _transaction);
+            return _connection.Delete(entity);
         }
 
-        public int GetPlayerId(string name)
+        #endregion Sync
+
+        #region Async
+
+        public async Task<IEnumerable<PlayerBankAccount>> GetAllAsync()
         {
-            return Connection.QueryFirstOrDefault<int>("SELECT Id FROM accounts WHERE Name = @Name;", new { Name = name }, transaction: _transaction);
+            return await _connection.GetAllAsync<PlayerBankAccount>();
         }
+
+        public async Task<long> AddAsync(PlayerBankAccount entity)
+        {
+            return await _connection.InsertAsync(entity);
+        }
+
+        public async Task<bool> UpdateAsync(PlayerBankAccount entity)
+        {
+            return await _connection.UpdateAsync(entity);
+        }
+
+        public async Task<bool> DeleteAsync(PlayerBankAccount entity)
+        {
+            return await _connection.DeleteAsync(entity);
+        }
+
+        #endregion Async
     }
 }
