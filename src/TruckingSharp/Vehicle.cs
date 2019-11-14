@@ -9,6 +9,8 @@ namespace TruckingSharp.World
     {
         public int Fuel { get; set; }
         public bool IsAdminSpawned { get; set; }
+        public bool IsWantedByMafia { get; set; }
+        public bool IsOwned { get; set; }
 
         protected override void Initialize()
         {

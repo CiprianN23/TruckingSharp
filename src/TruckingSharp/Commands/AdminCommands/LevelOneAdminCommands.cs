@@ -10,7 +10,7 @@ using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
 using TruckingSharp.Data;
 using TruckingSharp.Database;
-using TruckingSharp.Database.UnitsOfWork;
+using TruckingSharp.Database.Repositories;
 using TruckingSharp.Extensions.PlayersExtensions;
 using TruckingSharp.World;
 
@@ -39,7 +39,7 @@ namespace TruckingSharp.Commands.AdminCommands
 
             sender.SendClientMessage(Color.Red, $"You have kicked {target.Name} for {reason}.");
 
-            await Task.Delay(Configuration.KickDelay).ConfigureAwait(false);
+            await Task.Delay(Configuration.KickDelay);
             target.Kick();
         }
 
@@ -206,7 +206,7 @@ namespace TruckingSharp.Commands.AdminCommands
             if (target.Warnings == Configuration.MaxWarnBeforeKick && Configuration.CanAutoKickAfterWarn)
             {
                 target.SendClientMessage(Color.Red, $"This was the {Configuration.MaxWarnBeforeKick}th and last warning. You have been kicked.");
-                await Task.Delay(Configuration.KickDelay).ConfigureAwait(false);
+                await Task.Delay(Configuration.KickDelay);
                 target.Kick();
             }
         }
@@ -288,7 +288,7 @@ namespace TruckingSharp.Commands.AdminCommands
                 return;
             }
 
-            // Owned vehicles need to buy
+            // TODO: Owned vehicles need to buy
             sender.Vehicle.AddComponent(1010);
             sender.SendClientMessage(Color.GreenYellow, Messages.NosHasBeenAddedToTheVehicle);
         }
@@ -327,9 +327,7 @@ namespace TruckingSharp.Commands.AdminCommands
             var account = target.Account;
             account.Muted = currentTime.AddMinutes(duration);
 
-            using var uow = new UnitOfWork(DapperConnection.ConnectionString);
-            await uow.PlayerAccountRepository.UpdateAsync(account).ConfigureAwait(false);
-            uow.CommitAsync();
+            await new PlayerAccountRepository().UpdateAsync(account);
 
             target.SendClientMessage(Color.Red, $"You have been muted by {{FFFF00}}{sender.Name} {{FF0000}}for {{FFFF00}}{reason}");
             target.ShowRemainingMuteTime();
@@ -361,9 +359,7 @@ namespace TruckingSharp.Commands.AdminCommands
             var account = target.Account;
             account.Muted = DateTime.Now;
 
-            using var uow = new UnitOfWork(DapperConnection.ConnectionString);
-            await uow.PlayerAccountRepository.UpdateAsync(account).ConfigureAwait(false);
-            uow.CommitAsync();
+            await new PlayerAccountRepository().UpdateAsync(account);
 
             target.SendClientMessage(Color.GreenYellow, $"You have been un-muted by {{FFFF00}}{sender.Name}");
 

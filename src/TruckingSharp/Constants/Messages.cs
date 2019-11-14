@@ -5,6 +5,15 @@
         public const string PlayerJoinedTheServer = "Player '{{FFFF00}}{0}{{0000FF}}' (id: {{FFFF00}}{1}{{0000FF}}) has joined the server";
         public const string PlayerLeftTheServer = "Player '{{FFFF00}}{0}{{0000FF}}' (id: {{FFFF00}}{1}{{0000FF}}) has left the server";
 
+        public const string DialogButtonSelect = "Select";
+        public const string DialogButtonCancel = "Cancel";
+        public const string DialogButtonYes = "Yes";
+        public const string DialogButtonNo = "No";
+        public const string DialogButtonToggle = "Toggle";
+        public const string DialogButtonBuy = "Buy";
+        public const string DialogButtonSpawn = "Spawn";
+        public const string DialogButtonOk = "Ok";
+
         public const string FailedToLoginProperly = "You failed to login properly, you're kicked";
         public const string RulesNotYetAccepted = "You haven't accepted the {FFFF00}/rules{FF0000} yet";
         public const string MessageTooLongWithLimit = "Your message is too long. Please shorten it to {0} characters.";
@@ -65,6 +74,45 @@
         public const string AssistanceClass = "Assistance";
         public const string RoadWorkerClass = "Road Worker";
 
+        public const string MissionNeedVehicleToProceed = "{{FF0000}}You need to be in your vehicle to proceed.";
+        public const string MissionNeedTrailerToProceed = "{{FF0000}}You need to have your trailer attached to proceed.";
+
+        public const string MissionConvoyWaitingMembersToLoadCargo = "Waiting for all members to load their cargo.";
+        public const string MissionConvoyWaitingMembersToUnLoadCargo = "Waiting for all members to unload their cargo.";
+
+        public const string MissionTruckerLoading = "~r~Loading Your Truck... ~w~Please Wait";
+        public const string MissionTruckerUnLoading = "~r~Unloading Your Truck... ~w~Please Wait";
+        public const string MissionTruckerHaulingToPickupCargo = "~w~Hauling ~b~{0}~w~ from ~r~{1}~w~ to {2}";
+        public const string MissionTruckerHaulingToDeliverCargo = "~w~Hauling ~b~{0}~w~ from {1} to ~r~{2}~w~";
+        public const string MissionTruckerOverloaded = "{{FF0000}}You have been overloaded! Avoid the police!";
+        public const string MissionTruckerMafiaInterested = "~r~The mafia is interested in your load~w~";
+        public const string MissionTruckerDeliverFrom = "{{00FF00}}Pickup the {0} at {1}";
+        public const string MissionTruckerDeliverTo = "{{00FF00}}Deliver the {0} to {1}.";
+        public const string MissionTruckerCopletedJob = "Trucker {{FF00FF}}{0}{{FFFFFF}} succesfully transported {{0000FF}}{1}";
+        public const string MissionTruckerCopletedJobInfo = "from {{00FF00}}{0}{{FFFFFF}} to {{00FF00}}{1}";
+        public const string MissionTruckerBonusdOverload = "{{00FF00}}You also earned a bonus for being overloaded: ${0}";
+        public const string MissionTruckerBonusMafia = "{{00FF00}}You also earned a bonus for delivering a mafia-load: ${0}";
+        public const string MissionTruckerBonusOwnedVehicle = "{{00FF00}}You also earned a bonus for using your own truck: ${0}";
+        public const string MissionTruckerSelectMissionMethod = "Select method:";
+        public const string MissionTruckerDialogSelectLoad = "Select load:";
+        public const string MissionTruckerSelectStartingLocation = "Select loading point:";
+        public const string MissionTruckerSelectEndingLocation = "Select unloading point:";
+        public const string MissionTruckerTrailerNeeded = "You need a trailer to start a job.";
+        public const string MissionTruckerMustEnterVehicle = "You must enter your vehicle or re-attach your trailer";
+
+        public const string MissionBusDriverMustEnterVehicle = "You must enter your bus";
+
+        public const string MissionMafiaMustEnterVehicle = "You must enter your vehicle";
+
+        public const string MissionCourierMustEnterVehicle = "You must enter your vehicle";
+
+        public const string MissionRoadWorkerMustEnterVehicle = "You must enter your vehicle or re-attach your trailer";
+
+        public const string MissionReward = "{{00FF00}}You finished the mission and earned ${0}";
+        public const string AlreadyDoingAMission = "You are already doing a mission.";
+        public const string MissionNotDoingAMission = "You are not doing any mission.";
+        public const string MissionFailed = "~w~You ~r~failed~w~ your mission. You lost ~y~${0}~w~ to cover expenses.";
+
         public const string PlayerJoinedTruckerClass = "{{00FF00}}Player {{FFFF00}}{0}{{00FF00}} joined {{FFFF00}}Trucker class";
         public const string PlayerJoinedBusDriverClass = "{{00FF00}}Player {{FFFF00}}{0}{{00FF00}} joined {{FFFF00}}Busdriver class";
         public const string PlayerJoinedPilotClass = "{{00FF00}}Player {{FFFF00}}{0}{{00FF00}} joined {{FFFF00}}Pilot class";
@@ -73,5 +121,10 @@
         public const string PlayerJoinedCourierClass = "{{00FF00}}Player {{FFFF00}}{0}{{00FF00}} joined {{FFFF00}}Courier class";
         public const string PlayerJoinedAssistanceClass = "{{00FF00}}Player {{FFFF00}}{0}{{00FF00}} joined {{FFFF00}}Assistance class";
         public const string PlayerJoinedRoadWorkerClass = "{{00FF00}}Player {{FFFF00}}{0}{{00FF00}} joined {{FFFF00}}Roadworker class";
+
+        public const string NoMissionText = "No mission at the moment. Enter \"~y~/startmission~w~\" to start a mission.";
+        public const string NoMissionTextPolice = "~r~'RMB'~w~ fines a player (on foot), ~r~'LCTRL'~w~ warns the player (in vehicle).";
+        public const string NoMissionTextMafia = "Hijack a ~r~marked~w~ vehicle or enter \"~y~/startmission~w~\" to start a mission.";
+        public const string NoMissionTextAssistance = "~r~'RMB'~w~ repairs/refuels a vehicle (on foot), ~r~'LCTRL'~w~ fixes your own vehicle.";
     }
 }

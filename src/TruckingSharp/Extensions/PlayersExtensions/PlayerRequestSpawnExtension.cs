@@ -50,7 +50,10 @@ namespace TruckingSharp.Extensions.PlayersExtensions
 
                 case PlayerClasses.Police:
 
-                    player.CheckIfPlayerCanJoinPolice();
+                    if(!player.CheckIfPlayerCanJoinPolice())
+                    {
+                        return;
+                    }
 
                     if (player.Account.Score < 100)
                     {

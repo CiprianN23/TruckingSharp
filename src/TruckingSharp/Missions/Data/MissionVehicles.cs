@@ -1,9 +1,9 @@
 ﻿using SampSharp.GameMode.World;
 using System.Collections.Generic;
 
-namespace TruckingSharp.Data
+namespace TruckingSharp.Missions.Data
 {
-    public static class JobVehicles
+    public static class MissionVehicles
     {
         public static List<BaseVehicle> TruckerJobVehicles = new List<BaseVehicle>();
         public static List<BaseVehicle> BusDriverJobVehicles = new List<BaseVehicle>();

@@ -1,7 +1,7 @@
 ﻿using SampSharp.GameMode.Display;
 using SampSharp.GameMode.SAMP;
 using TruckingSharp.Database;
-using TruckingSharp.Database.UnitsOfWork;
+using TruckingSharp.Database.Repositories;
 using TruckingSharp.World;
 
 namespace TruckingSharp.Extensions.PlayersExtensions
@@ -85,7 +85,7 @@ namespace TruckingSharp.Extensions.PlayersExtensions
             };
         }
 
-        private static void BankCancelDialog_Response(object sender, SampSharp.GameMode.Events.DialogResponseEventArgs e)
+        private static async void BankCancelDialog_Response(object sender, SampSharp.GameMode.Events.DialogResponseEventArgs e)
         {
             if (e.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
             {
@@ -93,17 +93,14 @@ namespace TruckingSharp.Extensions.PlayersExtensions
 
                 if (player.BankAccount.Money > 0)
                 {
-                    player.GiveMoney(player.BankAccount.Money);
+                    player.Reward(player.BankAccount.Money);
 
                     player.SendClientMessage(Color.GreenYellow, "There was still some money in your bank account, it has been added to your account.");
                 }
 
-                using var uow = new UnitOfWork(DapperConnection.ConnectionString);
-
                 var playerBankAccount = player.BankAccount;
-                uow.PlayerBankAccountRepository.Delete(playerBankAccount);
+                await new PlayerBankAccountRepository().DeleteAsync(playerBankAccount);
 
-                uow.Commit();
 
                 player.IsLoggedInBankAccount = false;
 
@@ -136,7 +133,7 @@ namespace TruckingSharp.Extensions.PlayersExtensions
 
                     var playerNameDialog = new InputDialog("Enter player name", message, false, "Accept", "Cancel");
                     playerNameDialog.Show(player);
-                    playerNameDialog.Response += (senderObject, ev) =>
+                    playerNameDialog.Response += async (senderObject, ev) =>
                     {
                         if (ev.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
                         {
@@ -154,9 +151,7 @@ namespace TruckingSharp.Extensions.PlayersExtensions
                                 return;
                             }
 
-                            using var uow = new UnitOfWork(DapperConnection.ConnectionString);
-
-                            if (uow.PlayerBankAccountRepository.Find(uow.PlayerBankAccountRepository.GetPlayerId(ev.InputText)) == null)
+                            if (new PlayerBankAccountRepository().Find(new PlayerAccountRepository().Find(ev.InputText).Id) == null)
                             {
                                 player.SendClientMessage(Color.Red, "That player doesn't have a bank account.");
                                 playerNameDialog.Show(player);
@@ -164,14 +159,13 @@ namespace TruckingSharp.Extensions.PlayersExtensions
                             }
 
                             var playerBankAccount = player.BankAccount;
-                            var otherBankAccount = uow.PlayerBankAccountRepository.Find(uow.PlayerBankAccountRepository.GetPlayerId(ev.InputText));
+                            var otherBankAccount = new PlayerBankAccountRepository().Find(new PlayerAccountRepository().Find(ev.InputText).Id);
 
                             otherBankAccount.Money += transferMoney;
                             playerBankAccount.Money -= transferMoney;
 
-                            uow.PlayerBankAccountRepository.Update(playerBankAccount);
-                            uow.PlayerBankAccountRepository.Update(otherBankAccount);
-                            uow.Commit();
+                            await new PlayerBankAccountRepository().UpdateAsync(playerBankAccount);
+                            await new PlayerBankAccountRepository().UpdateAsync(otherBankAccount);
 
                             player.SendClientMessage(Color.GreenYellow, $"{{0FF00}}You have transferred {{FFFF00}}${transferMoney}{{00FF00}} to {{FFFF00}}{ev.InputText}{{00FF00}}'s bank account.");
 
@@ -188,7 +182,7 @@ namespace TruckingSharp.Extensions.PlayersExtensions
             }
         }
 
-        private static void MoneyWithdrawDialog_Response(object sender, SampSharp.GameMode.Events.DialogResponseEventArgs e)
+        private static async void MoneyWithdrawDialog_Response(object sender, SampSharp.GameMode.Events.DialogResponseEventArgs e)
         {
             if (e.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
             {
@@ -212,11 +206,9 @@ namespace TruckingSharp.Extensions.PlayersExtensions
                     var playerBankAccount = player.BankAccount;
                     playerBankAccount.Money -= withdrawMoney;
 
-                    player.GiveMoney(withdrawMoney);
+                    player.Reward(withdrawMoney);
 
-                    using var uow = new UnitOfWork(DapperConnection.ConnectionString);
-                    uow.PlayerBankAccountRepository.Update(playerBankAccount);
-                    uow.Commit();
+                    await new PlayerBankAccountRepository().UpdateAsync(playerBankAccount);
 
                     player.SendClientMessage(Color.GreenYellow, $"You have withdrawn {{FFFF00}}${withdrawMoney}{Color.GreenYellow} from your bank account.");
                     player.ShowBankAccountOptions();
@@ -230,7 +222,7 @@ namespace TruckingSharp.Extensions.PlayersExtensions
             }
         }
 
-        private static void MoneyDepositDialog_Response(object sender, SampSharp.GameMode.Events.DialogResponseEventArgs e)
+        private static async void MoneyDepositDialog_Response(object sender, SampSharp.GameMode.Events.DialogResponseEventArgs e)
         {
             if (e.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
             {
@@ -254,11 +246,9 @@ namespace TruckingSharp.Extensions.PlayersExtensions
                     var playerBankAccount = player.BankAccount;
                     playerBankAccount.Money += depositMoney;
 
-                    player.GiveMoney(-depositMoney);
+                    player.Reward(-depositMoney);
 
-                    using var uow = new UnitOfWork(DapperConnection.ConnectionString);
-                    uow.PlayerBankAccountRepository.Update(playerBankAccount);
-                    uow.Commit();
+                    await new PlayerBankAccountRepository().UpdateAsync(playerBankAccount);
 
                     player.SendClientMessage(Color.GreenYellow, $"You have deposited {{FFFF00}}${depositMoney}{Color.GreenYellow} into your bank account.");
                     player.ShowBankAccountOptions();

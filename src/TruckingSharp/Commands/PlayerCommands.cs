@@ -10,7 +10,7 @@ using TruckingSharp.Data;
 using TruckingSharp.Data.ClassesSpawn;
 using TruckingSharp.Database;
 using TruckingSharp.Database.Entities;
-using TruckingSharp.Database.UnitsOfWork;
+using TruckingSharp.Database.Repositories;
 using TruckingSharp.Extensions.PlayersExtensions;
 using TruckingSharp.Services;
 using TruckingSharp.World;
@@ -57,7 +57,7 @@ namespace TruckingSharp.Commands
                 {
                     var registerNewBankAccountDialog = new InputDialog("Enter a password", "Please enter a password to register your bank account:", true, "Accept", "Cancel");
                     registerNewBankAccountDialog.Show(sender);
-                    registerNewBankAccountDialog.Response += (senderObject, e) =>
+                    registerNewBankAccountDialog.Response += async (senderObject, e) =>
                     {
                         if (e.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
                         {
@@ -70,9 +70,7 @@ namespace TruckingSharp.Commands
 
                             var hash = PasswordHashingService.GetPasswordHash(e.InputText);
                             var newBankAccount = new PlayerBankAccount { Password = hash, PlayerId = sender.Account.Id };
-                            using var uow = new UnitOfWork(DapperConnection.ConnectionString);
-                            uow.PlayerBankAccountRepository.Add(newBankAccount);
-                            uow.Commit();
+                            await new PlayerBankAccountRepository().AddAsync(newBankAccount);
 
                             sender.SendClientMessage(Color.GreenYellow, Messages.BankAccountCreatedSuccessfully);
                         }
@@ -154,9 +152,7 @@ namespace TruckingSharp.Commands
                                 {
                                     var account = sender.Account;
                                     account.Password = PasswordHashingService.GetPasswordHash(e.InputText);
-                                    using var uow = new UnitOfWork(DapperConnection.ConnectionString);
-                                    await uow.PlayerAccountRepository.UpdateAsync(account).ConfigureAwait(false);
-                                    uow.CommitAsync();
+                                    await new PlayerAccountRepository().UpdateAsync(account);
 
                                     sender.SendClientMessage(Color.GreenYellow, Messages.PasswordChangedSuccessfully);
                                 }
@@ -176,7 +172,7 @@ namespace TruckingSharp.Commands
                 return;
             }
 
-            if (sender.IsPlayerDriving())
+            if (!sender.IsPlayerDriving())
             {
                 sender.SendClientMessage(Color.Red, Messages.CommandAllowedOnlyAsDriver);
                 return;
@@ -258,7 +254,7 @@ namespace TruckingSharp.Commands
                 return;
             }
 
-            if (sender.IsPlayerDriving())
+            if (!sender.IsPlayerDriving())
             {
                 sender.SendClientMessage(Color.Red, Messages.CommandAllowedOnlyAsDriver);
                 return;
@@ -286,7 +282,7 @@ namespace TruckingSharp.Commands
                 return;
             }
 
-            if (sender.IsDoingJob)
+            if (sender.IsDoingMission)
             {
                 sender.SendClientMessage(Color.Red, Messages.CommandOnlyIfNotDoingAJob);
                 return;
@@ -512,14 +508,12 @@ namespace TruckingSharp.Commands
             {
                 if (e.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left && sender.Account.RulesRead == 0)
                 {
-                    sender.GiveMoney(5000);
+                    sender.Reward(5000);
 
                     var account = sender.Account;
                     account.RulesRead = 1;
 
-                    using var uow = new UnitOfWork(DapperConnection.ConnectionString);
-                    await uow.PlayerAccountRepository.UpdateAsync(account).ConfigureAwait(false);
-                    uow.CommitAsync();
+                    await new PlayerAccountRepository().UpdateAsync(account);
 
                     sender.SendClientMessage(Color.FromInteger(65280, ColorFormat.RGB), "You have earned {FFFF00}$5000{00FF00} for accepting the rules");
                 }
@@ -553,8 +547,8 @@ namespace TruckingSharp.Commands
                 return;
             }
 
-            sender.GiveMoney(-money);
-            target.GiveMoney(money);
+            sender.Reward(-money);
+            target.Reward(money);
 
             target.SendClientMessage($"{{00FF00}}You have received {{FFFF00}}${money}{{00FF00}} from {{FFFF00}}{sender.Name}");
             sender.SendClientMessage($"{{00FF00}}You gave {{FFFF00}}${money}{{00FF00}} to {{FFFF00}}{target.Name}");
