@@ -1,6 +1,6 @@
-﻿namespace TruckingSharp.Data
+﻿namespace TruckingSharp.PlayerClasses.Data
 {
-    public enum PlayerClasses
+    public enum PlayerClassType
     {
         None,
         TruckDriver,

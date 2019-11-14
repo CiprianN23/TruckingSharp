@@ -1,5 +1,4 @@
 ﻿using System;
-using TruckingSharp.World;
 
 namespace TruckingSharp.Events
 {

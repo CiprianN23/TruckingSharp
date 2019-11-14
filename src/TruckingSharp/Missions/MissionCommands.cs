@@ -6,7 +6,7 @@ using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
 using TruckingSharp.Extensions.PlayersExtensions;
 using TruckingSharp.Missions.Trucker;
-using TruckingSharp.World;
+using TruckingSharp.PlayerClasses.Data;
 
 namespace TruckingSharp.Missions
 {
@@ -32,7 +32,7 @@ namespace TruckingSharp.Missions
 
             switch (sender.PlayerClass)
             {
-                case TruckingSharp.Data.PlayerClasses.TruckDriver:
+                case PlayerClassType.TruckDriver:
                     // TODO: Convoy checks
 
                     var dialogTruckerMission = new ListDialog(Messages.MissionTruckerSelectMissionMethod, Messages.DialogButtonSelect, Messages.DialogButtonCancel);
@@ -108,7 +108,7 @@ namespace TruckingSharp.Missions
         [Command("overload", Shortcut = "overload")]
         public static void OnOverLoadCommand(Player sender)
         {
-            if (sender.PlayerClass != TruckingSharp.Data.PlayerClasses.TruckDriver)
+            if (sender.PlayerClass != PlayerClassType.TruckDriver)
             {
                 sender.SendClientMessage(Color.Red, "You are not a truck driver!");
                 return;

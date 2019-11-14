@@ -1,6 +1,6 @@
 ﻿using SampSharp.GameMode;
 
-namespace TruckingSharp.Data.ClassesSpawn
+namespace TruckingSharp.PlayerClasses.ClassesSpawn
 {
     public class PoliceSpawn
     {

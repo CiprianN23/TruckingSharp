@@ -9,10 +9,8 @@ using System.Threading.Tasks;
 using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
 using TruckingSharp.Data;
-using TruckingSharp.Database;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Extensions.PlayersExtensions;
-using TruckingSharp.World;
 
 namespace TruckingSharp.Commands.AdminCommands
 {
@@ -168,7 +166,7 @@ namespace TruckingSharp.Commands.AdminCommands
 
             if (!player2.IsLoggedIn)
             {
-                sender.SendClientMessage(Color.Red,  Messages.PlayerTwoNotLoggedIn);
+                sender.SendClientMessage(Color.Red, Messages.PlayerTwoNotLoggedIn);
                 return;
             }
 

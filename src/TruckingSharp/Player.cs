@@ -13,15 +13,16 @@ using TruckingSharp.Database;
 using TruckingSharp.Database.Entities;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Missions.Data;
+using TruckingSharp.PlayerClasses.Data;
 
-namespace TruckingSharp.World
+namespace TruckingSharp
 {
     [PooledType]
     public class Player : BasePlayer
     {
         private PlayerAccountRepository _accountRepository => new PlayerAccountRepository(DapperConnection.ConnectionString);
 
-        public PlayerClasses PlayerClass;
+        public PlayerClassType PlayerClass;
 
         public PlayerAccount Account
         {
@@ -83,7 +84,7 @@ namespace TruckingSharp.World
                     {
                         switch (player.PlayerClass)
                         {
-                            case PlayerClasses.Police:
+                            case PlayerClassType.Police:
                                 policePlayers++;
                                 break;
 
@@ -280,7 +281,7 @@ namespace TruckingSharp.World
 
             if (e.NewState == PlayerState.Driving)
             {
-                if (PlayerClass != PlayerClasses.Police)
+                if (PlayerClass != PlayerClassType.Police)
                 {
                     if (MissionVehicles.PoliceJobVehicles.Contains(Vehicle))
                     {
@@ -291,7 +292,7 @@ namespace TruckingSharp.World
                     }
                 }
 
-                if (PlayerClass != PlayerClasses.Pilot)
+                if (PlayerClass != PlayerClassType.Pilot)
                 {
                     if (MissionVehicles.PilotJobVehicles.Contains(Vehicle))
                     {

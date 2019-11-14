@@ -1,6 +1,5 @@
 ﻿using SampSharp.GameMode.SAMP.Commands.PermissionCheckers;
 using SampSharp.GameMode.World;
-using TruckingSharp.World;
 
 namespace TruckingSharp.Commands.Permissions
 {

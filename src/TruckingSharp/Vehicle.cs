@@ -2,7 +2,7 @@
 using SampSharp.GameMode.World;
 using TruckingSharp.Constants;
 
-namespace TruckingSharp.World
+namespace TruckingSharp
 {
     [PooledType]
     public class Vehicle : BaseVehicle

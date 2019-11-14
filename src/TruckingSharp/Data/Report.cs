@@ -1,7 +1,6 @@
 ﻿using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.World;
 using TruckingSharp.Helpers;
-using TruckingSharp.World;
 
 namespace TruckingSharp.Data
 {

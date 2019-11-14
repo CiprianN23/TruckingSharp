@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using TruckingSharp.World;
 
 namespace TruckingSharp.Extensions.PlayersExtensions
 {

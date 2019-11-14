@@ -7,13 +7,12 @@ using System.Text;
 using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
 using TruckingSharp.Data;
-using TruckingSharp.Data.ClassesSpawn;
-using TruckingSharp.Database;
 using TruckingSharp.Database.Entities;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Extensions.PlayersExtensions;
+using TruckingSharp.PlayerClasses.ClassesSpawn;
+using TruckingSharp.PlayerClasses.Data;
 using TruckingSharp.Services;
-using TruckingSharp.World;
 
 namespace TruckingSharp.Commands
 {
@@ -298,7 +297,7 @@ namespace TruckingSharp.Commands
 
             switch (sender.PlayerClass)
             {
-                case Data.PlayerClasses.TruckDriver:
+                case PlayerClassType.TruckDriver:
                     dialogSpawns.AddItem("Fallen Tree Depot");
                     dialogSpawns.AddItem("Flint Trucking Depot");
                     dialogSpawns.AddItem("LVA Freight Depot");
@@ -308,39 +307,39 @@ namespace TruckingSharp.Commands
                     dialogSpawns.AddItem("Quarry Top");
                     dialogSpawns.AddItem("Shady Creek Depot");
 
-                    dialogSpawns.Response += (sender, e) => DialogSpawns_Response(sender, e, Data.PlayerClasses.TruckDriver);
+                    dialogSpawns.Response += (sender, e) => DialogSpawns_Response(sender, e, PlayerClassType.TruckDriver);
                     break;
 
-                case Data.PlayerClasses.BusDriver:
+                case PlayerClassType.BusDriver:
                     dialogSpawns.AddItem("Los Santos");
                     dialogSpawns.AddItem("San Fierro");
                     dialogSpawns.AddItem("Las Venturas");
 
-                    dialogSpawns.Response += (sender, e) => DialogSpawns_Response(sender, e, Data.PlayerClasses.BusDriver);
+                    dialogSpawns.Response += (sender, e) => DialogSpawns_Response(sender, e, PlayerClassType.BusDriver);
                     break;
 
-                case Data.PlayerClasses.Pilot:
+                case PlayerClassType.Pilot:
                     dialogSpawns.AddItem("Los Santos");
                     dialogSpawns.AddItem("San Fierro");
                     dialogSpawns.AddItem("Las Venturas");
 
-                    dialogSpawns.Response += (sender, e) => DialogSpawns_Response(sender, e, Data.PlayerClasses.Pilot);
+                    dialogSpawns.Response += (sender, e) => DialogSpawns_Response(sender, e, PlayerClassType.Pilot);
                     break;
 
-                case Data.PlayerClasses.Police:
+                case PlayerClassType.Police:
                     dialogSpawns.AddItem("Los Santos");
                     dialogSpawns.AddItem("San Fierro");
                     dialogSpawns.AddItem("Las Venturas");
 
-                    dialogSpawns.Response += (sender, e) => DialogSpawns_Response(sender, e, Data.PlayerClasses.Police);
+                    dialogSpawns.Response += (sender, e) => DialogSpawns_Response(sender, e, PlayerClassType.Police);
                     break;
 
-                case Data.PlayerClasses.Courier:
+                case PlayerClassType.Courier:
                     dialogSpawns.AddItem("Los Santos");
                     dialogSpawns.AddItem("San Fierro");
                     dialogSpawns.AddItem("Las Venturas");
 
-                    dialogSpawns.Response += (sender, e) => DialogSpawns_Response(sender, e, Data.PlayerClasses.Courier);
+                    dialogSpawns.Response += (sender, e) => DialogSpawns_Response(sender, e, PlayerClassType.Courier);
                     break;
             }
 
@@ -393,35 +392,35 @@ namespace TruckingSharp.Commands
 
             switch (sender.PlayerClass)
             {
-                case PlayerClasses.TruckDriver:
+                case PlayerClassType.TruckDriver:
                     className = Messages.TruckerClass;
                     break;
 
-                case PlayerClasses.BusDriver:
+                case PlayerClassType.BusDriver:
                     className = Messages.BusDriverClass;
                     break;
 
-                case PlayerClasses.Pilot:
+                case PlayerClassType.Pilot:
                     className = Messages.PilotClass;
                     break;
 
-                case PlayerClasses.Police:
+                case PlayerClassType.Police:
                     className = Messages.PoliceClass;
                     break;
 
-                case PlayerClasses.Mafia:
+                case PlayerClassType.Mafia:
                     className = Messages.MafiaClass;
                     break;
 
-                case PlayerClasses.Courier:
+                case PlayerClassType.Courier:
                     className = Messages.CourierClass;
                     break;
 
-                case PlayerClasses.Assistance:
+                case PlayerClassType.Assistance:
                     className = Messages.AssistanceClass;
                     break;
 
-                case PlayerClasses.RoadWorker:
+                case PlayerClassType.RoadWorker:
                     className = Messages.RoadWorkerClass;
                     break;
             }
@@ -535,13 +534,13 @@ namespace TruckingSharp.Commands
                 return;
             }
 
-            if(money <= 0)
+            if (money <= 0)
             {
                 sender.SendClientMessage(Color.Red, Messages.ValueNeedToBePositive);
                 return;
             }
 
-            if(sender.Account.Money < money)
+            if (sender.Account.Money < money)
             {
                 sender.SendClientMessage(Color.Red, Messages.NotEnoughMoney);
                 return;
@@ -554,7 +553,7 @@ namespace TruckingSharp.Commands
             sender.SendClientMessage($"{{00FF00}}You gave {{FFFF00}}${money}{{00FF00}} to {{FFFF00}}{target.Name}");
         }
 
-        private static void DialogSpawns_Response(object sender, SampSharp.GameMode.Events.DialogResponseEventArgs e, PlayerClasses classId)
+        private static void DialogSpawns_Response(object sender, SampSharp.GameMode.Events.DialogResponseEventArgs e, PlayerClassType classId)
         {
             if (e.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
             {
@@ -562,35 +561,35 @@ namespace TruckingSharp.Commands
 
                 switch (classId)
                 {
-                    case Data.PlayerClasses.TruckDriver:
+                    case PlayerClassType.TruckDriver:
                         player.Position = e.ListItem switch
                         {
                             _ => TruckerSpawn.TruckerSpawns[e.ListItem].Position,
                         };
                         break;
 
-                    case Data.PlayerClasses.BusDriver:
+                    case PlayerClassType.BusDriver:
                         player.Position = e.ListItem switch
                         {
                             _ => BusDriverSpawn.BusDriverSpawns[e.ListItem].Position,
                         };
                         break;
 
-                    case Data.PlayerClasses.Pilot:
+                    case PlayerClassType.Pilot:
                         player.Position = e.ListItem switch
                         {
                             _ => PilotSpawn.PilotSpawns[e.ListItem].Position,
                         };
                         break;
 
-                    case Data.PlayerClasses.Police:
+                    case PlayerClassType.Police:
                         player.Position = e.ListItem switch
                         {
                             _ => PoliceSpawn.PoliceSpawns[e.ListItem].Position,
                         };
                         break;
 
-                    case Data.PlayerClasses.Courier:
+                    case PlayerClassType.Courier:
                         player.Position = e.ListItem switch
                         {
                             _ => CourierSpawn.CourierSpawns[e.ListItem].Position,

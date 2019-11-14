@@ -11,7 +11,7 @@ using TruckingSharp.Constants;
 using TruckingSharp.Database;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Missions.Data;
-using TruckingSharp.World;
+using TruckingSharp.PlayerClasses.Data;
 
 namespace TruckingSharp.Missions.Trucker
 {
@@ -321,7 +321,7 @@ namespace TruckingSharp.Missions.Trucker
         {
             Player player = sender as Player;
 
-            if (player.PlayerClass != TruckingSharp.Data.PlayerClasses.TruckDriver)
+            if (player.PlayerClass != PlayerClassType.TruckDriver)
             {
                 return;
             }

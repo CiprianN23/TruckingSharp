@@ -6,7 +6,7 @@ using SampSharp.GameMode.SAMP;
 using System;
 using TruckingSharp.Constants;
 using TruckingSharp.Missions.Trucker;
-using TruckingSharp.World;
+using TruckingSharp.PlayerClasses.Data;
 
 namespace TruckingSharp.Missions
 {
@@ -19,7 +19,7 @@ namespace TruckingSharp.Missions
         {
             switch (player.PlayerClass)
             {
-                case TruckingSharp.Data.PlayerClasses.TruckDriver:
+                case PlayerClassType.TruckDriver:
                     TruckerController.EndMission(player);
                     break;
             }
@@ -50,8 +50,8 @@ namespace TruckingSharp.Missions
 
                 switch (player.PlayerClass)
                 {
-                    case TruckingSharp.Data.PlayerClasses.TruckDriver:
-                    case TruckingSharp.Data.PlayerClasses.RoadWorker:
+                    case PlayerClassType.TruckDriver:
+                    case PlayerClassType.RoadWorker:
                         if (player.MissionVehicleTime != 0)
                         {
                             if (oldVehicle == newVehicle && oldTrailer == newTrailer)
@@ -69,9 +69,9 @@ namespace TruckingSharp.Missions
                         }
                         break;
 
-                    case TruckingSharp.Data.PlayerClasses.BusDriver:
-                    case TruckingSharp.Data.PlayerClasses.Mafia:
-                    case TruckingSharp.Data.PlayerClasses.Courier:
+                    case PlayerClassType.BusDriver:
+                    case PlayerClassType.Mafia:
+                    case PlayerClassType.Courier:
                         if (player.MissionVehicleTime != 0)
                         {
                             if (oldVehicle == newVehicle)
@@ -137,23 +137,23 @@ namespace TruckingSharp.Missions
 
             switch (player.PlayerClass)
             {
-                case TruckingSharp.Data.PlayerClasses.TruckDriver:
-                case TruckingSharp.Data.PlayerClasses.BusDriver:
-                case TruckingSharp.Data.PlayerClasses.Pilot:
-                case TruckingSharp.Data.PlayerClasses.Courier:
-                case TruckingSharp.Data.PlayerClasses.RoadWorker:
+                case PlayerClassType.TruckDriver:
+                case PlayerClassType.BusDriver:
+                case PlayerClassType.Pilot:
+                case PlayerClassType.Courier:
+                case PlayerClassType.RoadWorker:
                     player.MissionTextDraw.Text = Messages.NoMissionText;
                     break;
 
-                case TruckingSharp.Data.PlayerClasses.Police:
+                case PlayerClassType.Police:
                     player.MissionTextDraw.Text = Messages.NoMissionTextPolice;
                     break;
 
-                case TruckingSharp.Data.PlayerClasses.Mafia:
+                case PlayerClassType.Mafia:
                     player.MissionTextDraw.Text = Messages.NoMissionTextMafia;
                     break;
 
-                case TruckingSharp.Data.PlayerClasses.Assistance:
+                case PlayerClassType.Assistance:
                     player.MissionTextDraw.Text = Messages.NoMissionTextAssistance;
                     break;
             }
@@ -179,19 +179,19 @@ namespace TruckingSharp.Missions
             {
                 switch (player.PlayerClass)
                 {
-                    case TruckingSharp.Data.PlayerClasses.TruckDriver:
+                    case PlayerClassType.TruckDriver:
                         player.SendClientMessage(Color.Red, Messages.MissionTruckerMustEnterVehicle);
                         break;
 
-                    case TruckingSharp.Data.PlayerClasses.BusDriver:
+                    case PlayerClassType.BusDriver:
                         player.SendClientMessage(Color.Red, Messages.MissionBusDriverMustEnterVehicle);
                         break;
 
-                    case TruckingSharp.Data.PlayerClasses.Mafia:
+                    case PlayerClassType.Mafia:
                         player.SendClientMessage(Color.Red, Messages.MissionMafiaMustEnterVehicle);
                         break;
 
-                    case TruckingSharp.Data.PlayerClasses.RoadWorker:
+                    case PlayerClassType.RoadWorker:
                         player.SendClientMessage(Color.Red, Messages.MissionRoadWorkerMustEnterVehicle);
                         break;
                 }

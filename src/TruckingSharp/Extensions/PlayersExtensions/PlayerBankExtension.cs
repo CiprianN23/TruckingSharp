@@ -1,8 +1,6 @@
 ﻿using SampSharp.GameMode.Display;
 using SampSharp.GameMode.SAMP;
-using TruckingSharp.Database;
 using TruckingSharp.Database.Repositories;
-using TruckingSharp.World;
 
 namespace TruckingSharp.Extensions.PlayersExtensions
 {

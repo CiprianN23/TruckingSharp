@@ -1,6 +1,5 @@
 ﻿using SampSharp.GameMode.Events;
 using SampSharp.GameMode.SAMP;
-using TruckingSharp.World;
 
 namespace TruckingSharp.Extensions.PlayersExtensions
 {

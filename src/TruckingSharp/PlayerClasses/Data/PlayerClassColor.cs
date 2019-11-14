@@ -1,8 +1,8 @@
 ﻿using SampSharp.GameMode.SAMP;
 
-namespace TruckingSharp.Data
+namespace TruckingSharp.PlayerClasses.Data
 {
-    public static class PlayerClassesColor
+    public struct PlayerClassColor
     {
         public static Color TruckerColor { get; } = Color.FromInteger(16744448, ColorFormat.RGB);
         public static Color BusDriverColor { get; } = Color.FromInteger(8454143, ColorFormat.RGB);

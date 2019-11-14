@@ -12,7 +12,6 @@ using TruckingSharp.Database.Repositories;
 using TruckingSharp.Events;
 using TruckingSharp.Extensions.PlayersExtensions;
 using TruckingSharp.Services;
-using TruckingSharp.World;
 
 namespace TruckingSharp.Controllers
 {

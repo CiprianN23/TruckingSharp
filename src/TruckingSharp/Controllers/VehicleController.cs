@@ -1,5 +1,4 @@
 ﻿using SampSharp.GameMode.Controllers;
-using TruckingSharp.World;
 
 namespace TruckingSharp.Controllers
 {
