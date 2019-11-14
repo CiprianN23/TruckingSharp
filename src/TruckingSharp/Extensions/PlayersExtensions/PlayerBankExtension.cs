@@ -99,7 +99,6 @@ namespace TruckingSharp.Extensions.PlayersExtensions
                 var playerBankAccount = player.BankAccount;
                 await new PlayerBankAccountRepository().DeleteAsync(playerBankAccount);
 
-
                 player.IsLoggedInBankAccount = false;
 
                 player.SendClientMessage(Color.GreenYellow, "Your bank account has been deleted.");

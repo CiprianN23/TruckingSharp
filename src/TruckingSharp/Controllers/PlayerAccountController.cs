@@ -87,6 +87,7 @@ namespace TruckingSharp.Controllers
                 player.Score = player.Account.Score;
             }
         }
+
         private void RegisterPlayer(Player player)
         {
             player.ShowPlayerInputDialog("Register", "Insert your password", true, "Submit", "Cancel", async (senderPlayer, ev) =>

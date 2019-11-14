@@ -160,6 +160,7 @@ namespace TruckingSharp.Missions
 
             player.MissionTextDraw.Show();
         }
+
         private void PlayerFailMission(Player player)
         {
             ClassEndMission(player);
