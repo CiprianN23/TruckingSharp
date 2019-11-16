@@ -5,6 +5,7 @@ using SampSharp.GameMode.Display;
 using SampSharp.GameMode.SAMP;
 using System;
 using TruckingSharp.Constants;
+using TruckingSharp.Missions.Convoy;
 using TruckingSharp.Missions.Trucker;
 using TruckingSharp.PlayerClasses.Data;
 
@@ -164,7 +165,7 @@ namespace TruckingSharp.Missions
         private void PlayerFailMission(Player player)
         {
             ClassEndMission(player);
-            // TODO: Remove player from convoy
+            MissionConvoy.PlayerLeaveConvoy(player);
 
             var message = string.Format(Messages.MissionFailed, Configuration.PriceFailedMission);
             player.GameText(message, 5000, 4);

@@ -23,6 +23,8 @@
         public const string PrivMessageFrom = "[PM From] {0} ({1}): {2}";
         public const string CommandNotAllowedInsideBuilding = "You can not use this command when you are inside a building.";
         public const string CommandAllowedOnlyAsDriver = "You can only use this command when you are driving a vehicle.";
+        public const string CommandOnlyAllowedAsTruckDriver = "Command can be used only by truck drivers.";
+        public const string CommandOnlyAllowedAsConvoyLeader = "You need to be the leader of a convoy.";
         public const string NoTrailerAttached = "There is no trailer attached to this vehicle.";
         public const string TrailerDetached = "You have detached the trailer.";
         public const string VehicleFlipped = "You have flipped the vehicle.";
@@ -30,7 +32,7 @@
         public const string MustBeInnocent = "You must be innocent (no wanted level) to use this command.";
         public const string CommandOnlyIfNotDoingAJob = "You can not use this command while doing a job.";
         public const string CommandOnlyIfNotJailed = "You can not use this command when you are in jail.";
-        public const string CommandNotAallowedOnSelf = "You can not use this command on yourself.";
+        public const string CommandNotAllowedOnSelf = "You can not use this command on yourself.";
         public const string NoAdminOnline = "No admin online.";
         public const string PlayerNotInVehicle = "That player is not in your vehicle.";
         public const string VehicleEngineTurnedOn = "You have turned on the engine.";
@@ -64,6 +66,7 @@
         public const string PlayerIsSpectacting = "Player is spectacting.";
         public const string PlayerIsDeadOrNotSpawned = "That player is dead or not spawned yet.";
         public const string PlayerIsNotSpectacting = "You are not spectacting.";
+        public const string PlayerNotPartOfAnyConvoy = "You are not part of any convoy.";
 
         public const string TruckerClass = "Truck Driver";
         public const string BusDriverClass = "Bus Driver";
@@ -79,6 +82,16 @@
 
         public const string MissionConvoyWaitingMembersToLoadCargo = "Waiting for all members to load their cargo.";
         public const string MissionConvoyWaitingMembersToUnLoadCargo = "Waiting for all members to unload their cargo.";
+        public const string MissionConvoyAlreadyFull = "This convoy is already full.";
+        public const string MissionConvoyAlreadyOnRoute = "This convoy is en-route to it's destination, you can not join it.";
+        public const string MissionConvoyCargoTrailerNeeded = "You need a cargo trailer.";
+        public const string MissionConvoyOreTrailerNeeded = "You need a ore trailer.";
+        public const string MissionConvoyFluidsTrailerNeeded = "You need a fluids trailer.";
+        public const string MissionConvoyNoTrailerVehicleNeeded = "You need a Flatbed or DFT-30.";
+        public const string MissionconvoyReadyToGo = "All members have the same trailer, convoy is ready to go.";
+        public const string MissionConvoyCantGo = "Not all members have the same trailer, convoy cannot start yet.";
+        public const string MissionConvoyMembersLoaded = "All members have loaded their cargo, convoy is ready to proceed to the unloading-point.";
+        public const string MissionConvoyWaitingForLeader = "Waiting for the leader to start a job.";
 
         public const string MissionTruckerLoading = "~r~Loading Your Truck... ~w~Please Wait";
         public const string MissionTruckerUnLoading = "~r~Unloading Your Truck... ~w~Please Wait";
@@ -112,6 +125,8 @@
         public const string AlreadyDoingAMission = "You are already doing a mission.";
         public const string MissionNotDoingAMission = "You are not doing any mission.";
         public const string MissionFailed = "~w~You ~r~failed~w~ your mission. You lost ~y~${0}~w~ to cover expenses.";
+
+        public const string MissionConvoyOpened = "Player {{00FF00}}{0}{{FFFFFF}} wants to start a {{00FF00}}convoy{{FFFFFF}}, join him by entering \"/convoy\"";
 
         public const string PlayerJoinedTruckerClass = "{{00FF00}}Player {{FFFF00}}{0}{{00FF00}} joined {{FFFF00}}Trucker class";
         public const string PlayerJoinedBusDriverClass = "{{00FF00}}Player {{FFFF00}}{0}{{00FF00}} joined {{FFFF00}}Busdriver class";

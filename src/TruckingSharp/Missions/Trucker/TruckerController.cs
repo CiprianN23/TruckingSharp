@@ -200,11 +200,9 @@ namespace TruckingSharp.Missions.Trucker
                 case VehicleModelType.Flatbed:
                 case VehicleModelType.DFT30:
                     return MissionCargo.GetCargoList(MissionCargoVehicleType.NoTrailer, ref numberOfCargos);
-                    break;
 
                 case VehicleModelType.CementTruck:
                     return MissionCargo.GetCargoList(MissionCargoVehicleType.CementTruck, ref numberOfCargos);
-                    break;
 
                 case VehicleModelType.Linerunner:
                 case VehicleModelType.Tanker:
@@ -214,15 +212,12 @@ namespace TruckingSharp.Missions.Trucker
                         case VehicleModelType.ArticleTrailer:
                         case VehicleModelType.ArticleTrailer3:
                             return MissionCargo.GetCargoList(MissionCargoVehicleType.CargoTrailer, ref numberOfCargos);
-                            break;
 
                         case VehicleModelType.ArticleTrailer2:
                             return MissionCargo.GetCargoList(MissionCargoVehicleType.OreTrailer, ref numberOfCargos);
-                            break;
 
                         case VehicleModelType.PetrolTrailer:
                             return MissionCargo.GetCargoList(MissionCargoVehicleType.FluidsTrailer, ref numberOfCargos);
-                            break;
                     }
                     break;
             }
@@ -242,11 +237,9 @@ namespace TruckingSharp.Missions.Trucker
                     case VehicleModelType.Flatbed:
                     case VehicleModelType.DFT30:
                         return SetRandomMissionData(player, MissionCargoVehicleType.NoTrailer);
-                        break;
 
                     case VehicleModelType.CementTruck:
                         return SetRandomMissionData(player, MissionCargoVehicleType.CementTruck);
-                        break;
 
                     case VehicleModelType.Linerunner:
                     case VehicleModelType.Roadtrain:
@@ -257,15 +250,12 @@ namespace TruckingSharp.Missions.Trucker
                                 case VehicleModelType.ArticleTrailer3:
                                 case VehicleModelType.ArticleTrailer:
                                     return SetRandomMissionData(player, MissionCargoVehicleType.CargoTrailer);
-                                    break;
 
                                 case VehicleModelType.ArticleTrailer2:
                                     return SetRandomMissionData(player, MissionCargoVehicleType.OreTrailer);
-                                    break;
 
                                 case VehicleModelType.PetrolTrailer:
                                     return SetRandomMissionData(player, MissionCargoVehicleType.FluidsTrailer);
-                                    break;
                             }
                         }
                         break;
@@ -287,13 +277,13 @@ namespace TruckingSharp.Missions.Trucker
             return true;
         }
 
-        private int CalculatePayment(MissionLocation fromLocation, MissionLocation toLocation, MissionCargo missionCargo)
+        public static int CalculatePayment(MissionLocation fromLocation, MissionLocation toLocation, MissionCargo missionCargo)
         {
             var distance = GetDistance(fromLocation, toLocation);
             return (int)Math.Floor(distance * missionCargo.PayPerUnit);
         }
 
-        private double GetDistance(MissionLocation fromLocation, MissionLocation toLocation)
+        public static double GetDistance(MissionLocation fromLocation, MissionLocation toLocation)
         {
             return Math.Sqrt(Math.Pow(toLocation.Position.X - fromLocation.Position.X, 2) + Math.Pow(toLocation.Position.Y - fromLocation.Position.Y, 2));
         }

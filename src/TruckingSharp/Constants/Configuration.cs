@@ -41,7 +41,7 @@ namespace TruckingSharp.Constants
         public const bool CanPoliceGetWeapons = true;
         public static Weapon[] PoliceWeapons = { Weapon.Nitestick, Weapon.Teargas, Weapon.Colt45, Weapon.Shotgun, Weapon.MP5, Weapon.Rifle, Weapon.Spraycan };
         public const int PoliceGunsAmmo = 5000;
-        public const int PlayersBeforePolice = 0;
+        public const int PlayersBeforePolice = 1;
 
         public const int DefaultJailTime = 120; // time in seconds
         public const int DefaultFinePerStar = 1000;
@@ -60,5 +60,8 @@ namespace TruckingSharp.Constants
         public const bool CanAutoKickAfterWarn = true;
         public const int MaxWarnBeforeKick = 3;
         public const int KickDelay = 50;
+
+        public const int MaximumConvoys = 5;
+        public const int MaximumConvoyMembers = 25;
     }
 }

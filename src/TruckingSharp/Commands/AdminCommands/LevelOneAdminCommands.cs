@@ -28,7 +28,7 @@ namespace TruckingSharp.Commands.AdminCommands
 
             if (sender == target)
             {
-                sender.SendClientMessage(Color.Red, Messages.CommandNotAallowedOnSelf);
+                sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedOnSelf);
                 return;
             }
 
@@ -64,7 +64,7 @@ namespace TruckingSharp.Commands.AdminCommands
 
             if (sender == target)
             {
-                sender.SendClientMessage(Color.Red, Messages.CommandNotAallowedOnSelf);
+                sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedOnSelf);
                 return;
             }
 
@@ -188,7 +188,7 @@ namespace TruckingSharp.Commands.AdminCommands
 
             if (sender == target)
             {
-                sender.SendClientMessage(Color.Red, Messages.CommandNotAallowedOnSelf);
+                sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedOnSelf);
                 return;
             }
 
@@ -260,7 +260,7 @@ namespace TruckingSharp.Commands.AdminCommands
 
             if (sender == target)
             {
-                sender.SendClientMessage(Color.Red, Messages.CommandNotAallowedOnSelf);
+                sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedOnSelf);
                 return;
             }
 
@@ -302,7 +302,7 @@ namespace TruckingSharp.Commands.AdminCommands
 
             if (sender == target)
             {
-                sender.SendClientMessage(Color.Red, Messages.CommandNotAallowedOnSelf);
+                sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedOnSelf);
                 return;
             }
 
@@ -344,7 +344,7 @@ namespace TruckingSharp.Commands.AdminCommands
 
             if (sender == target)
             {
-                sender.SendClientMessage(Color.Red, Messages.CommandNotAallowedOnSelf);
+                sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedOnSelf);
                 return;
             }
 
@@ -397,7 +397,7 @@ namespace TruckingSharp.Commands.AdminCommands
 
             if (sender == target)
             {
-                sender.SendClientMessage(Color.Red, Messages.CommandNotAallowedOnSelf);
+                sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedOnSelf);
                 return;
             }
 
@@ -447,7 +447,7 @@ namespace TruckingSharp.Commands.AdminCommands
 
             if (sender == target)
             {
-                sender.SendClientMessage(Color.Red, Messages.CommandNotAallowedOnSelf);
+                sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedOnSelf);
                 return;
             }
 
@@ -496,7 +496,7 @@ namespace TruckingSharp.Commands.AdminCommands
         {
             if (sender == target)
             {
-                sender.SendClientMessage(Color.Red, Messages.CommandNotAallowedOnSelf);
+                sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedOnSelf);
                 return;
             }
 

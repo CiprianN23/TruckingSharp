@@ -5,6 +5,8 @@ using SampSharp.GameMode.SAMP.Commands;
 using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
 using TruckingSharp.Extensions.PlayersExtensions;
+using TruckingSharp.Missions.Convoy;
+using TruckingSharp.Missions.Data;
 using TruckingSharp.Missions.Trucker;
 using TruckingSharp.PlayerClasses.Data;
 
@@ -33,7 +35,14 @@ namespace TruckingSharp.Missions
             switch (sender.PlayerClass)
             {
                 case PlayerClassType.TruckDriver:
-                    // TODO: Convoy checks
+
+                    var convoy = sender.Convoy;
+
+                    if (sender.IsInConvoy && convoy?.Members[0] != sender)
+                    {
+                        sender.SendClientMessage(Color.Red, "You are not the leader of the convoy, you can not start a job.");
+                        return;
+                    }
 
                     var dialogTruckerMission = new ListDialog(Messages.MissionTruckerSelectMissionMethod, Messages.DialogButtonSelect, Messages.DialogButtonCancel);
                     dialogTruckerMission.AddItem("Setup your own load and route\r\nAuto assigned load");
@@ -90,7 +99,10 @@ namespace TruckingSharp.Missions
                 return;
             }
 
-            // TODO: Check convoy and take proper action
+            if (sender.IsInConvoy)
+            {
+                Convoy.MissionConvoy.PlayerLeaveConvoy(sender);
+            }
 
             if (sender.MissionStep == 1)
             {

@@ -12,6 +12,7 @@ using TruckingSharp.Data;
 using TruckingSharp.Database;
 using TruckingSharp.Database.Entities;
 using TruckingSharp.Database.Repositories;
+using TruckingSharp.Missions.Convoy;
 using TruckingSharp.Missions.Data;
 using TruckingSharp.PlayerClasses.Data;
 
@@ -65,13 +66,14 @@ namespace TruckingSharp
         public Timer MissionLoadingTimer { get; set; }
         public int MissionVehicleTime { get; set; }
         public PlayerTextDraw MissionTextDraw { get; set; }
+        public MissionConvoy Convoy { get; set; }
 
         public bool CheckIfPlayerCanJoinPolice()
         {
             if (Configuration.PlayersBeforePolice > 0)
             {
-                int normalPlayers;
-                int policePlayers;
+                int normalPlayers = 0;
+                int policePlayers = 0;
                 foreach (Player player in All)
                 {
                     if (player == this)
@@ -104,8 +106,6 @@ namespace TruckingSharp
 
                 return CanSpawnAsCop;
             }
-
-            return true;
         }
 
         public async void Reward(int money, int score = 0)
@@ -191,8 +191,6 @@ namespace TruckingSharp
 
         public override void OnDisconnected(DisconnectEventArgs e)
         {
-            base.OnDisconnected(e);
-
             SendClientMessageToAll(Color.Blue, Messages.PlayerLeftTheServer, Name, Id);
 
             foreach (Player player in All)
@@ -209,8 +207,9 @@ namespace TruckingSharp
                 }
             }
 
-            // TODO: Leave convoy
             // TODO Destroy rented vehicle
+
+            base.OnDisconnected(e);
         }
 
         public override void OnEnterVehicle(EnterVehicleEventArgs e)
