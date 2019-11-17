@@ -9,7 +9,7 @@ namespace TruckingSharp.Missions.Bonus
     [Controller]
     public class BonusMissionController : IEventListener
     {
-        private Timer _timer;
+        public static Timer Timer;
 
         public void RegisterEvents(BaseMode gameMode)
         {
@@ -18,11 +18,11 @@ namespace TruckingSharp.Missions.Bonus
 
         private void Bonus_GamemodeInitialized(object sender, EventArgs e)
         {
-            _timer = new Timer(TimeSpan.FromMinutes(5), true);
-            _timer.Tick += Timer_Tick;
+            Timer = new Timer(TimeSpan.FromMinutes(5), true);
+            Timer.Tick += Timer_Tick;
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
+        public static void Timer_Tick(object sender, EventArgs e)
         {
             bool isMissionSet = false;
             Random random = new Random();

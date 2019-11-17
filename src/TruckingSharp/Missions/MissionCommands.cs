@@ -2,9 +2,11 @@
 using SampSharp.GameMode.Display;
 using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.SAMP.Commands;
+using System;
 using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
 using TruckingSharp.Extensions.PlayersExtensions;
+using TruckingSharp.Missions.Bonus;
 using TruckingSharp.Missions.Convoy;
 using TruckingSharp.Missions.Data;
 using TruckingSharp.Missions.Trucker;
@@ -182,6 +184,17 @@ namespace TruckingSharp.Missions
                 sender.SendClientMessage(Color.Yellow, "You have overloaded your truck, watch out for the police.");
                 // TODO: Send message to police
             }
+        }
+        [Command("bonus", Shortcut = "bonus")]
+        public static void OnBonuscommand(Player sender)
+        {
+            if(sender.PlayerClass != PlayerClassType.TruckDriver)
+            {
+                sender.SendClientMessage(Color.Red, "You need to be Truck Driver to use this command.");
+                return;
+            }
+
+            BonusMissionController.Timer.OnTick(EventArgs.Empty);
         }
     }
 }
