@@ -189,7 +189,7 @@ namespace TruckingSharp.Missions.Convoy
             member.MissionTextDraw.Text = string.Format(Messages.MissionTruckerHaulingToDeliverCargo, MissionCargo.Name, FromLocation.Name, ToLocation.Name);
 
             member.SetCheckpoint(ToLocation.Position, 7.0f);
-            member.SendClientMessage(Color.White, Messages.MissionTruckerHaulingToDeliverCargo, MissionCargo.Name, FromLocation.Name, ToLocation.Name);
+            member.SendClientMessage(Color.White, Messages.MissionTruckerDeliverTo, MissionCargo.Name, ToLocation.Name);
         }
 
         public void UpdateTextDraw()
