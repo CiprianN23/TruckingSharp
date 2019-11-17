@@ -2,9 +2,11 @@
 using SampSharp.GameMode.Controllers;
 using SampSharp.GameMode.Definitions;
 using SampSharp.GameMode.SAMP;
+using SampSharp.GameMode.World;
 using TruckingSharp.Constants;
 using TruckingSharp.Database;
 using TruckingSharp.Database.Repositories;
+using TruckingSharp.Missions.Bonus;
 using TruckingSharp.Missions.Trucker;
 
 namespace TruckingSharp.Missions.Convoy
@@ -157,12 +159,33 @@ namespace TruckingSharp.Missions.Convoy
                     }
                     break;
 
+                case 2:
+                    bool didAllMembersUnlaoded = true;
+
+                    foreach(var member in convoy.Members)
+                    {
+                        if (member.MissionStep != 4)
+                            didAllMembersUnlaoded = false;
+                    }
+
+                    if (didAllMembersUnlaoded)
+                        convoy.MissionStep = 3;
+                    break;
+
                 case 3:
                     int numberOfMembers = convoy.Members.Count;
 
                     int payment = TruckerController.CalculatePayment(convoy.FromLocation, convoy.ToLocation, convoy.MissionCargo);
 
-                    // TODO: Bonus mission
+                    if (!BonusMission.IsMissionFinished
+                        && BonusMission.RandomCargo == convoy.MissionCargo
+                        && BonusMission.RandomFromLocation == convoy.FromLocation
+                        && BonusMission.RandomToLocation == convoy.ToLocation)
+                    {
+                        payment *= 2;
+                        BonusMission.IsMissionFinished = true;
+                        BasePlayer.SendClientMessageToAll($"{{00BBFF}}Convoy with leader {{FFBB00}}{leader.Name}{{00BBFF}} has finished the bonus mission.");
+                    }
 
                     int bonus = (numberOfMembers * 25) + 100;
                     payment = (payment * bonus) / 100;

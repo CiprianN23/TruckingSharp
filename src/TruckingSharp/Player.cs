@@ -118,7 +118,7 @@ namespace TruckingSharp
             Money = account.Money;
             Score = account.Score;
 
-            await _accountRepository.UpdateAsync(account);
+            await _accountRepository.UpdateAsync(account).ConfigureAwait(false);
         }
 
         public async void SetWantedLevel(int wantedLevel)

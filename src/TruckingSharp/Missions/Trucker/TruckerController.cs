@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using TruckingSharp.Constants;
 using TruckingSharp.Database;
 using TruckingSharp.Database.Repositories;
+using TruckingSharp.Missions.Bonus;
 using TruckingSharp.Missions.Data;
 using TruckingSharp.PlayerClasses.Data;
 
@@ -409,7 +410,15 @@ namespace TruckingSharp.Missions.Trucker
 
                     int payment = CalculatePayment(player.FromLocation, player.ToLocation, player.MissionCargo);
 
-                    // TODO: Bonus mission
+                    if (!BonusMission.IsMissionFinished
+                        && BonusMission.RandomCargo == player.MissionCargo
+                        && BonusMission.RandomFromLocation == player.FromLocation
+                        && BonusMission.RandomToLocation == player.ToLocation)
+                    {
+                        payment *= 2;
+                        BonusMission.IsMissionFinished = true;
+                        BasePlayer.SendClientMessageToAll($"{{00BBFF}}Player {{FFBB00}}{player.Name}{{00BBFF}} has finished the bonus mission.");
+                    }
 
                     player.Reward(payment);
                     player.SendClientMessage(Messages.MissionReward, payment);
