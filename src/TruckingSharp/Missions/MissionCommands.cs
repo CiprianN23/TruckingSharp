@@ -7,8 +7,6 @@ using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
 using TruckingSharp.Extensions.PlayersExtensions;
 using TruckingSharp.Missions.Bonus;
-using TruckingSharp.Missions.Convoy;
-using TruckingSharp.Missions.Data;
 using TruckingSharp.Missions.Trucker;
 using TruckingSharp.PlayerClasses.Data;
 
@@ -185,10 +183,11 @@ namespace TruckingSharp.Missions
                 // TODO: Send message to police
             }
         }
+
         [Command("bonus", Shortcut = "bonus")]
         public static void OnBonuscommand(Player sender)
         {
-            if(sender.PlayerClass != PlayerClassType.TruckDriver)
+            if (sender.PlayerClass != PlayerClassType.TruckDriver)
             {
                 sender.SendClientMessage(Color.Red, "You need to be Truck Driver to use this command.");
                 return;

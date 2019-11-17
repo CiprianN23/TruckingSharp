@@ -14,9 +14,8 @@ namespace TruckingSharp
 
         protected override void Initialize()
         {
-            base.Initialize();
-
             Fuel = Configuration.MaxFuel;
+            base.Initialize();
         }
     }
 }

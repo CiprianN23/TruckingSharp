@@ -63,5 +63,7 @@ namespace TruckingSharp.Constants
 
         public const int MaximumConvoys = 5;
         public const int MaximumConvoyMembers = 25;
+
+        public const double KilometersPerHourMultiplier = 195.12;
     }
 }

@@ -5,7 +5,6 @@ using SampSharp.GameMode.SAMP;
 using System;
 using System.Collections.Generic;
 using TruckingSharp.Constants;
-using TruckingSharp.Missions.Convoy;
 using TruckingSharp.Missions.Data;
 
 namespace TruckingSharp.Missions.Convoy
@@ -140,7 +139,7 @@ namespace TruckingSharp.Missions.Convoy
             convoy.MemberText.Hide(player);
             convoy.LeaderText.Hide(player);
 
-            if(!player.MissionTextDraw.IsDisposed)
+            if (!player.MissionTextDraw.IsDisposed)
                 player.MissionTextDraw.Text = Messages.NoMissionText;
 
             if (convoy.Members[0] == player)

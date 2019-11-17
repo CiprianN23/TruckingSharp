@@ -162,7 +162,7 @@ namespace TruckingSharp.Missions.Convoy
                 case 2:
                     bool didAllMembersUnlaoded = true;
 
-                    foreach(var member in convoy.Members)
+                    foreach (var member in convoy.Members)
                     {
                         if (member.MissionStep != 4)
                             didAllMembersUnlaoded = false;

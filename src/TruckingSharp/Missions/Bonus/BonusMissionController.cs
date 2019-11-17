@@ -57,28 +57,32 @@ namespace TruckingSharp.Missions.Bonus
 
             string truckName = string.Empty;
 
-            switch(BonusMission.RandomCargo.JobCargoVehicleType)
+            switch (BonusMission.RandomCargo.JobCargoVehicleType)
             {
                 case MissionCargoVehicleType.CargoTrailer:
                     truckName = "truck with cargo trailer";
                     break;
+
                 case MissionCargoVehicleType.FluidsTrailer:
                     truckName = "truck with fluids trailer";
                     break;
+
                 case MissionCargoVehicleType.OreTrailer:
                     truckName = "truck with ore trailer";
                     break;
+
                 case MissionCargoVehicleType.CementTruck:
                     truckName = "cement truck";
                     break;
+
                 case MissionCargoVehicleType.NoTrailer:
                     truckName = "Flatbed or DFT-30";
                     break;
             }
 
-            foreach(Player player in Player.All)
+            foreach (Player player in Player.All)
             {
-                if(player.PlayerClass == PlayerClasses.Data.PlayerClassType.TruckDriver)
+                if (player.PlayerClass == PlayerClasses.Data.PlayerClassType.TruckDriver)
                 {
                     player.SendClientMessage(Color.White, $"{{00BBFF}}Bonus mission: transport {{FFBB00}}{BonusMission.RandomCargo.Name}");
                     player.SendClientMessage(Color.White, $"{{00BBFF}}from {{FFBB00}}{BonusMission.RandomFromLocation.Name}{{00BBFF}} to {{FFBB00}}{BonusMission.RandomToLocation.Name}");

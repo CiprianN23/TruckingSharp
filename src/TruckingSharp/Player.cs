@@ -68,6 +68,11 @@ namespace TruckingSharp
         public PlayerTextDraw MissionTextDraw { get; set; }
         public MissionConvoy Convoy { get; set; }
 
+        public PlayerTextDraw VehicleNameTextDraw { get; set; }
+        public PlayerTextDraw SpeedometerTextDraw { get; set; }
+        public PlayerTextDraw FuelGaugeTextDraw { get; set; }
+        public Timer SpeedometerTimer { get; set; }
+
         public bool CheckIfPlayerCanJoinPolice()
         {
             if (Configuration.PlayersBeforePolice > 0)
@@ -328,6 +333,15 @@ namespace TruckingSharp
         {
             var remainingMuteTime = Account.Muted - DateTime.Now;
             SendClientMessage(Color.Silver, $"Mute time remaining: Minutes: {remainingMuteTime.Minutes}, Seconds: {remainingMuteTime.Seconds}");
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            SpeedometerTimer?.Dispose();
+            SpectateTimer?.Dispose();
+            MissionLoadingTimer?.Dispose();
+
+            base.Dispose(disposing);
         }
     }
 }
