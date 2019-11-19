@@ -108,7 +108,7 @@ namespace TruckingSharp.Controllers
                 {
                     player.Kick();
                 }
-            });
+            };
         }
     }
 }

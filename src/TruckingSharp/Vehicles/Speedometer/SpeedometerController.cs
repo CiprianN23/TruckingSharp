@@ -7,7 +7,7 @@ using TruckingSharp.Constants;
 using TruckingSharp.Database;
 using TruckingSharp.Database.Repositories;
 
-namespace TruckingSharp.Speedometer
+namespace TruckingSharp.Vehicles.Speedometer
 {
     [Controller]
     public class SpeedometerController : IEventListener
@@ -17,6 +17,30 @@ namespace TruckingSharp.Speedometer
         public void RegisterEvents(BaseMode gameMode)
         {
             gameMode.PlayerConnected += Speedometer_PlayerConnected;
+            gameMode.PlayerEnterVehicle += Speedoemeter_PlayerEnterVehicle;
+            gameMode.PlayerExitVehicle += Speedometer_PlayerExitVehicle;
+        }
+
+        private void Speedometer_PlayerExitVehicle(object sender, SampSharp.GameMode.Events.PlayerVehicleEventArgs e)
+        {
+            var player = e.Player as Player;
+
+            player.VehicleNameTextDraw.Hide();
+            player.SpeedometerTextDraw.Hide();
+            player.FuelGaugeTextDraw.Hide();
+
+            player.SpeedometerTimer.IsRunning = false;
+        }
+
+        private void Speedoemeter_PlayerEnterVehicle(object sender, SampSharp.GameMode.Events.EnterVehicleEventArgs e)
+        {
+            var player = e.Player as Player;
+
+            player.VehicleNameTextDraw.Show();
+            player.SpeedometerTextDraw.Show();
+            player.FuelGaugeTextDraw.Show();
+
+            player.SpeedometerTimer.IsRunning = true;
         }
 
         private void Speedometer_PlayerConnected(object sender, EventArgs e)
@@ -28,6 +52,7 @@ namespace TruckingSharp.Speedometer
             player.FuelGaugeTextDraw = new PlayerTextDraw(player, new Vector2(500.0, 410.0), " ");
 
             player.SpeedometerTimer = new Timer(TimeSpan.FromMilliseconds(500), true);
+            player.SpeedometerTimer.IsRunning = false;
             player.SpeedometerTimer.Tick += (sender, e) => SpeedometerTimer_Tick(sender, e, player);
         }
 
@@ -35,25 +60,20 @@ namespace TruckingSharp.Speedometer
         {
             if (player.Vehicle != null)
             {
-                player.VehicleNameTextDraw.Show();
-                player.SpeedometerTextDraw.Show();
-                player.FuelGaugeTextDraw.Show();
-
                 var playerVehicle = (Vehicle)player.Vehicle;
                 var playerVehicleVelocity = playerVehicle.Velocity;
 
-                int finalSpeed = (int)(Math.Sqrt(Math.Pow(playerVehicleVelocity.X, 2) + Math.Pow(playerVehicleVelocity.Y, 2) + Math.Pow(playerVehicleVelocity.Z, 2))
-                    * Configuration.KilometersPerHourMultiplier);
+                int playerVehicleSpeed = GetPlayerVehicleSpeed(playerVehicleVelocity);
 
-                player.SpeedometerTextDraw.Text = $"~w~Speed: ~b~{finalSpeed}~w~ kph";
+                player.SpeedometerTextDraw.Text = $"~w~Speed: ~b~{playerVehicleSpeed}~w~ kph";
 
                 var account = player.Account;
-                account.MetersDriven = (float)(account.MetersDriven + (finalSpeed / 7.2));
+                account.MetersDriven = (float)(account.MetersDriven + (playerVehicleSpeed / 7.2));
                 await _playerAccountRepository.UpdateAsync(account);
 
                 player.VehicleNameTextDraw.Text = $"{playerVehicle.ModelInfo.Name}";
 
-                if (finalSpeed > 10 && playerVehicle.Fuel > 0)
+                if (playerVehicleSpeed > 10 && playerVehicle.Fuel > 0)
                     playerVehicle.Fuel--;
 
                 player.FuelGaugeTextDraw.Text = ConstructFuelGauge(playerVehicle.Fuel);
@@ -64,12 +84,11 @@ namespace TruckingSharp.Speedometer
                     playerVehicle.Lights = false;
                 }
             }
-            else
-            {
-                player.VehicleNameTextDraw.Hide();
-                player.SpeedometerTextDraw.Hide();
-                player.FuelGaugeTextDraw.Hide();
-            }
+        }
+
+        private int GetPlayerVehicleSpeed(Vector3 velocity)
+        {
+            return (int)(Math.Sqrt(Math.Pow(velocity.X, 2) + Math.Pow(velocity.Y, 2) + Math.Pow(velocity.Z, 2)) * Configuration.KilometersPerHourMultiplier);
         }
 
         private string ConstructFuelGauge(int fuel)
