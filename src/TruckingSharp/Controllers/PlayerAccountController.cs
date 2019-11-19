@@ -90,7 +90,9 @@ namespace TruckingSharp.Controllers
 
         private void RegisterPlayer(Player player)
         {
-            player.ShowPlayerInputDialog("Register", "Insert your password", true, "Submit", "Cancel", async (senderPlayer, ev) =>
+            var registerDialog = new InputDialog("Register", "Insert your password", true, "Submit", "Cancel");
+            registerDialog.Show(player);
+            registerDialog.Response += async (senderPlayer, ev) =>
             {
                 if (ev.DialogButton == DialogButton.Left)
                 {

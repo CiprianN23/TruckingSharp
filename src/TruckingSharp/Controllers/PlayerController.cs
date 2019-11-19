@@ -1,6 +1,4 @@
-﻿using SampSharp.GameMode;
-using SampSharp.GameMode.Controllers;
-using TruckingSharp.Extensions.PlayersExtensions;
+﻿using SampSharp.GameMode.Controllers;
 
 namespace TruckingSharp.Controllers
 {
@@ -9,15 +7,6 @@ namespace TruckingSharp.Controllers
         public override void RegisterTypes()
         {
             Player.Register<Player>();
-        }
-
-        public override void RegisterEvents(BaseMode gameMode)
-        {
-            var baseGameMode = gameMode as GameMode;
-
-            baseGameMode.PlayerCommandText += (sender, args) => (sender as Player)?.OnPlayerCommandTextSendToAdmins(args);
-
-            base.RegisterEvents(baseGameMode);
         }
     }
 }
