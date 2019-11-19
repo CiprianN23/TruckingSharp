@@ -541,6 +541,8 @@ namespace TruckingSharp.Commands.AdminCommands
                 sender.SpectateType = SpectateTypes.Vehicle;
             }
 
+            sender.SpectateTimer.IsRunning = true;
+
             sender.SendClientMessage($"{{00FF00}}You're spectating {{FFFF00}}{target.Name}");
         }
 
@@ -556,6 +558,7 @@ namespace TruckingSharp.Commands.AdminCommands
             sender.ToggleSpectating(false);
             sender.SpectatedPlayer = null;
             sender.SpectatedVehicle = null;
+            sender.SpectateTimer.IsRunning = false;
             sender.SpectateType = SpectateTypes.None;
         }
     }

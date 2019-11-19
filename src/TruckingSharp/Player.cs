@@ -149,68 +149,18 @@ namespace TruckingSharp
 
             await Task.Delay(100);
             SendClientMessageToAll(Color.Blue, Messages.PlayerJoinedTheServer, Name, Id);
-
-            SpectateTimer = new Timer(500, true);
-            SpectateTimer.Tick += SpectateTimer_Tick;
-        }
-
-        private void SpectateTimer_Tick(object sender, EventArgs e)
-        {
-            if (SpectatedPlayer == null)
-                return;
-
-            if (State == PlayerState.Spectating)
-            {
-                VirtualWorld = SpectatedPlayer.VirtualWorld;
-                Interior = SpectatedPlayer.Interior;
-
-                if (SpectateType == SpectateTypes.Player)
-                {
-                    if (SpectatedPlayer.VehicleSeat != -1)
-                    {
-                        SpectateVehicle(SpectatedPlayer.Vehicle);
-                        SpectatedVehicle = SpectatedPlayer.Vehicle;
-                        SpectateType = SpectateTypes.Vehicle;
-                        SendClientMessage($"{{00FF00}}Player {{FFFF00}}{SpectatedPlayer.Name}{{00FF00}} has entered a vehicle, changing spectate mode to match");
-                    }
-                }
-                else
-                {
-                    if (SpectatedPlayer.VehicleSeat == -1)
-                    {
-                        SpectatePlayer(SpectatedPlayer);
-                        SpectateType = SpectateTypes.Player;
-                        SendClientMessage($"{{00FF00}}Player {{FFFF00}}{SpectatedPlayer.Name}{{00FF00}} has exited a vehicle, changing spectate mode to match");
-                    }
-                }
-            }
         }
 
         public override void OnDeath(DeathEventArgs e)
         {
             base.OnDeath(e);
 
-            // TODO: Leave convoy
             // TODO: Wanted for killer
         }
 
         public override void OnDisconnected(DisconnectEventArgs e)
         {
             SendClientMessageToAll(Color.Blue, Messages.PlayerLeftTheServer, Name, Id);
-
-            foreach (Player player in All)
-            {
-                if (!player.IsLoggedIn)
-                    continue;
-
-                if (player.State == PlayerState.Spectating && player.SpectatedPlayer == this)
-                {
-                    player.ToggleSpectating(false);
-                    player.SpectatedPlayer = null;
-                    player.SpectatedVehicle = null;
-                    player.SendClientMessage(Color.Red, "Target player has logged off, ending specate mode.");
-                }
-            }
 
             // TODO Destroy rented vehicle
 

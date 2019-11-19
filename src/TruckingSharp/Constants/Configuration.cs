@@ -1,4 +1,5 @@
 ﻿using SampSharp.GameMode.Definitions;
+using System;
 
 namespace TruckingSharp.Constants
 {
@@ -59,7 +60,7 @@ namespace TruckingSharp.Constants
 
         public const bool CanAutoKickAfterWarn = true;
         public const int MaxWarnBeforeKick = 3;
-        public const int KickDelay = 50;
+        public static TimeSpan KickDelay = TimeSpan.FromMilliseconds(50);
 
         public const int MaximumConvoys = 5;
         public const int MaximumConvoyMembers = 25;
