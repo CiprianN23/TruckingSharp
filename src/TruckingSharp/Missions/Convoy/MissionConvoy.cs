@@ -86,7 +86,7 @@ namespace TruckingSharp.Missions.Convoy
                 leader.IsInConvoy = true;
                 leader.Convoy = convoy;
 
-                convoy.Timer = new Timer(1000, true);
+                convoy.Timer = new Timer(TimeSpan.FromSeconds(1), true);
                 convoy.Timer.Tick += (sender, e) => ConvoyController.ConvoyTimer_Tick(sender, e, convoy);
 
                 foreach (Player player in Player.All)

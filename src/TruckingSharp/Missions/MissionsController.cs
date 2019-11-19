@@ -100,7 +100,7 @@ namespace TruckingSharp.Missions
 
         private void Mission_GamemodeInitialized(object sender, System.EventArgs e)
         {
-            _missionTimer = new Timer(1000, true);
+            _missionTimer = new Timer(TimeSpan.FromSeconds(1), true);
             _missionTimer.Tick += _missionTimer_Tick;
         }
 

@@ -416,7 +416,7 @@ namespace TruckingSharp.Commands.AdminCommands
             target.FrozenTime = seconds;
             target.ToggleControllable(false);
 
-            Timer freezeTimer = new Timer(1000, true);
+            Timer freezeTimer = new Timer(TimeSpan.FromSeconds(1), true);
             freezeTimer.Tick += (senderObject, args) =>
             {
                 target.FrozenTime--;

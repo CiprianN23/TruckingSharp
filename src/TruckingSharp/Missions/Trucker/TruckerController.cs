@@ -343,7 +343,7 @@ namespace TruckingSharp.Missions.Trucker
 
             player.ToggleControllable(false);
 
-            player.MissionLoadingTimer = new Timer(5000, false);
+            player.MissionLoadingTimer = new Timer(TimeSpan.FromSeconds(5), false);
             player.MissionLoadingTimer.Tick += (sender, e) => TruckerLoadUnlaod_Tick(sender, e, player);
         }
 
