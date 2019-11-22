@@ -11,7 +11,7 @@ namespace TruckingSharp.Commands.AdminCommands
     public class LevelThreeAdminCommands
     {
         [Command("setadmin", Shortcut = "setadmin")]
-        public static async void OnSetAdminCommand(BasePlayer sender, Player target, byte level)
+        public static async void OnSetAdminCommand(BasePlayer sender, Player target, int level)
         {
             if (!target.IsLoggedIn)
             {
@@ -32,14 +32,14 @@ namespace TruckingSharp.Commands.AdminCommands
             }
 
             var targetAccount = target.Account;
-            targetAccount.AdminLevel = level;
+            targetAccount.AdminLevel = (byte)level;
             await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
 
             target.SendClientMessage(Color.GreenYellow, $"Your admin level have been seted to {level} by {sender.Name}.");
         }
 
         [Command("resetplayer", Shortcut = "resetplayer")]
-        public static async void OnResetPlayerCommand(BasePlayer sender, Player target, byte money, byte score, byte stats, string reason)
+        public static async void OnResetPlayerCommand(BasePlayer sender, Player target, int money, int score, int stats, string reason)
         {
             if (!target.IsLoggedIn)
             {
