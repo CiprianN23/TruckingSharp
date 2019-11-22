@@ -69,7 +69,7 @@ namespace TruckingSharp.Commands
 
                             var hash = PasswordHashingService.GetPasswordHash(e.InputText);
                             var newBankAccount = new PlayerBankAccount { Password = hash, PlayerId = sender.Account.Id };
-                            await new PlayerBankAccountRepository().AddAsync(newBankAccount);
+                            await new PlayerBankAccountRepository(ConnectionFactory.GetConnection).AddAsync(newBankAccount);
 
                             sender.SendClientMessage(Color.GreenYellow, Messages.BankAccountCreatedSuccessfully);
                         }
@@ -151,7 +151,7 @@ namespace TruckingSharp.Commands
                                 {
                                     var account = sender.Account;
                                     account.Password = PasswordHashingService.GetPasswordHash(e.InputText);
-                                    await new PlayerAccountRepository().UpdateAsync(account);
+                                    await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(account);
 
                                     sender.SendClientMessage(Color.GreenYellow, Messages.PasswordChangedSuccessfully);
                                 }
@@ -512,7 +512,7 @@ namespace TruckingSharp.Commands
                     var account = sender.Account;
                     account.RulesRead = 1;
 
-                    await new PlayerAccountRepository().UpdateAsync(account);
+                    await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(account);
 
                     sender.SendClientMessage(Color.FromInteger(65280, ColorFormat.RGB), "You have earned {FFFF00}$5000{00FF00} for accepting the rules");
                 }

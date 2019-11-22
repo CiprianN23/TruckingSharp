@@ -9,7 +9,6 @@ using System;
 using System.Threading.Tasks;
 using TruckingSharp.Constants;
 using TruckingSharp.Data;
-using TruckingSharp.Database;
 using TruckingSharp.Database.Entities;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Missions.Convoy;
@@ -21,7 +20,7 @@ namespace TruckingSharp
     [PooledType]
     public class Player : BasePlayer
     {
-        private PlayerAccountRepository _accountRepository => new PlayerAccountRepository(DapperConnection.ConnectionString);
+        private PlayerAccountRepository _accountRepository => new PlayerAccountRepository(ConnectionFactory.GetConnection);
 
         public PlayerClassType PlayerClass;
 
@@ -37,7 +36,7 @@ namespace TruckingSharp
         {
             get
             {
-                return new PlayerBankAccountRepository().Find(Account.Id);
+                return new PlayerBankAccountRepository(ConnectionFactory.GetConnection).Find(Account.Id);
             }
         }
 
@@ -131,7 +130,7 @@ namespace TruckingSharp
             var account = Account;
             account.Wanted = wantedLevel;
             WantedLevel = wantedLevel;
-            await _accountRepository.UpdateAsync(account);
+            await _accountRepository.UpdateAsync(account).ConfigureAwait(false);
         }
 
         public override void OnClickPlayer(ClickPlayerEventArgs e)
@@ -141,14 +140,13 @@ namespace TruckingSharp
             // TODO: Show player stats
         }
 
-        public override async void OnConnected(EventArgs e)
+        public override void OnConnected(EventArgs e)
         {
             ToggleSpectating(true);
 
-            base.OnConnected(e);
+            SendClientMessageToAll(Color.LightGray, Messages.PlayerJoinedTheServer, Name, Id);
 
-            await Task.Delay(100);
-            SendClientMessageToAll(Color.Blue, Messages.PlayerJoinedTheServer, Name, Id);
+            base.OnConnected(e);
         }
 
         public override void OnDeath(DeathEventArgs e)
@@ -160,7 +158,7 @@ namespace TruckingSharp
 
         public override void OnDisconnected(DisconnectEventArgs e)
         {
-            SendClientMessageToAll(Color.Blue, Messages.PlayerLeftTheServer, Name, Id);
+            SendClientMessageToAll(Color.LightGray, Messages.PlayerLeftTheServer, Name, Id);
 
             // TODO Destroy rented vehicle
 

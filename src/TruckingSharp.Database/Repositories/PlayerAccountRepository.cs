@@ -12,14 +12,9 @@ namespace TruckingSharp.Database.Repositories
     {
         private MySqlConnection _connection;
 
-        public PlayerAccountRepository()
+        public PlayerAccountRepository(MySqlConnection conenction)
         {
-            _connection = new MySqlConnection(DapperConnection.ConnectionString);
-        }
-
-        public PlayerAccountRepository(string connectionString)
-        {
-            _connection = new MySqlConnection(connectionString);
+            _connection = conenction;
         }
 
         #region Sync
@@ -41,7 +36,7 @@ namespace TruckingSharp.Database.Repositories
 
         public PlayerAccount Find(int id)
         {
-            return _connection.QueryFirstOrDefault<PlayerAccount>("SELECT * FROM accounts WHERE Id = @Id;", new { Id = id });
+            return _connection.Get<PlayerAccount>(id);
         }
 
         public PlayerAccount Find(string name)

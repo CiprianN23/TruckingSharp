@@ -6,11 +6,9 @@ using SampSharp.GameMode.SAMP;
 using System;
 using System.Threading.Tasks;
 using TruckingSharp.Constants;
-using TruckingSharp.Database;
 using TruckingSharp.Database.Entities;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Events;
-using TruckingSharp.Extensions.PlayersExtensions;
 using TruckingSharp.Services;
 
 namespace TruckingSharp.Controllers
@@ -18,7 +16,8 @@ namespace TruckingSharp.Controllers
     [Controller]
     public class PlayerAccountController : IController, IEventListener
     {
-        private PlayerAccountRepository _accountRepository => new PlayerAccountRepository(DapperConnection.ConnectionString);
+        private PlayerAccountRepository _accountRepository => new PlayerAccountRepository(ConnectionFactory.GetConnection);
+        private PlayerBanRepository _banRepository => new PlayerBanRepository(ConnectionFactory.GetConnection);
 
         public event EventHandler<PlayerLoginEventArgs> PlayerLogin;
 
@@ -28,10 +27,35 @@ namespace TruckingSharp.Controllers
             gameMode.PlayerConnected += GameMode_PlayerConnected;
         }
 
-        private void GameMode_PlayerConnected(object sender, EventArgs e)
+        private async void GameMode_PlayerConnected(object sender, EventArgs e)
         {
             Player player = sender as Player;
 
+            var playerBan = _banRepository.Find(player.Name);
+
+            if (playerBan != null)
+            {
+                if (playerBan.Duration < DateTime.Now)
+                {
+                    await _banRepository.DeleteAsync(playerBan);
+                    CheckAccount(player);
+                    return;
+                }
+
+                player.SendClientMessage(Color.Red, "You are still banned.");
+                player.SendClientMessage(Color.Red, "Until: {0:dd/MM/yyyy H:mm:ss zzz}", playerBan.Duration);
+
+                await Task.Delay(Configuration.KickDelay);
+                player.Kick();
+
+                return;
+            }
+
+            CheckAccount(player);
+        }
+
+        private void CheckAccount(Player player)
+        {
             if (player.Account == null)
                 RegisterPlayer(player);
             else

@@ -4,7 +4,6 @@ using SampSharp.GameMode.Definitions;
 using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.World;
 using TruckingSharp.Constants;
-using TruckingSharp.Database;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Missions.Bonus;
 using TruckingSharp.Missions.Trucker;
@@ -14,7 +13,7 @@ namespace TruckingSharp.Missions.Convoy
     [Controller]
     public class ConvoyController : IController, IEventListener
     {
-        private static PlayerAccountRepository _accountRepository => new PlayerAccountRepository(DapperConnection.ConnectionString);
+        private static PlayerAccountRepository _accountRepository => new PlayerAccountRepository(ConnectionFactory.GetConnection);
 
         public static void ConvoyListDialog_Response(object sender, SampSharp.GameMode.Events.DialogResponseEventArgs e)
         {

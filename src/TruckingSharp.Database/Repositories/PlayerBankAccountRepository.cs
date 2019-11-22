@@ -12,14 +12,9 @@ namespace TruckingSharp.Database.Repositories
     {
         private MySqlConnection _connection;
 
-        public PlayerBankAccountRepository()
+        public PlayerBankAccountRepository(MySqlConnection connection)
         {
-            _connection = new MySqlConnection(DapperConnection.ConnectionString);
-        }
-
-        public PlayerBankAccountRepository(string connectionString)
-        {
-            _connection = new MySqlConnection(connectionString);
+            _connection = connection;
         }
 
         #region Sync

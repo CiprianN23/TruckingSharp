@@ -325,7 +325,7 @@ namespace TruckingSharp.Commands.AdminCommands
             var account = target.Account;
             account.Muted = currentTime.AddMinutes(duration);
 
-            await new PlayerAccountRepository().UpdateAsync(account);
+            await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(account);
 
             target.SendClientMessage(Color.Red, $"You have been muted by {{FFFF00}}{sender.Name} {{FF0000}}for {{FFFF00}}{reason}");
             target.ShowRemainingMuteTime();
@@ -357,7 +357,7 @@ namespace TruckingSharp.Commands.AdminCommands
             var account = target.Account;
             account.Muted = DateTime.Now;
 
-            await new PlayerAccountRepository().UpdateAsync(account);
+            await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(account);
 
             target.SendClientMessage(Color.GreenYellow, $"You have been un-muted by {{FFFF00}}{sender.Name}");
 
@@ -560,6 +560,43 @@ namespace TruckingSharp.Commands.AdminCommands
             sender.SpectatedVehicle = null;
             sender.SpectateTimer.IsRunning = false;
             sender.SpectateType = SpectateTypes.None;
+        }
+
+        [Command("setwanted", Shortcut = "setwanted")]
+        public static void OnSetWantedCommand(BasePlayer sender, Player target, int wanted)
+        {
+            if (!target.IsLoggedIn)
+            {
+                sender.SendClientMessage(Color.Red, Messages.PlayerNotLoggedIn);
+                return;
+            }
+
+            if (target == sender)
+            {
+                sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedOnSelf);
+                return;
+            }
+
+            if (wanted < 0 || wanted > 6)
+            {
+                sender.SendClientMessage(Color.Red, "You have entered an invalid wanted level. Only 0-6 are possible.");
+                return;
+            }
+
+            target.SetWantedLevel(wanted);
+            target.SendClientMessage(Color.Blue, "Your wanted level has been set by an admin.");
+        }
+
+        [Command("announce", Shortcut = "announce")]
+        public static void OnAnnounceCommand(BasePlayer sender, string message)
+        {
+            if (string.IsNullOrEmpty(message))
+            {
+                sender.SendClientMessage(Color.Red, "The message can not be empty.");
+                return;
+            }
+
+            BasePlayer.GameTextForAll(message, 5000, 4);
         }
     }
 }

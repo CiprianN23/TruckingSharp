@@ -2,8 +2,8 @@
 {
     public static class Messages
     {
-        public const string PlayerJoinedTheServer = "Player '{{FFFF00}}{0}{{0000FF}}' (id: {{FFFF00}}{1}{{0000FF}}) has joined the server";
-        public const string PlayerLeftTheServer = "Player '{{FFFF00}}{0}{{0000FF}}' (id: {{FFFF00}}{1}{{0000FF}}) has left the server";
+        public const string PlayerJoinedTheServer = "Player {0}({1}) has joined the server.";
+        public const string PlayerLeftTheServer = "Player {0}({1}) has left the server.";
 
         public const string DialogButtonSelect = "Select";
         public const string DialogButtonCancel = "Cancel";

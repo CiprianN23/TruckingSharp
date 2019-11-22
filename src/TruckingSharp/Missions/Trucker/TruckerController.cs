@@ -8,7 +8,6 @@ using SampSharp.GameMode.World;
 using System;
 using System.Collections.Generic;
 using TruckingSharp.Constants;
-using TruckingSharp.Database;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Missions.Bonus;
 using TruckingSharp.Missions.Data;
@@ -19,7 +18,7 @@ namespace TruckingSharp.Missions.Trucker
     [Controller]
     public class TruckerController : IController, IEventListener
     {
-        private PlayerAccountRepository _accountRepository => new PlayerAccountRepository(DapperConnection.ConnectionString);
+        private PlayerAccountRepository _accountRepository => new PlayerAccountRepository(ConnectionFactory.GetConnection);
 
         public static void EndMission(Player player)
         {

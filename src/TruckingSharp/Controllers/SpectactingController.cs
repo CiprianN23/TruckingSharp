@@ -1,8 +1,8 @@
 ﻿using SampSharp.GameMode;
 using SampSharp.GameMode.Controllers;
-using System;
-using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.Definitions;
+using SampSharp.GameMode.SAMP;
+using System;
 using TruckingSharp.Data;
 
 namespace TruckingSharp.Controllers

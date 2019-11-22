@@ -5,7 +5,7 @@ namespace TruckingSharp.Commands.Permissions
 {
     public class LevelOneAdminPermission : IPermissionChecker
     {
-        public string Message => "You are not an admin.";
+        public string Message => "You are not a level 1 admin.";
 
         public bool Check(BasePlayer player)
         {

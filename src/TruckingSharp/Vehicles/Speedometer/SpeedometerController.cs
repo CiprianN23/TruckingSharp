@@ -4,7 +4,6 @@ using SampSharp.GameMode.Display;
 using SampSharp.GameMode.SAMP;
 using System;
 using TruckingSharp.Constants;
-using TruckingSharp.Database;
 using TruckingSharp.Database.Repositories;
 
 namespace TruckingSharp.Vehicles.Speedometer
@@ -12,7 +11,7 @@ namespace TruckingSharp.Vehicles.Speedometer
     [Controller]
     public class SpeedometerController : IEventListener
     {
-        private PlayerAccountRepository _playerAccountRepository => new PlayerAccountRepository(DapperConnection.ConnectionString);
+        private PlayerAccountRepository _playerAccountRepository => new PlayerAccountRepository(ConnectionFactory.GetConnection);
 
         public void RegisterEvents(BaseMode gameMode)
         {

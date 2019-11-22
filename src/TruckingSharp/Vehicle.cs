@@ -12,6 +12,14 @@ namespace TruckingSharp
         public bool IsWantedByMafia { get; set; }
         public bool IsOwned { get; set; }
 
+        public void RemoveAllPlayersFromVehicle()
+        {
+            foreach (BasePlayer player in Passengers)
+                player.RemoveFromVehicle();
+
+            Driver?.RemoveFromVehicle();
+        }
+
         protected override void Initialize()
         {
             Fuel = Configuration.MaxFuel;
