@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Dapper.Contrib.Extensions;
 using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,9 +10,10 @@ using TruckingSharp.Database.Repositories.Interfaces;
 
 namespace TruckingSharp.Database.Repositories
 {
-    public class PlayerBanRepository : IRepository<PlayerBan>
+    public class PlayerBanRepository : IRepository<PlayerBan>, IDisposable
     {
         private MySqlConnection _connection;
+        private bool isDisposed;
 
         public PlayerBanRepository(MySqlConnection connection)
         {
@@ -75,5 +77,29 @@ namespace TruckingSharp.Database.Repositories
         }
 
         #endregion Async
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!isDisposed)
+            {
+                if (disposing)
+                    _connection.Dispose();
+            }
+
+
+            _connection.Dispose();
+            isDisposed = true;
+        }
+
+        ~PlayerBanRepository()
+        {
+            Dispose(false);
+        }
     }
 }
