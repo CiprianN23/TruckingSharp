@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Dapper.Contrib.Extensions;
 using MySql.Data.MySqlClient;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -23,28 +24,72 @@ namespace TruckingSharp.Database.Repositories
 
         public long Add(SpeedCamera entity)
         {
-            return _connection.Execute("INSERT INTO speedcameras (Id, Speed, PositionX, PositionY, PositionZ, Angle) VALUES (@Id, @Speed, @PositionX, @PositionY, @PositionZ, @Angle)", entity);
-            //return _connection.Insert(entity);
+            try
+            {
+                return _connection.Execute("INSERT INTO speedcameras (Id, Speed, PositionX, PositionY, PositionZ, Angle) VALUES (@Id, @Speed, @PositionX, @PositionY, @PositionZ, @Angle)", entity);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Failed to insert speed camera with id: {entity.Id}.");
+                throw;
+            }
+            
         }
 
         public bool Delete(SpeedCamera entity)
         {
-            return _connection.Delete(entity);
+            try
+            {
+                return _connection.Delete(entity);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Failed to delete speed camera with id: {entity.Id}.");
+                throw;
+            }
+            
         }
 
         public SpeedCamera Find(int id)
         {
-            return _connection.Get<SpeedCamera>(id);
+            try
+            {
+                return _connection.Get<SpeedCamera>(id);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Failed to find speed camera with id: {id}.");
+                throw;
+            }
+            
         }
 
         public IEnumerable<SpeedCamera> GetAll()
         {
-            return _connection.GetAll<SpeedCamera>();
+            try
+            {
+                return _connection.GetAll<SpeedCamera>();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Failed to get all speed cameras.");
+                throw;
+            }
+            
         }
 
         public bool Update(SpeedCamera entity)
         {
-            return _connection.Update(entity);
+            try
+            {
+                return _connection.Update(entity);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Failed to update speed camera with id: {entity.Id}.");
+                throw;
+            }
+            
         }
 
         #endregion Sync
@@ -53,22 +98,58 @@ namespace TruckingSharp.Database.Repositories
 
         public async Task<long> AddAsync(SpeedCamera entity)
         {
-            return await _connection.ExecuteAsync("INSERT INTO speedcameras (Id, Speed, PositionX, PositionY, PositionZ, Angle) VALUES (@Id, @Speed, @PositionX, @PositionY, @PositionZ, @Angle)", entity);
+            try
+            {
+                return await _connection.ExecuteAsync("INSERT INTO speedcameras (Id, Speed, PositionX, PositionY, PositionZ, Angle) VALUES (@Id, @Speed, @PositionX, @PositionY, @PositionZ, @Angle)", entity);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Failed to insert async speed camera with id: {entity.Id}.");
+                throw;
+            }
+            
         }
 
         public async Task<bool> DeleteAsync(SpeedCamera entity)
         {
-            return await _connection.DeleteAsync(entity);
+            try
+            {
+                return await _connection.DeleteAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Failed to delete async speed camera with id: {entity.Id}.");
+                throw;
+            }
+            
         }
 
         public async Task<IEnumerable<SpeedCamera>> GetAllAsync()
         {
-            return await _connection.GetAllAsync<SpeedCamera>();
+            try
+            {
+                return await _connection.GetAllAsync<SpeedCamera>();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Failed to get all speed cameras async.");
+                throw;
+            }
+            
         }
 
         public async Task<bool> UpdateAsync(SpeedCamera entity)
         {
-            return await _connection.UpdateAsync(entity);
+            try
+            {
+                return await _connection.UpdateAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Failed to update async speed camera with id: {entity.Id}.");
+                throw;
+            }
+            
         }
 
         #endregion Async

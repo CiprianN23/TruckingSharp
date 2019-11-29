@@ -11,6 +11,7 @@
     <PackageReference Include="Dapper.Contrib" Version="2.0.30" />
     <PackageReference Include="MicroOrm.Dapper.Repositories" Version="1.11.0" />
     <PackageReference Include="MySqlConnector" Version="0.61.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
   </ItemGroup>
 
 </Project>

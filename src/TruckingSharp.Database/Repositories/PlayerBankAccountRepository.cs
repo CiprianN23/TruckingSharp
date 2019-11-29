@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Dapper.Contrib.Extensions;
 using MySql.Data.MySqlClient;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -23,27 +24,72 @@ namespace TruckingSharp.Database.Repositories
 
         public IEnumerable<PlayerBankAccount> GetAll()
         {
-            return _connection.GetAll<PlayerBankAccount>();
+            try
+            {
+                return _connection.GetAll<PlayerBankAccount>();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Failed to get all player bank accounts from database.");
+                throw;
+            }
+            
         }
 
         public PlayerBankAccount Find(int id)
         {
-            return _connection.QueryFirstOrDefault<PlayerBankAccount>("SELECT * FROM bankaccounts WHERE PlayerId = @Id;", new { Id = id });
+            try
+            {
+                return _connection.QueryFirstOrDefault<PlayerBankAccount>("SELECT * FROM bankaccounts WHERE PlayerId = @Id;", new { Id = id });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Failed to get player bank account with id: {id}.");
+                throw;
+            }
+            
         }
 
         public long Add(PlayerBankAccount entity)
         {
-            return _connection.Insert(entity);
+            try
+            {
+                return _connection.Insert(entity);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Failed to insert player bank account with player id: {entity.PlayerId}.");
+                throw;
+            }
+            
         }
 
         public bool Update(PlayerBankAccount entity)
         {
-            return _connection.Update(entity);
+            try
+            {
+                return _connection.Update(entity);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Failed to update player bank account with player id: {entity.PlayerId}.");
+                throw;
+            }
+            
         }
 
         public bool Delete(PlayerBankAccount entity)
         {
-            return _connection.Delete(entity);
+            try
+            {
+                return _connection.Delete(entity);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Failed to delete player bank account with player id: {entity.PlayerId}.");
+                throw;
+            }
+            
         }
 
         #endregion Sync
@@ -52,22 +98,58 @@ namespace TruckingSharp.Database.Repositories
 
         public async Task<IEnumerable<PlayerBankAccount>> GetAllAsync()
         {
-            return await _connection.GetAllAsync<PlayerBankAccount>();
+            try
+            {
+                return await _connection.GetAllAsync<PlayerBankAccount>();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Failed to get all player bank accounts async.");
+                throw;
+            }
+            
         }
 
         public async Task<long> AddAsync(PlayerBankAccount entity)
         {
-            return await _connection.InsertAsync(entity);
+            try
+            {
+                return await _connection.InsertAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Failed to insert async player bank account with player id: {entity.PlayerId}.");
+                throw;
+            }
+            
         }
 
         public async Task<bool> UpdateAsync(PlayerBankAccount entity)
         {
-            return await _connection.UpdateAsync(entity);
+            try
+            {
+                return await _connection.UpdateAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Failed to update async player bank account with player id: {entity.PlayerId}.");
+                throw;
+            }
+            
         }
 
         public async Task<bool> DeleteAsync(PlayerBankAccount entity)
         {
-            return await _connection.DeleteAsync(entity);
+            try
+            {
+                return await _connection.DeleteAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Failed to delete async player bank account with player id: {entity.PlayerId}.");
+                throw;
+            }
+            
         }
 
         #endregion Async
