@@ -33,7 +33,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to get all player bank accounts from database.");
                 throw;
             }
-            
         }
 
         public PlayerBankAccount Find(int id)
@@ -47,7 +46,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to get player bank account with id: {id}.");
                 throw;
             }
-            
         }
 
         public long Add(PlayerBankAccount entity)
@@ -61,7 +59,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to insert player bank account with player id: {entity.PlayerId}.");
                 throw;
             }
-            
         }
 
         public bool Update(PlayerBankAccount entity)
@@ -75,7 +72,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to update player bank account with player id: {entity.PlayerId}.");
                 throw;
             }
-            
         }
 
         public bool Delete(PlayerBankAccount entity)
@@ -89,7 +85,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to delete player bank account with player id: {entity.PlayerId}.");
                 throw;
             }
-            
         }
 
         #endregion Sync
@@ -107,7 +102,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to get all player bank accounts async.");
                 throw;
             }
-            
         }
 
         public async Task<long> AddAsync(PlayerBankAccount entity)
@@ -121,7 +115,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to insert async player bank account with player id: {entity.PlayerId}.");
                 throw;
             }
-            
         }
 
         public async Task<bool> UpdateAsync(PlayerBankAccount entity)
@@ -135,7 +128,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to update async player bank account with player id: {entity.PlayerId}.");
                 throw;
             }
-            
         }
 
         public async Task<bool> DeleteAsync(PlayerBankAccount entity)
@@ -149,7 +141,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to delete async player bank account with player id: {entity.PlayerId}.");
                 throw;
             }
-            
         }
 
         #endregion Async

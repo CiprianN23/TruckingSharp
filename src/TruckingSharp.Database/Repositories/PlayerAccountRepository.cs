@@ -33,7 +33,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to insert player account with name: {entity.Name}.");
                 throw;
             }
-            
         }
 
         public bool Delete(PlayerAccount entity)
@@ -47,7 +46,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to delete player account with name: {entity.Name}.");
                 throw;
             }
-            
         }
 
         public IEnumerable<PlayerAccount> GetAll()
@@ -61,7 +59,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, "Failed to get all player accounts from database.");
                 throw;
             }
-            
         }
 
         public PlayerAccount Find(int id)
@@ -69,14 +66,12 @@ namespace TruckingSharp.Database.Repositories
             try
             {
                 return _connection.Get<PlayerAccount>(id);
-
             }
             catch (Exception ex)
             {
                 Log.Error(ex, $"Failed to find player account with id: {id}.");
                 throw;
             }
-            
         }
 
         public PlayerAccount Find(string name)
@@ -90,7 +85,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to find player account with name: {name}.");
                 throw;
             }
-            
         }
 
         public bool Update(PlayerAccount entity)
@@ -104,7 +98,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to update player account with name: {entity.Name}.");
                 throw;
             }
-            
         }
 
         #endregion Sync
@@ -122,7 +115,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to update async player account with name: {entity.Name}.");
                 throw;
             }
-            
         }
 
         public async Task<IEnumerable<PlayerAccount>> GetAllAsync()
@@ -136,7 +128,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, "Failed to get all player accounts from database async.");
                 throw;
             }
-            
         }
 
         public async Task<long> AddAsync(PlayerAccount entity)
@@ -150,7 +141,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to insert async player account with name: {entity.Name}.");
                 throw;
             }
-            
         }
 
         public async Task<bool> DeleteAsync(PlayerAccount entity)
@@ -164,7 +154,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to delete async player account with name: {entity.Name}.");
                 throw;
             }
-            
         }
 
         #endregion Async

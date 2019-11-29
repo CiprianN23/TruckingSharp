@@ -80,11 +80,11 @@ namespace TruckingSharp.Commands.AdminCommands
 
             var totalBanTime = DateTime.Now + TimeSpan.FromDays(days);
 
-            if (account.Bans >= Configuration.MaxBans)
+            if (account.Bans >= Configuration.Instance.MaximumBans)
             {
                 playerBan.Duration = DateTime.MaxValue;
 
-                target.SendClientMessage(Color.Red, $"This was the {Configuration.MaxBans}ith and last ban. You have been banned permanently by {AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name}.");
+                target.SendClientMessage(Color.Red, $"This was the {Configuration.Instance.MaximumBans}ith and last ban. You have been banned permanently by {AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name}.");
             }
             else
             {
@@ -99,7 +99,7 @@ namespace TruckingSharp.Commands.AdminCommands
 
             BasePlayer.SendClientMessageToAll(Color.LightGray, $"{AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name} has banned {target.Name} for {days} day/s.");
 
-            await Task.Delay(Configuration.KickDelay);
+            await Task.Delay(Configuration.Instance.KickDelay);
             target.Kick();
         }
 
@@ -311,7 +311,7 @@ namespace TruckingSharp.Commands.AdminCommands
         public static void OnFuelAllCommand(BasePlayer sender)
         {
             foreach (Vehicle vehicle in Vehicle.All)
-                vehicle.Fuel = Configuration.MaxFuel;
+                vehicle.Fuel = Configuration.Instance.MaximumFuel;
 
             sender.SendClientMessage(Color.GreenYellow, "All vehicles have been refueled.");
         }

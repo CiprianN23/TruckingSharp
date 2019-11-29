@@ -18,6 +18,8 @@ namespace TruckingSharp
             .MinimumLevel.Debug()
             .WriteTo.File("logs\\my_log.log", rollingInterval: RollingInterval.Day)
             .CreateLogger();
+
+            Configuration.LoadConfigurationFromFile();
         }
     }
 }

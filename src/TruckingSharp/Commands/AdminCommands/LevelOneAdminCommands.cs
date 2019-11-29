@@ -37,7 +37,7 @@ namespace TruckingSharp.Commands.AdminCommands
 
             sender.SendClientMessage(Color.Red, $"You have kicked {target.Name} for {reason}.");
 
-            await Task.Delay(Configuration.KickDelay);
+            await Task.Delay(Configuration.Instance.KickDelay);
             target.Kick();
         }
 
@@ -196,15 +196,15 @@ namespace TruckingSharp.Commands.AdminCommands
 
             target.SendClientMessage(Color.Red, $"You have been warned by {AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name}.");
             target.SendClientMessage(Color.Red, $"Reason: {reason}");
-            target.GameText($"~w~Warning {target.Warnings}/{Configuration.MaxWarnBeforeKick}: ~r~{reason}", 5000, 4);
+            target.GameText($"~w~Warning {target.Warnings}/{Configuration.Instance.MaximumWarnsBeforeKick}: ~r~{reason}", 5000, 4);
 
-            sender.SendClientMessage(Color.GreenYellow, $"You have warned {target.Name} (warnings: {target.Warnings}/{Configuration.MaxWarnBeforeKick}).");
+            sender.SendClientMessage(Color.GreenYellow, $"You have warned {target.Name} (warnings: {target.Warnings}/{Configuration.Instance.MaximumWarnsBeforeKick}).");
             sender.SendClientMessage(Color.Red, $"Reason: {reason}");
 
-            if (target.Warnings == Configuration.MaxWarnBeforeKick && Configuration.CanAutoKickAfterWarn)
+            if (target.Warnings == Configuration.Instance.MaximumWarnsBeforeKick && Configuration.Instance.CanAutoKickAfterWarn)
             {
-                target.SendClientMessage(Color.Red, $"This was the {Configuration.MaxWarnBeforeKick}th and last warning. You have been kicked.");
-                await Task.Delay(Configuration.KickDelay);
+                target.SendClientMessage(Color.Red, $"This was the {Configuration.Instance.MaximumWarnsBeforeKick}th and last warning. You have been kicked.");
+                await Task.Delay(Configuration.Instance.KickDelay);
                 target.Kick();
             }
         }
@@ -244,7 +244,7 @@ namespace TruckingSharp.Commands.AdminCommands
             }
 
             Vehicle playerCar = (Vehicle)sender.Vehicle;
-            playerCar.Fuel = Configuration.MaxFuel;
+            playerCar.Fuel = Configuration.Instance.MaximumFuel;
 
             sender.SendClientMessage(Color.GreenYellow, Messages.VehicleHasBeenRefuelled);
         }

@@ -99,7 +99,7 @@ namespace TruckingSharp.Missions.Trucker
             {
                 player.IsDoingMission = true;
 
-                player.MissionVehicleTime = Configuration.TimeToFailMission;
+                player.MissionVehicleTime = Configuration.Instance.FailMissionSeconds;
 
                 player.MissionStep = 1;
 
@@ -160,7 +160,7 @@ namespace TruckingSharp.Missions.Trucker
             player.MissionTextDraw.Text = string.Format(Messages.MissionTruckerHaulingToPickupCargo, player.MissionCargo.Name, player.FromLocation.Name, player.ToLocation.Name);
 
             player.SetCheckpoint(player.FromLocation.Position, 7);
-            player.MissionVehicleTime = Configuration.TimeToFailMission;
+            player.MissionVehicleTime = Configuration.Instance.FailMissionSeconds;
 
             player.SendClientMessage(Messages.MissionTruckerDeliverFrom, cargo.Name, player.FromLocation.Name);
         }

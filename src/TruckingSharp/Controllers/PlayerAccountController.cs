@@ -5,7 +5,6 @@ using SampSharp.GameMode.Display;
 using SampSharp.GameMode.SAMP;
 using System;
 using System.Threading.Tasks;
-using TruckingSharp.Constants;
 using TruckingSharp.Database.Entities;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Events;
@@ -45,7 +44,7 @@ namespace TruckingSharp.Controllers
                 player.SendClientMessage(Color.Red, "You are still banned.");
                 player.SendClientMessage(Color.Red, "Until: {0:dd/MM/yyyy H:mm:ss zzz}", playerBan.Duration);
 
-                await Task.Delay(Configuration.KickDelay);
+                await Task.Delay(Configuration.Instance.KickDelay);
                 player.Kick();
 
                 return;
@@ -64,17 +63,17 @@ namespace TruckingSharp.Controllers
 
         private void LoginPlayer(Player player)
         {
-            var message = $"Insert your password. Tries left: {player.LoginTries}/{Configuration.MaxLogins}";
+            var message = $"Insert your password. Tries left: {player.LoginTries}/{Configuration.Instance.MaximumLogins}";
             var dialog = new InputDialog("Login", message, true, "Login", "Cancel");
             dialog.Show(player);
             dialog.Response += async (sender, ev) =>
             {
                 if (ev.DialogButton == DialogButton.Left)
                 {
-                    if (player.LoginTries >= Configuration.MaxLogins)
+                    if (player.LoginTries >= Configuration.Instance.MaximumLogins)
                     {
                         player.SendClientMessage(Color.OrangeRed, "You exceed maximum login tries. You have been kicked!");
-                        await Task.Delay(Configuration.KickDelay);
+                        await Task.Delay(Configuration.Instance.KickDelay);
                         player.Kick();
                     }
                     else if (PasswordHashingService.VerifyPasswordHash(ev.InputText, player.Account.Password))
@@ -88,7 +87,7 @@ namespace TruckingSharp.Controllers
                         player.LoginTries++;
                         player.SendClientMessage(Color.Red, "Wrong password");
 
-                        dialog.Message = $"Wrong password! Retype your password! Tries left: {player.LoginTries}/{Configuration.MaxLogins}";
+                        dialog.Message = $"Wrong password! Retype your password! Tries left: {player.LoginTries}/{Configuration.Instance.MaximumLogins}";
 
                         LoginPlayer(player);
                     }

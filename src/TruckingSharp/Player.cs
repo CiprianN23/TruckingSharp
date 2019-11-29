@@ -76,7 +76,7 @@ namespace TruckingSharp
 
         public bool CheckIfPlayerCanJoinPolice()
         {
-            if (Configuration.PlayersBeforePolice > 0)
+            if (Configuration.Instance.PlayersBeforePolice > 0)
             {
                 int normalPlayers = 0;
                 int policePlayers = 0;
@@ -103,7 +103,7 @@ namespace TruckingSharp
                     }
                 }
 
-                bool CanSpawnAsCop = policePlayers < (normalPlayers / Configuration.PlayersBeforePolice);
+                bool CanSpawnAsCop = policePlayers < (normalPlayers / Configuration.Instance.PlayersBeforePolice);
                 if (!CanSpawnAsCop)
                 {
                     GameText("Maximum amount of cops already reached", 5000, 4);
@@ -112,6 +112,8 @@ namespace TruckingSharp
 
                 return CanSpawnAsCop;
             }
+
+            return false;
         }
 
         public async void Reward(int money, int score = 0)
@@ -193,7 +195,7 @@ namespace TruckingSharp
             if (!IsLoggedIn)
             {
                 SendClientMessage(Color.Red, Messages.FailedToLoginProperly);
-                await Task.Delay(Configuration.KickDelay);
+                await Task.Delay(Configuration.Instance.KickDelay);
                 Kick();
             }
         }

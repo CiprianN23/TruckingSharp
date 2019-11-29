@@ -4,7 +4,6 @@ using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.Tools;
 using System;
 using System.Collections.Generic;
-using TruckingSharp.Constants;
 using TruckingSharp.Extensions.PlayersExtensions;
 
 namespace TruckingSharp.Vehicles.GasStation
@@ -47,8 +46,8 @@ namespace TruckingSharp.Vehicles.GasStation
         private void RefuelVehicle(object sender, EventArgs e, Player player)
         {
             var playerVehicle = (Vehicle)player.Vehicle;
-            int fuelAmount = Configuration.MaxFuel - playerVehicle.Fuel;
-            int refuelPrice = (fuelAmount / Configuration.RefuelMaxPrice) / Configuration.MaxFuel;
+            int fuelAmount = Configuration.Instance.MaximumFuel - playerVehicle.Fuel;
+            int refuelPrice = (fuelAmount / Configuration.Instance.RefuelPrice) / Configuration.Instance.MaximumFuel;
 
             if (player.Account.Money < refuelPrice)
             {
@@ -57,7 +56,7 @@ namespace TruckingSharp.Vehicles.GasStation
                 return;
             }
 
-            playerVehicle.Fuel = Configuration.MaxFuel;
+            playerVehicle.Fuel = Configuration.Instance.MaximumFuel;
             player.Reward(-refuelPrice);
             player.SendClientMessage(Color.GreenYellow, $"You refuelled your vehicle for ${refuelPrice}.");
             player.ToggleControllable(true);

@@ -101,7 +101,7 @@ namespace TruckingSharp.Missions.Convoy
         {
             if (IasPlayerAllowedToJoin(member))
             {
-                if (convoy.Members.Count < Configuration.MaximumConvoyMembers)
+                if (convoy.Members.Count < Configuration.Instance.MaximumConvoyMembers)
                 {
                     convoy.SendMessage($"Player {{00FF00}}{member.Name}{{FFFFFF}} has joined the convoy.");
 
@@ -112,7 +112,7 @@ namespace TruckingSharp.Missions.Convoy
                     member.IsInConvoy = true;
                     member.Convoy = convoy;
 
-                    if (convoy.Members.Count == Configuration.MaximumConvoyMembers)
+                    if (convoy.Members.Count == Configuration.Instance.MaximumConvoyMembers)
                         convoy.Status = ConvoyStatus.Full;
 
                     convoy.MemberText.Text = "Waiting for the leader to start a job.";
@@ -175,7 +175,7 @@ namespace TruckingSharp.Missions.Convoy
             member.MissionTrailer = (Vehicle)member.Vehicle.Trailer;
 
             member.MissionStep = 1;
-            member.MissionVehicleTime = Configuration.TimeToFailMission;
+            member.MissionVehicleTime = Configuration.Instance.FailMissionSeconds;
             member.MissionTextDraw.Text = string.Format(Messages.MissionTruckerHaulingToPickupCargo, MissionCargo.Name, FromLocation.Name, ToLocation.Name);
             member.SetCheckpoint(FromLocation.Position, 7.0f);
             member.SendClientMessage(Color.White, Messages.MissionTruckerDeliverFrom, MissionCargo.Name, FromLocation.Name);

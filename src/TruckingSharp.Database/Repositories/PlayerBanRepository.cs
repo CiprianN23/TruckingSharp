@@ -34,7 +34,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to insert player ban with owner id: {entity.OwnerId}.");
                 throw;
             }
-            
         }
 
         public bool Delete(PlayerBan entity)
@@ -48,7 +47,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to delete player ban with owner id: {entity.OwnerId}.");
                 throw;
             }
-            
         }
 
         public PlayerBan Find(int ownerId)
@@ -62,7 +60,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to find player ban with owner id: {ownerId}.");
                 throw;
             }
-            
         }
 
         public PlayerBan Find(string ownerName)
@@ -76,7 +73,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to find player ban with owner name: {ownerName}.");
                 throw;
             }
-            
         }
 
         public IEnumerable<PlayerBan> GetAll()
@@ -90,7 +86,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to get all player bans.");
                 throw;
             }
-            
         }
 
         public bool Update(PlayerBan entity)
@@ -104,7 +99,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to to update player ban with owner id: {entity.OwnerId}.");
                 throw;
             }
-            
         }
 
         #endregion Sync
@@ -122,7 +116,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to to insert async player ban with owner id: {entity.OwnerId}.");
                 throw;
             }
-            
         }
 
         public async Task<bool> DeleteAsync(PlayerBan entity)
@@ -136,7 +129,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to to delete async player ban with owner id: {entity.OwnerId}.");
                 throw;
             }
-            
         }
 
         public async Task<IEnumerable<PlayerBan>> GetAllAsync()
@@ -150,7 +142,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to get all players bans async.");
                 throw;
             }
-            
         }
 
         public async Task<bool> UpdateAsync(PlayerBan entity)
@@ -164,7 +155,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to to update async player ban with owner id: {entity.OwnerId}.");
                 throw;
             }
-            
         }
 
         #endregion Async

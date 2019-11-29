@@ -3,7 +3,6 @@ using SampSharp.GameMode.Controllers;
 using SampSharp.GameMode.Display;
 using SampSharp.GameMode.SAMP;
 using System;
-using TruckingSharp.Constants;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.World;
 
@@ -94,12 +93,12 @@ namespace TruckingSharp.Vehicles.Speedometer
 
         private int GetPlayerVehicleSpeed(Vector3 velocity)
         {
-            return (int)(Math.Sqrt(Math.Pow(velocity.X, 2) + Math.Pow(velocity.Y, 2) + Math.Pow(velocity.Z, 2)) * Configuration.KilometersPerHourMultiplier);
+            return (int)(Math.Sqrt(Math.Pow(velocity.X, 2) + Math.Pow(velocity.Y, 2) + Math.Pow(velocity.Z, 2)) * Configuration.Instance.KilometersPerHourMultiplier);
         }
 
         private string ConstructFuelGauge(int fuel)
         {
-            int MaxFuel = Configuration.MaxFuel;
+            int MaxFuel = Configuration.Instance.MaximumFuel;
 
             if (fuel > 0 && fuel < (MaxFuel / 10))
                 return "~g~I~r~IIIIIIIII";

@@ -33,7 +33,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to insert speed camera with id: {entity.Id}.");
                 throw;
             }
-            
         }
 
         public bool Delete(SpeedCamera entity)
@@ -47,7 +46,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to delete speed camera with id: {entity.Id}.");
                 throw;
             }
-            
         }
 
         public SpeedCamera Find(int id)
@@ -61,7 +59,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to find speed camera with id: {id}.");
                 throw;
             }
-            
         }
 
         public IEnumerable<SpeedCamera> GetAll()
@@ -75,7 +72,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to get all speed cameras.");
                 throw;
             }
-            
         }
 
         public bool Update(SpeedCamera entity)
@@ -89,7 +85,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to update speed camera with id: {entity.Id}.");
                 throw;
             }
-            
         }
 
         #endregion Sync
@@ -107,7 +102,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to insert async speed camera with id: {entity.Id}.");
                 throw;
             }
-            
         }
 
         public async Task<bool> DeleteAsync(SpeedCamera entity)
@@ -121,7 +115,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to delete async speed camera with id: {entity.Id}.");
                 throw;
             }
-            
         }
 
         public async Task<IEnumerable<SpeedCamera>> GetAllAsync()
@@ -135,7 +128,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to get all speed cameras async.");
                 throw;
             }
-            
         }
 
         public async Task<bool> UpdateAsync(SpeedCamera entity)
@@ -149,7 +141,6 @@ namespace TruckingSharp.Database.Repositories
                 Log.Error(ex, $"Failed to update async speed camera with id: {entity.Id}.");
                 throw;
             }
-            
         }
 
         #endregion Async

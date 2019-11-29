@@ -1,6 +1,5 @@
 ﻿using SampSharp.GameMode.Pools;
 using SampSharp.GameMode.World;
-using TruckingSharp.Constants;
 
 namespace TruckingSharp
 {
@@ -22,7 +21,7 @@ namespace TruckingSharp
 
         protected override void Initialize()
         {
-            Fuel = Configuration.MaxFuel;
+            Fuel = Configuration.Instance.MaximumFuel;
             base.Initialize();
         }
     }

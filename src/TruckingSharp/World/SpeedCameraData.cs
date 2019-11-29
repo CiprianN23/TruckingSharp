@@ -1,13 +1,12 @@
 ﻿using SampSharp.GameMode;
 using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.World;
-using TruckingSharp.Constants;
 
 namespace TruckingSharp.World
 {
     public class SpeedCameraData
     {
-        public static SpeedCameraData[] SpeedCameras = new SpeedCameraData[Configuration.MaxSpeedCameras];
+        public static SpeedCameraData[] SpeedCameras = new SpeedCameraData[Configuration.Instance.MaximumSpeedCameras];
 
         public SpeedCameraData(int camId, Vector3 position, float angle, int maxSpeed)
         {

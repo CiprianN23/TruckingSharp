@@ -113,8 +113,8 @@ namespace TruckingSharp.Missions
 
             MissionsController.ClassEndMission(sender);
 
-            sender.SendClientMessage(Color.Red, $"You {{FF0000}}failed{{FFFFFF}} your mission. You lost {{FFFF00}}${Configuration.PriceFailedMission}{{FFFFFF}} to cover expenses.");
-            sender.Reward(-Configuration.PriceFailedMission);
+            sender.SendClientMessage(Color.Red, $"You {{FF0000}}failed{{FFFFFF}} your mission. You lost {{FFFF00}}${Configuration.Instance.FailedMissionPrice}{{FFFFFF}} to cover expenses.");
+            sender.Reward(-Configuration.Instance.FailedMissionPrice);
         }
 
         [Command("overload", Shortcut = "overload")]

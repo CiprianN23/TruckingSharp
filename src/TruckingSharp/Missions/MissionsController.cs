@@ -57,7 +57,7 @@ namespace TruckingSharp.Missions
                         {
                             if (oldVehicle == newVehicle && oldTrailer == newTrailer)
                             {
-                                player.MissionVehicleTime = Configuration.TimeToFailMission;
+                                player.MissionVehicleTime = Configuration.Instance.FailMissionSeconds;
                             }
                             else
                             {
@@ -77,7 +77,7 @@ namespace TruckingSharp.Missions
                         {
                             if (oldVehicle == newVehicle)
                             {
-                                player.MissionVehicleTime = Configuration.TimeToFailMission;
+                                player.MissionVehicleTime = Configuration.Instance.FailMissionSeconds;
                             }
                             else
                             {
@@ -167,9 +167,9 @@ namespace TruckingSharp.Missions
             ClassEndMission(player);
             MissionConvoy.PlayerLeaveConvoy(player);
 
-            var message = string.Format(Messages.MissionFailed, Configuration.PriceFailedMission);
+            var message = string.Format(Messages.MissionFailed, Configuration.Instance.FailedMissionPrice);
             player.GameText(message, 5000, 4);
-            player.Reward(-Configuration.PriceFailedMission);
+            player.Reward(-Configuration.Instance.FailedMissionPrice);
         }
 
         private void PlayerLeftVehicle(Player player)
@@ -177,7 +177,7 @@ namespace TruckingSharp.Missions
             player.MissionVehicleTime -= 1;
             player.GameText($"{player.MissionVehicleTime}", 1000, 4);
 
-            if (player.MissionVehicleTime == (Configuration.TimeToFailMission - 1))
+            if (player.MissionVehicleTime == (Configuration.Instance.FailMissionSeconds - 1))
             {
                 switch (player.PlayerClass)
                 {
