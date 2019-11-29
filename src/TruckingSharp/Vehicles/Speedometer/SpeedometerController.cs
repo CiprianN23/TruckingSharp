@@ -5,6 +5,7 @@ using SampSharp.GameMode.SAMP;
 using System;
 using TruckingSharp.Constants;
 using TruckingSharp.Database.Repositories;
+using TruckingSharp.World;
 
 namespace TruckingSharp.Vehicles.Speedometer
 {
@@ -16,30 +17,33 @@ namespace TruckingSharp.Vehicles.Speedometer
         public void RegisterEvents(BaseMode gameMode)
         {
             gameMode.PlayerConnected += Speedometer_PlayerConnected;
-            gameMode.PlayerEnterVehicle += Speedoemeter_PlayerEnterVehicle;
-            gameMode.PlayerExitVehicle += Speedometer_PlayerExitVehicle;
+            gameMode.PlayerStateChanged += Speedoemeter_PlayerStateChanged;
         }
 
-        private void Speedometer_PlayerExitVehicle(object sender, SampSharp.GameMode.Events.PlayerVehicleEventArgs e)
+        private void Speedoemeter_PlayerStateChanged(object sender, SampSharp.GameMode.Events.StateEventArgs e)
         {
-            var player = e.Player as Player;
+            var player = sender as Player;
 
-            player.VehicleNameTextDraw.Hide();
-            player.SpeedometerTextDraw.Hide();
-            player.FuelGaugeTextDraw.Hide();
+            if (e.NewState == SampSharp.GameMode.Definitions.PlayerState.Driving || e.NewState == SampSharp.GameMode.Definitions.PlayerState.Passenger)
+            {
+                player.VehicleNameTextDraw.Show();
+                player.SpeedometerTextDraw.Show();
+                player.FuelGaugeTextDraw.Show();
 
-            player.SpeedometerTimer.IsRunning = false;
-        }
+                player.Speed = 0;
 
-        private void Speedoemeter_PlayerEnterVehicle(object sender, SampSharp.GameMode.Events.EnterVehicleEventArgs e)
-        {
-            var player = e.Player as Player;
+                player.SpeedometerTimer.IsRunning = true;
+            }
+            else if (e.OldState == SampSharp.GameMode.Definitions.PlayerState.Driving || e.OldState == SampSharp.GameMode.Definitions.PlayerState.Passenger)
+            {
+                player.VehicleNameTextDraw.Hide();
+                player.SpeedometerTextDraw.Hide();
+                player.FuelGaugeTextDraw.Hide();
 
-            player.VehicleNameTextDraw.Show();
-            player.SpeedometerTextDraw.Show();
-            player.FuelGaugeTextDraw.Show();
+                player.Speed = 0;
 
-            player.SpeedometerTimer.IsRunning = true;
+                player.SpeedometerTimer.IsRunning = false;
+            }
         }
 
         private void Speedometer_PlayerConnected(object sender, EventArgs e)
@@ -53,6 +57,7 @@ namespace TruckingSharp.Vehicles.Speedometer
             player.SpeedometerTimer = new Timer(TimeSpan.FromMilliseconds(500), true);
             player.SpeedometerTimer.IsRunning = false;
             player.SpeedometerTimer.Tick += (sender, e) => SpeedometerTimer_Tick(sender, e, player);
+            player.SpeedometerTimer.Tick += (sender, e) => SpeedCameraController.SpeedometerTimer_Tick(sender, e, player);
         }
 
         private async void SpeedometerTimer_Tick(object sender, EventArgs e, Player player)
@@ -66,13 +71,15 @@ namespace TruckingSharp.Vehicles.Speedometer
 
                 player.SpeedometerTextDraw.Text = $"~w~Speed: ~b~{playerVehicleSpeed}~w~ kph";
 
+                player.Speed = playerVehicleSpeed;
+
                 var account = player.Account;
                 account.MetersDriven = (float)(account.MetersDriven + (playerVehicleSpeed / 7.2));
                 await _playerAccountRepository.UpdateAsync(account);
 
                 player.VehicleNameTextDraw.Text = $"{playerVehicle.ModelInfo.Name}";
 
-                if (playerVehicleSpeed > 10 && playerVehicle.Fuel > 0)
+                if (playerVehicleSpeed > 10 && playerVehicle.Fuel > 0 && playerVehicle.Engine)
                     playerVehicle.Fuel--;
 
                 player.FuelGaugeTextDraw.Text = ConstructFuelGauge(playerVehicle.Fuel);

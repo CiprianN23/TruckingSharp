@@ -80,10 +80,9 @@ namespace TruckingSharp.Database.Repositories
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!isDisposed)
+            if (!isDisposed && disposing)
             {
-                if (disposing)
-                    _connection.Dispose();
+                // Dispose other resources here
             }
 
             _connection.Dispose();

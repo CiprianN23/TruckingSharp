@@ -3,51 +3,46 @@ using Dapper.Contrib.Extensions;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using TruckingSharp.Database.Entities;
 using TruckingSharp.Database.Repositories.Interfaces;
 
 namespace TruckingSharp.Database.Repositories
 {
-    public class PlayerBanRepository : IRepository<PlayerBan>, IDisposable
+    public class SpeedCameraRepository : IRepository<SpeedCamera>, IDisposable
     {
         private MySqlConnection _connection;
         private bool isDisposed;
 
-        public PlayerBanRepository(MySqlConnection connection)
+        public SpeedCameraRepository(MySqlConnection conenction)
         {
-            _connection = connection;
+            _connection = conenction;
         }
 
         #region Sync
 
-        public long Add(PlayerBan entity)
+        public long Add(SpeedCamera entity)
         {
-            return _connection.Insert(entity);
+            return _connection.Execute("INSERT INTO speedcameras (Id, Speed, PositionX, PositionY, PositionZ, Angle) VALUES (@Id, @Speed, @PositionX, @PositionY, @PositionZ, @Angle)", entity);
+            //return _connection.Insert(entity);
         }
 
-        public bool Delete(PlayerBan entity)
+        public bool Delete(SpeedCamera entity)
         {
             return _connection.Delete(entity);
         }
 
-        public PlayerBan Find(int ownerId)
+        public SpeedCamera Find(int id)
         {
-            return _connection.QueryFirstOrDefault("SELECT * FROM playerbans WHERE OwnerId = @Id", new { Id = ownerId });
+            return _connection.Get<SpeedCamera>(id);
         }
 
-        public PlayerBan Find(string ownerName)
+        public IEnumerable<SpeedCamera> GetAll()
         {
-            return _connection.Query<PlayerBan>("SELECT playerbans.* FROM playerbans LEFT JOIN accounts ON playerbans.OwnerId = accounts.Id WHERE accounts.Name = @Name", new { Name = ownerName }).FirstOrDefault();
+            return _connection.GetAll<SpeedCamera>();
         }
 
-        public IEnumerable<PlayerBan> GetAll()
-        {
-            return _connection.GetAll<PlayerBan>();
-        }
-
-        public bool Update(PlayerBan entity)
+        public bool Update(SpeedCamera entity)
         {
             return _connection.Update(entity);
         }
@@ -56,22 +51,22 @@ namespace TruckingSharp.Database.Repositories
 
         #region Async
 
-        public async Task<long> AddAsync(PlayerBan entity)
+        public async Task<long> AddAsync(SpeedCamera entity)
         {
-            return await _connection.InsertAsync(entity);
+            return await _connection.ExecuteAsync("INSERT INTO speedcameras (Id, Speed, PositionX, PositionY, PositionZ, Angle) VALUES (@Id, @Speed, @PositionX, @PositionY, @PositionZ, @Angle)", entity);
         }
 
-        public async Task<bool> DeleteAsync(PlayerBan entity)
+        public async Task<bool> DeleteAsync(SpeedCamera entity)
         {
             return await _connection.DeleteAsync(entity);
         }
 
-        public async Task<IEnumerable<PlayerBan>> GetAllAsync()
+        public async Task<IEnumerable<SpeedCamera>> GetAllAsync()
         {
-            return await _connection.GetAllAsync<PlayerBan>();
+            return await _connection.GetAllAsync<SpeedCamera>();
         }
 
-        public async Task<bool> UpdateAsync(PlayerBan entity)
+        public async Task<bool> UpdateAsync(SpeedCamera entity)
         {
             return await _connection.UpdateAsync(entity);
         }
@@ -95,7 +90,7 @@ namespace TruckingSharp.Database.Repositories
             isDisposed = true;
         }
 
-        ~PlayerBanRepository()
+        ~SpeedCameraRepository()
         {
             Dispose(false);
         }

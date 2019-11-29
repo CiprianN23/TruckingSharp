@@ -87,7 +87,7 @@ namespace TruckingSharp.Database.Repositories
         {
             if (!isDisposed && disposing)
             {
-                _connection.Dispose();
+                // Dispose other resources here
             }
 
             _connection.Dispose();

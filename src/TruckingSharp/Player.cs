@@ -71,6 +71,8 @@ namespace TruckingSharp
         public PlayerTextDraw SpeedometerTextDraw { get; set; }
         public PlayerTextDraw FuelGaugeTextDraw { get; set; }
         public Timer SpeedometerTimer { get; set; }
+        public int Speed { get; set; }
+        public int TimeSincePlayerCaughtSpeedingInSeconds { get; set; }
 
         public bool CheckIfPlayerCanJoinPolice()
         {
@@ -165,13 +167,6 @@ namespace TruckingSharp
             base.OnDisconnected(e);
         }
 
-        public override void OnEnterVehicle(EnterVehicleEventArgs e)
-        {
-            base.OnEnterVehicle(e);
-
-            // TODO: Check fuel/no engine
-        }
-
         public override void OnExitVehicle(PlayerVehicleEventArgs e)
         {
             base.OnExitVehicle(e);
@@ -189,7 +184,6 @@ namespace TruckingSharp
             // TODO: Police fine/warn to stop
             // TODO: Assistance repair vehicle/own vehicle
             // TODO: Tow vehicle with tow truck
-            // TODO: Refuel with horn key
         }
 
         public override async void OnRequestClass(RequestClassEventArgs e)

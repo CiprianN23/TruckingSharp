@@ -1,9 +1,11 @@
-﻿using SampSharp.GameMode.SAMP;
+﻿using SampSharp.GameMode;
+using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.SAMP.Commands;
 using SampSharp.GameMode.World;
 using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
 using TruckingSharp.Database.Repositories;
+using TruckingSharp.World;
 
 namespace TruckingSharp.Commands.AdminCommands
 {
@@ -95,6 +97,19 @@ namespace TruckingSharp.Commands.AdminCommands
             target.SendClientMessage(Color.Red, $"Reason: {reason}.");
 
             await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
+        }
+
+        [Command("createcamera", Shortcut = "createcamera")]
+        public static void OnCreateCameraCommand(Player sender, int maxSpeed)
+        {
+            SpeedCameraController.CreateSpeedCamera(sender.Position + Vector3.Down, sender.Angle, maxSpeed);
+            sender.Position += Vector3.One;
+        }
+
+        [Command("deletecamera", Shortcut = "deletecamera")]
+        public static void OnDeleteCameraCommand(Player sender, int camId)
+        {
+            SpeedCameraController.RemoveSpeedCamera(camId);
         }
     }
 }

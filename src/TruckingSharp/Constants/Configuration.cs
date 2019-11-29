@@ -31,7 +31,7 @@ namespace TruckingSharp.Constants
 
         public const int MaxSpikeStrips = 10;
 
-        public const int MaxCameras = 120;
+        public const int MaxSpeedCameras = 120;
 
         public const int PricePaintJob = 200;
         public const int PriceColorChange = 150;
