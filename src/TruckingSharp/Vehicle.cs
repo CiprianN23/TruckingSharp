@@ -13,7 +13,7 @@ namespace TruckingSharp
 
         public void RemoveAllPlayersFromVehicle()
         {
-            foreach (BasePlayer player in Passengers)
+            foreach (var player in Passengers)
                 player.RemoveFromVehicle();
 
             Driver?.RemoveFromVehicle();

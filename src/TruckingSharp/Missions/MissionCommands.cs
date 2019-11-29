@@ -7,6 +7,7 @@ using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
 using TruckingSharp.Extensions.PlayersExtensions;
 using TruckingSharp.Missions.Bonus;
+using TruckingSharp.Missions.Convoy;
 using TruckingSharp.Missions.Trucker;
 using TruckingSharp.PlayerClasses.Data;
 
@@ -40,11 +41,13 @@ namespace TruckingSharp.Missions
 
                     if (sender.IsInConvoy && convoy?.Members[0] != sender)
                     {
-                        sender.SendClientMessage(Color.Red, "You are not the leader of the convoy, you can not start a job.");
+                        sender.SendClientMessage(Color.Red,
+                            "You are not the leader of the convoy, you can not start a job.");
                         return;
                     }
 
-                    var dialogTruckerMission = new ListDialog(Messages.MissionTruckerSelectMissionMethod, Messages.DialogButtonSelect, Messages.DialogButtonCancel);
+                    var dialogTruckerMission = new ListDialog(Messages.MissionTruckerSelectMissionMethod,
+                        Messages.DialogButtonSelect, Messages.DialogButtonCancel);
                     dialogTruckerMission.AddItem("Setup your own load and route\r\nAuto assigned load");
 
                     switch (playerVehicleModel)
@@ -53,13 +56,9 @@ namespace TruckingSharp.Missions
                         case VehicleModelType.DFT30:
                         case VehicleModelType.CementTruck:
                             if (sender.Account.TruckerLicense == 1)
-                            {
                                 dialogTruckerMission.Show(sender);
-                            }
                             else
-                            {
                                 TruckerController.StartRandomMission(sender);
-                            }
                             break;
 
                         case VehicleModelType.Roadtrain:
@@ -68,19 +67,16 @@ namespace TruckingSharp.Missions
                             if (sender.Vehicle.Trailer != null)
                             {
                                 if (sender.Account.TruckerLicense == 1)
-                                {
                                     dialogTruckerMission.Show(sender);
-                                }
                                 else
-                                {
                                     TruckerController.StartRandomMission(sender);
-                                }
                             }
                             else
                             {
                                 sender.SendClientMessage(Color.Red, Messages.MissionTruckerTrailerNeeded);
                                 return;
                             }
+
                             break;
                     }
 
@@ -99,10 +95,7 @@ namespace TruckingSharp.Missions
                 return;
             }
 
-            if (sender.IsInConvoy)
-            {
-                Convoy.MissionConvoy.PlayerLeaveConvoy(sender);
-            }
+            if (sender.IsInConvoy) MissionConvoy.PlayerLeaveConvoy(sender);
 
             if (sender.MissionStep == 1)
             {
@@ -113,7 +106,8 @@ namespace TruckingSharp.Missions
 
             MissionsController.ClassEndMission(sender);
 
-            sender.SendClientMessage(Color.Red, $"You {{FF0000}}failed{{FFFFFF}} your mission. You lost {{FFFF00}}${Configuration.Instance.FailedMissionPrice}{{FFFFFF}} to cover expenses.");
+            sender.SendClientMessage(Color.Red,
+                $"You {{FF0000}}failed{{FFFFFF}} your mission. You lost {{FFFF00}}${Configuration.Instance.FailedMissionPrice}{{FFFFFF}} to cover expenses.");
             sender.Reward(-Configuration.Instance.FailedMissionPrice);
         }
 
@@ -152,7 +146,7 @@ namespace TruckingSharp.Missions
 
             var playerVehicleModel = sender.MissionVehicle?.Model;
             var playerVehicleTrailerModel = sender.MissionTrailer?.Model;
-            bool isValidOverload = false;
+            var isValidOverload = false;
 
             switch (playerVehicleModel)
             {
@@ -172,16 +166,17 @@ namespace TruckingSharp.Missions
                             isValidOverload = true;
                             break;
                     }
+
                     break;
             }
 
-            if (isValidOverload)
-            {
-                sender.IsOverloaded = true;
-                sender.SetWantedLevel(sender.Account.Wanted + 2);
-                sender.SendClientMessage(Color.Yellow, "You have overloaded your truck, watch out for the police.");
-                // TODO: Send message to police
-            }
+            if (!isValidOverload)
+                return;
+
+            sender.IsOverloaded = true;
+            sender.SetWantedLevel(sender.Account.Wanted + 2);
+            sender.SendClientMessage(Color.Yellow, "You have overloaded your truck, watch out for the police.");
+            // TODO: Send message to police
         }
 
         [Command("bonus", Shortcut = "bonus")]

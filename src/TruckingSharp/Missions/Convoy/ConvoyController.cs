@@ -1,8 +1,10 @@
 ﻿using SampSharp.GameMode;
 using SampSharp.GameMode.Controllers;
 using SampSharp.GameMode.Definitions;
+using SampSharp.GameMode.Events;
 using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.World;
+using System;
 using TruckingSharp.Constants;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Missions.Bonus;
@@ -11,11 +13,18 @@ using TruckingSharp.Missions.Trucker;
 namespace TruckingSharp.Missions.Convoy
 {
     [Controller]
-    public class ConvoyController : IController, IEventListener
+    public class ConvoyController : IEventListener
     {
-        private static PlayerAccountRepository _accountRepository => new PlayerAccountRepository(ConnectionFactory.GetConnection);
+        private static PlayerAccountRepository AccountRepository =>
+            new PlayerAccountRepository(ConnectionFactory.GetConnection);
 
-        public static void ConvoyListDialog_Response(object sender, SampSharp.GameMode.Events.DialogResponseEventArgs e)
+        public void RegisterEvents(BaseMode gameMode)
+        {
+            gameMode.PlayerDisconnected += Convoy_PlayerDisconnected;
+            gameMode.PlayerDied += Convoy_PlayerDied;
+        }
+
+        public static void ConvoyListDialog_Response(object sender, DialogResponseEventArgs e)
         {
             if (e.DialogButton == DialogButton.Right)
                 return;
@@ -34,16 +43,16 @@ namespace TruckingSharp.Missions.Convoy
                     break;
 
                 case ConvoyStatus.Full:
-                    player.SendClientMessage(Color.Red, Messages.MissionConvoyAlreadyFull);
+                    player?.SendClientMessage(Color.Red, Messages.MissionConvoyAlreadyFull);
                     break;
 
                 case ConvoyStatus.Closed:
-                    player.SendClientMessage(Color.Red, Messages.MissionConvoyAlreadyOnRoute);
+                    player?.SendClientMessage(Color.Red, Messages.MissionConvoyAlreadyOnRoute);
                     break;
             }
         }
 
-        public static async void ConvoyTimer_Tick(object sender, System.EventArgs e, MissionConvoy convoy)
+        public static async void ConvoyTimer_Tick(object sender, EventArgs e, MissionConvoy convoy)
         {
             convoy.UpdateTextDraw();
 
@@ -52,7 +61,7 @@ namespace TruckingSharp.Missions.Convoy
             switch (convoy.MissionStep)
             {
                 case 0:
-                    bool IsSameTrailer = true;
+                    var isSameTrailer = true;
 
                     if (leader.IsDoingMission)
                     {
@@ -62,35 +71,33 @@ namespace TruckingSharp.Missions.Convoy
                         convoy.ConvoyTrailerModel = leader.Vehicle?.Trailer?.Model ?? 0;
 
                         if (convoy.ConvoyTrailerModel != 0)
-                        {
                             foreach (var member in convoy.Members)
                             {
                                 if (member == leader)
                                     continue;
 
-                                if (member.Vehicle?.Trailer?.Model != convoy.ConvoyTrailerModel)
+                                if (member.Vehicle?.Trailer?.Model == convoy.ConvoyTrailerModel)
+                                    continue;
+
+                                switch (convoy.ConvoyTrailerModel)
                                 {
-                                    switch (convoy.ConvoyTrailerModel)
-                                    {
-                                        case VehicleModelType.ArticleTrailer:
-                                        case VehicleModelType.ArticleTrailer3:
-                                            member.MissionTextDraw.Text = Messages.MissionConvoyCargoTrailerNeeded;
-                                            break;
+                                    case VehicleModelType.ArticleTrailer:
+                                    case VehicleModelType.ArticleTrailer3:
+                                        member.MissionTextDraw.Text = Messages.MissionConvoyCargoTrailerNeeded;
+                                        break;
 
-                                        case VehicleModelType.ArticleTrailer2:
-                                            member.MissionTextDraw.Text = Messages.MissionConvoyOreTrailerNeeded;
-                                            break;
+                                    case VehicleModelType.ArticleTrailer2:
+                                        member.MissionTextDraw.Text = Messages.MissionConvoyOreTrailerNeeded;
+                                        break;
 
-                                        case VehicleModelType.PetrolTrailer:
-                                            member.MissionTextDraw.Text = Messages.MissionConvoyFluidsTrailerNeeded;
-                                            break;
-                                    }
-                                    IsSameTrailer = false;
+                                    case VehicleModelType.PetrolTrailer:
+                                        member.MissionTextDraw.Text = Messages.MissionConvoyFluidsTrailerNeeded;
+                                        break;
                                 }
+
+                                isSameTrailer = false;
                             }
-                        }
                         else
-                        {
                             foreach (var member in convoy.Members)
                             {
                                 if (member == leader)
@@ -100,7 +107,7 @@ namespace TruckingSharp.Missions.Convoy
                                 {
                                     case VehicleModelType.Flatbed:
                                     case VehicleModelType.DFT30:
-                                        IsSameTrailer = true;
+                                        isSameTrailer = true;
                                         break;
 
                                     default:
@@ -108,11 +115,10 @@ namespace TruckingSharp.Missions.Convoy
                                         break;
                                 }
                             }
-                        }
 
-                        if (IsSameTrailer)
+                        if (isSameTrailer)
                         {
-                            leader.SendClientMessage(Color.GreenYellow, Messages.MissionconvoyReadyToGo);
+                            leader.SendClientMessage(Color.GreenYellow, Messages.MissionConvoyReadyToGo);
 
                             foreach (var member in convoy.Members)
                             {
@@ -134,47 +140,43 @@ namespace TruckingSharp.Missions.Convoy
                             }
                         }
                     }
+
                     break;
 
                 case 1:
-                    bool AreAllMemebersLoaded = true;
+                    var areAllMembersLoaded = true;
 
                     foreach (var member in convoy.Members)
-                    {
                         if (member.MissionStep != 2)
-                            AreAllMemebersLoaded = false;
-                    }
+                            areAllMembersLoaded = false;
 
-                    if (AreAllMemebersLoaded)
+                    if (areAllMembersLoaded)
                     {
                         leader.SendClientMessage(Color.GreenYellow, Messages.MissionConvoyMembersLoaded);
 
-                        foreach (var member in convoy.Members)
-                        {
-                            convoy.UpdateMemberJob(member);
-                        }
+                        foreach (var member in convoy.Members) convoy.UpdateMemberJob(member);
 
                         convoy.MissionStep = 2;
                     }
+
                     break;
 
                 case 2:
-                    bool didAllMembersUnlaoded = true;
+                    var didAllMembersUnloaded = true;
 
                     foreach (var member in convoy.Members)
-                    {
                         if (member.MissionStep != 4)
-                            didAllMembersUnlaoded = false;
-                    }
+                            didAllMembersUnloaded = false;
 
-                    if (didAllMembersUnlaoded)
+                    if (didAllMembersUnloaded)
                         convoy.MissionStep = 3;
                     break;
 
                 case 3:
-                    int numberOfMembers = convoy.Members.Count;
+                    var numberOfMembers = convoy.Members.Count;
 
-                    int payment = TruckerController.CalculatePayment(convoy.FromLocation, convoy.ToLocation, convoy.MissionCargo);
+                    var payment = TruckerController.CalculatePayment(convoy.FromLocation, convoy.ToLocation,
+                        convoy.MissionCargo);
 
                     if (!BonusMission.IsMissionFinished
                         && BonusMission.RandomCargo == convoy.MissionCargo
@@ -183,11 +185,12 @@ namespace TruckingSharp.Missions.Convoy
                     {
                         payment *= 2;
                         BonusMission.IsMissionFinished = true;
-                        BasePlayer.SendClientMessageToAll($"{{00BBFF}}Convoy with leader {{FFBB00}}{leader.Name}{{00BBFF}} has finished the bonus mission.");
+                        BasePlayer.SendClientMessageToAll(
+                            $"{{00BBFF}}Convoy with leader {{FFBB00}}{leader.Name}{{00BBFF}} has finished the bonus mission.");
                     }
 
-                    int bonus = (numberOfMembers * 25) + 100;
-                    payment = (payment * bonus) / 100;
+                    var bonus = numberOfMembers * 25 + 100;
+                    payment = payment * bonus / 100;
 
                     foreach (var member in convoy.Members)
                     {
@@ -195,11 +198,12 @@ namespace TruckingSharp.Missions.Convoy
 
                         var memberAccount = member.Account;
                         memberAccount.ConvoyJobs++;
-                        await _accountRepository.UpdateAsync(memberAccount);
+                        await AccountRepository.UpdateAsync(memberAccount);
 
                         MissionsController.ClassEndMission(member);
 
-                        member.SendClientMessage(Color.White, $"{{00FF00}}You finished the convoy and earned ${payment}");
+                        member.SendClientMessage(Color.White,
+                            $"{{00FF00}}You finished the convoy and earned ${payment}");
 
                         if (member != convoy.Members[0])
                             member.MissionTextDraw.Text = Messages.MissionConvoyWaitingForLeader;
@@ -216,19 +220,13 @@ namespace TruckingSharp.Missions.Convoy
             }
         }
 
-        public void RegisterEvents(BaseMode gameMode)
-        {
-            gameMode.PlayerDisconnected += Convoy_PlayerDisconnected;
-            gameMode.PlayerDied += Convoy_PlayerDied;
-        }
-
-        private void Convoy_PlayerDied(object sender, SampSharp.GameMode.Events.DeathEventArgs e)
+        private void Convoy_PlayerDied(object sender, DeathEventArgs e)
         {
             var player = sender as Player;
             MissionConvoy.PlayerLeaveConvoy(player);
         }
 
-        private void Convoy_PlayerDisconnected(object sender, SampSharp.GameMode.Events.DisconnectEventArgs e)
+        private void Convoy_PlayerDisconnected(object sender, DisconnectEventArgs e)
         {
             var player = sender as Player;
             MissionConvoy.PlayerLeaveConvoy(player);

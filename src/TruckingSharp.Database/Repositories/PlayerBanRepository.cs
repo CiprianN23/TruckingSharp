@@ -11,14 +11,36 @@ using TruckingSharp.Database.Repositories.Interfaces;
 
 namespace TruckingSharp.Database.Repositories
 {
-    public class PlayerBanRepository : IRepository<PlayerBan>, IDisposable
+    public sealed class PlayerBanRepository : IRepository<PlayerBan>, IDisposable
     {
-        private MySqlConnection _connection;
-        private bool isDisposed;
+        private readonly MySqlConnection _connection;
+        private bool _isDisposed;
 
         public PlayerBanRepository(MySqlConnection connection)
         {
             _connection = connection;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!_isDisposed && disposing)
+            {
+                // Dispose other resources here
+            }
+
+            _connection.Dispose();
+            _isDisposed = true;
+        }
+
+        ~PlayerBanRepository()
+        {
+            Dispose(false);
         }
 
         #region Sync
@@ -53,7 +75,8 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                return _connection.QueryFirstOrDefault("SELECT * FROM playerbans WHERE OwnerId = @Id", new { Id = ownerId });
+                return _connection.QueryFirstOrDefault("SELECT * FROM playerbans WHERE OwnerId = @Id",
+                    new { Id = ownerId });
             }
             catch (Exception ex)
             {
@@ -66,7 +89,10 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                return _connection.Query<PlayerBan>("SELECT playerbans.* FROM playerbans LEFT JOIN accounts ON playerbans.OwnerId = accounts.Id WHERE accounts.Name = @Name", new { Name = ownerName }).FirstOrDefault();
+                return _connection
+                    .Query<PlayerBan>(
+                        "SELECT playerbans.* FROM playerbans LEFT JOIN accounts ON playerbans.OwnerId = accounts.Id WHERE accounts.Name = @Name",
+                        new { Name = ownerName }).FirstOrDefault();
             }
             catch (Exception ex)
             {
@@ -83,7 +109,7 @@ namespace TruckingSharp.Database.Repositories
             }
             catch (Exception ex)
             {
-                Log.Error(ex, $"Failed to get all player bans.");
+                Log.Error(ex, "Failed to get all player bans.");
                 throw;
             }
         }
@@ -139,7 +165,7 @@ namespace TruckingSharp.Database.Repositories
             }
             catch (Exception ex)
             {
-                Log.Error(ex, $"Failed to get all players bans async.");
+                Log.Error(ex, "Failed to get all players bans async.");
                 throw;
             }
         }
@@ -158,27 +184,5 @@ namespace TruckingSharp.Database.Repositories
         }
 
         #endregion Async
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!isDisposed && disposing)
-            {
-                // Dispose other resources here
-            }
-
-            _connection.Dispose();
-            isDisposed = true;
-        }
-
-        ~PlayerBanRepository()
-        {
-            Dispose(false);
-        }
     }
 }

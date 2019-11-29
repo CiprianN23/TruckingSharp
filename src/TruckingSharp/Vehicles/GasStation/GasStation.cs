@@ -8,20 +8,20 @@ namespace TruckingSharp.Vehicles.GasStation
 {
     public class GasStation
     {
-        private readonly DynamicMapIcon MapIcon;
+        private readonly DynamicMapIcon _mapIcon;
 
-        private readonly Pickup Pickup;
+        private readonly Pickup _pickup;
 
-        private readonly TextLabel TextLabel;
+        private readonly TextLabel _textLabel;
 
-        public GasStation(Vector3 positon)
+        public GasStation(Vector3 position)
         {
-            Position = positon;
-            Pickup = Pickup.Create(ObjectModel.Petrolpump, PickupType.ScriptedActionsOnlyEveryFewSeconds, positon);
-            TextLabel = new TextLabel("Honk the horn\nto refuel your vehicle", Color.Teal, positon, 30.0f);
-            MapIcon = new DynamicMapIcon(positon, 56);
+            Position = position;
+            _pickup = Pickup.Create(ObjectModel.Petrolpump, PickupType.ScriptedActionsOnlyEveryFewSeconds, position);
+            _textLabel = new TextLabel("Honk the horn\nto refuel your vehicle", Color.Teal, position, 30.0f);
+            _mapIcon = new DynamicMapIcon(position, 56);
         }
 
-        public Vector3 Position { get; set; }
+        public Vector3 Position { get; }
     }
 }

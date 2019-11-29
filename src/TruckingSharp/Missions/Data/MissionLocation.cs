@@ -4,7 +4,7 @@ namespace TruckingSharp.Missions.Data
 {
     public class MissionLocation
     {
-        public static MissionLocation[] MissionLocations = new MissionLocation[]
+        public static readonly MissionLocation[] MissionLocations =
         {
             new MissionLocation("Dummy Location", Vector3.Zero),
 
@@ -70,7 +70,7 @@ namespace TruckingSharp.Missions.Data
             new MissionLocation("The Pleasure Domes", new Vector3(-2697.0, 1402.5, 7.2)),
             new MissionLocation("4 Dragons Casino", new Vector3(1903.75, 960.5, 10.9)),
             new MissionLocation("SF Financial Center", new Vector3(-2039.5, 467.5, 35.2)),
-            new MissionLocation("Area 69", new Vector3(134.54, 1945.79, 19.0)),
+            new MissionLocation("Area 69", new Vector3(134.54, 1945.79, 19.0))
         };
 
         private MissionLocation(string locationName, Vector3 location)

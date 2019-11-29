@@ -1,5 +1,6 @@
 ﻿using SampSharp.GameMode;
 using SampSharp.GameMode.Controllers;
+using SampSharp.GameMode.Events;
 using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.World;
 using System;
@@ -10,7 +11,7 @@ using TruckingSharp.PlayerClasses.Data;
 namespace TruckingSharp.PlayerClasses
 {
     [Controller]
-    public class ClassController : IController, IEventListener
+    public class ClassController : IEventListener
     {
         public void RegisterEvents(BaseMode gameMode)
         {
@@ -19,9 +20,10 @@ namespace TruckingSharp.PlayerClasses
             gameMode.PlayerSpawned += Class_PlayerSpawned;
         }
 
-        private void Class_PlayerSpawned(object sender, SampSharp.GameMode.Events.SpawnEventArgs e)
+        private void Class_PlayerSpawned(object sender, SpawnEventArgs e)
         {
-            var player = sender as Player;
+            if (!(sender is Player player))
+                return;
 
             switch (player.PlayerClass)
             {
@@ -59,14 +61,15 @@ namespace TruckingSharp.PlayerClasses
             }
         }
 
-        private void Class_PlayerRequestSpawn(object sender, SampSharp.GameMode.Events.RequestSpawnEventArgs e)
+        private void Class_PlayerRequestSpawn(object sender, RequestSpawnEventArgs e)
         {
-            var player = sender as Player;
+            if (!(sender is Player player))
+                return;
 
             var randomIndex = new Random();
             int index;
-            float angle = 0.0f;
-            Vector3 position = Vector3.Zero;
+            var angle = 0.0f;
+            var position = Vector3.Zero;
 
             switch (player.PlayerClass)
             {
@@ -99,15 +102,12 @@ namespace TruckingSharp.PlayerClasses
 
                 case PlayerClassType.Police:
 
-                    if (!player.CheckIfPlayerCanJoinPolice())
-                    {
-                        return;
-                    }
+                    if (!player.CheckIfPlayerCanJoinPolice()) return;
 
                     if (player.Account.Score < 100)
                     {
-                        player.GameText("You need 100 scorepoints for police class", 5000, 4);
-                        player.SendClientMessage(Color.Red, "You need 100 scorepoints for police class");
+                        player.GameText("You need 100 score points for police class", 5000, 4);
+                        player.SendClientMessage(Color.Red, "You need 100 score points for police class");
                         e.PreventSpawning = true;
                         return;
                     }
@@ -115,7 +115,8 @@ namespace TruckingSharp.PlayerClasses
                     if (player.Account.Wanted > 0)
                     {
                         player.GameText("You are not allowed to choose police class when you're wanted", 5000, 4);
-                        player.SendClientMessage(Color.Red, "You are not allowed to choose police class when you're wanted");
+                        player.SendClientMessage(Color.Red,
+                            "You are not allowed to choose police class when you're wanted");
                         e.PreventSpawning = true;
                         return;
                     }
@@ -156,10 +157,10 @@ namespace TruckingSharp.PlayerClasses
                     break;
 
                 case PlayerClassType.RoadWorker:
-                    index = randomIndex.Next(0, RoadWorkerSpawn.RoadworkerSpawns.Length);
+                    index = randomIndex.Next(0, RoadWorkerSpawn.RoadWorkerSpawns.Length);
 
-                    position = RoadWorkerSpawn.RoadworkerSpawns[index].Position;
-                    angle = RoadWorkerSpawn.RoadworkerSpawns[index].Angle;
+                    position = RoadWorkerSpawn.RoadWorkerSpawns[index].Position;
+                    angle = RoadWorkerSpawn.RoadWorkerSpawns[index].Angle;
 
                     BasePlayer.SendClientMessageToAll(Messages.PlayerJoinedRoadWorkerClass, player.Name);
                     break;
@@ -168,9 +169,10 @@ namespace TruckingSharp.PlayerClasses
             player.SetSpawnInfo(0, player.Skin, position, angle);
         }
 
-        private void Class_PlayerRequestClass(object sender, SampSharp.GameMode.Events.RequestClassEventArgs e)
+        private void Class_PlayerRequestClass(object sender, RequestClassEventArgs e)
         {
-            var player = sender as Player;
+            if (!(sender is Player player))
+                return;
 
             player.Interior = 14;
             player.Position = new Vector3(258.4893, -41.4008, 1002.0234);

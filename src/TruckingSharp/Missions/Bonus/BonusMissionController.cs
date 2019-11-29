@@ -3,6 +3,7 @@ using SampSharp.GameMode.Controllers;
 using SampSharp.GameMode.SAMP;
 using System;
 using TruckingSharp.Missions.Data;
+using TruckingSharp.PlayerClasses.Data;
 
 namespace TruckingSharp.Missions.Bonus
 {
@@ -22,17 +23,17 @@ namespace TruckingSharp.Missions.Bonus
             Timer.Tick += Timer_Tick;
         }
 
-        public static void Timer_Tick(object sender, EventArgs e)
+        private static void Timer_Tick(object sender, EventArgs e)
         {
-            bool isMissionSet = false;
-            Random random = new Random();
+            var isMissionSet = false;
+            var random = new Random();
 
             if (BonusMission.RandomCargo == null || BonusMission.IsMissionFinished)
             {
                 while (!isMissionSet)
                 {
-                    int index = random.Next(1, MissionCargo.MissionCargos.Count);
-                    BonusMission.RandomCargo = MissionCargo.MissionCargos[index];
+                    var index = random.Next(1, MissionCargo.MissionCargoes.Count);
+                    BonusMission.RandomCargo = MissionCargo.MissionCargoes[index];
 
                     switch (BonusMission.RandomCargo.JobCargoVehicleType)
                     {
@@ -55,7 +56,7 @@ namespace TruckingSharp.Missions.Bonus
                 BonusMission.IsMissionFinished = false;
             }
 
-            string truckName = string.Empty;
+            var truckName = string.Empty;
 
             switch (BonusMission.RandomCargo.JobCargoVehicleType)
             {
@@ -80,14 +81,19 @@ namespace TruckingSharp.Missions.Bonus
                     break;
             }
 
-            foreach (Player player in Player.All)
+            foreach (var basePlayer in Player.All)
             {
-                if (player.PlayerClass == PlayerClasses.Data.PlayerClassType.TruckDriver)
-                {
-                    player.SendClientMessage(Color.White, $"{{00BBFF}}Bonus mission: transport {{FFBB00}}{BonusMission.RandomCargo.Name}");
-                    player.SendClientMessage(Color.White, $"{{00BBFF}}from {{FFBB00}}{BonusMission.RandomFromLocation.Name}{{00BBFF}} to {{FFBB00}}{BonusMission.RandomToLocation.Name}");
-                    player.SendClientMessage(Color.White, $"{{00BBFF}}You'll need a {{FFBB00}}{truckName}{{00BBFF}} to complete this mission");
-                }
+                var player = (Player)basePlayer;
+
+                if (player.PlayerClass != PlayerClassType.TruckDriver)
+                    continue;
+
+                player.SendClientMessage(Color.White,
+                    $"{{00BBFF}}Bonus mission: transport {{FFBB00}}{BonusMission.RandomCargo.Name}");
+                player.SendClientMessage(Color.White,
+                    $"{{00BBFF}}from {{FFBB00}}{BonusMission.RandomFromLocation.Name}{{00BBFF}} to {{FFBB00}}{BonusMission.RandomToLocation.Name}");
+                player.SendClientMessage(Color.White,
+                    $"{{00BBFF}}You'll need a {{FFBB00}}{truckName}{{00BBFF}} to complete this mission");
             }
         }
     }

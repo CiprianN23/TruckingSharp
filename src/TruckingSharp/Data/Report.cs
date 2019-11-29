@@ -6,28 +6,28 @@ namespace TruckingSharp.Data
 {
     public class Report
     {
-        public static Report[] Reports = ArrayHelper.InitializeArray<Report>(50);
+        public static readonly Report[] Reports = ArrayHelper.InitializeArray<Report>(50);
         private bool _isUsed;
         public bool IsEmpty => !_isUsed && string.IsNullOrEmpty(OffenderName) && string.IsNullOrEmpty(Reason);
-        public string OffenderName { get; set; }
-        public string Reason { get; set; }
+        public string OffenderName { get; private set; }
+        public string Reason { get; private set; }
 
         public static void AddReport(string offenderName, string reason)
         {
-            int reportId = -1;
+            var reportId = -1;
 
-            for (int i = 0; i < 50; i++)
+            for (var i = 0; i < 50; i++)
             {
-                if (!Reports[i]._isUsed)
-                {
-                    reportId = i;
-                    break;
-                }
+                if (Reports[i]._isUsed)
+                    continue;
+
+                reportId = i;
+                break;
             }
 
             if (reportId == -1)
             {
-                for (int i = 1; i < 50; i++)
+                for (var i = 1; i < 50; i++)
                 {
                     Reports[i - 1]._isUsed = Reports[i]._isUsed;
                     Reports[i - 1].OffenderName = $"{Reports[i].OffenderName}";
@@ -61,13 +61,15 @@ namespace TruckingSharp.Data
                 totalReason = $"{reason} (by AntiHack)";
             }
 
-            foreach (Player admin in Player.All)
+            foreach (var basePlayer in Player.All)
             {
-                if (admin.Account.AdminLevel > 0)
-                {
-                    admin.SendClientMessage(Color.Cyan, message);
-                    admin.GameText(gameTextMessage, 10000, 4);
-                }
+                var admin = (Player)basePlayer;
+
+                if (admin.Account.AdminLevel <= 0)
+                    continue;
+
+                admin.SendClientMessage(Color.Cyan, message);
+                admin.GameText(gameTextMessage, 10000, 4);
             }
 
             AddReport(offender.Name, totalReason);

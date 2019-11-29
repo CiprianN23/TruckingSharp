@@ -20,25 +20,15 @@ namespace TruckingSharp
     [PooledType]
     public class Player : BasePlayer
     {
-        private PlayerAccountRepository _accountRepository => new PlayerAccountRepository(ConnectionFactory.GetConnection);
-
         public PlayerClassType PlayerClass;
 
-        public PlayerAccount Account
-        {
-            get
-            {
-                return _accountRepository.Find(Name);
-            }
-        }
+        private static PlayerAccountRepository AccountRepository =>
+            new PlayerAccountRepository(ConnectionFactory.GetConnection);
 
-        public PlayerBankAccount BankAccount
-        {
-            get
-            {
-                return new PlayerBankAccountRepository(ConnectionFactory.GetConnection).Find(Account.Id);
-            }
-        }
+        public PlayerAccount Account => AccountRepository.Find(Name);
+
+        public PlayerBankAccount BankAccount =>
+            new PlayerBankAccountRepository(ConnectionFactory.GetConnection).Find(Account.Id);
 
         public bool IsLoggedIn { get; set; }
         public bool IsLoggedInBankAccount { get; set; }
@@ -76,42 +66,41 @@ namespace TruckingSharp
 
         public bool CheckIfPlayerCanJoinPolice()
         {
-            if (Configuration.Instance.PlayersBeforePolice > 0)
+            if (Configuration.Instance.PlayersBeforePolice <= 0)
+                return false;
+
+            var normalPlayers = 0;
+            var policePlayers = 0;
+            foreach (var basePlayer in All)
             {
-                int normalPlayers = 0;
-                int policePlayers = 0;
-                foreach (Player player in All)
+                var player = (Player)basePlayer;
+
+                if (player == this)
+                    continue;
+
+                if (player.Interior == 14)
+                    continue;
+
+                if (!IsLoggedIn)
+                    continue;
+
+                switch (player.PlayerClass)
                 {
-                    if (player == this)
-                        continue;
+                    case PlayerClassType.Police:
+                        policePlayers++;
+                        break;
 
-                    if (player.Interior == 14)
-                        continue;
-
-                    if (IsLoggedIn)
-                    {
-                        switch (player.PlayerClass)
-                        {
-                            case PlayerClassType.Police:
-                                policePlayers++;
-                                break;
-
-                            default:
-                                normalPlayers++;
-                                break;
-                        }
-                    }
+                    default:
+                        normalPlayers++;
+                        break;
                 }
-
-                bool CanSpawnAsCop = policePlayers < (normalPlayers / Configuration.Instance.PlayersBeforePolice);
-                if (!CanSpawnAsCop)
-                {
-                    GameText("Maximum amount of cops already reached", 5000, 4);
-                    SendClientMessage(Color.Red, "The maximum amount of cops has been reached already, please select another class");
-                }
-
-                return CanSpawnAsCop;
             }
+
+            var canSpawnAsCop = policePlayers < normalPlayers / Configuration.Instance.PlayersBeforePolice;
+            if (canSpawnAsCop) return true;
+            GameText("Maximum amount of cops already reached", 5000, 4);
+            SendClientMessage(Color.Red,
+                "The maximum amount of cops has been reached already, please select another class");
 
             return false;
         }
@@ -126,7 +115,7 @@ namespace TruckingSharp
             Money = account.Money;
             Score = account.Score;
 
-            await _accountRepository.UpdateAsync(account).ConfigureAwait(false);
+            await AccountRepository.UpdateAsync(account).ConfigureAwait(false);
         }
 
         public async void SetWantedLevel(int wantedLevel)
@@ -134,7 +123,7 @@ namespace TruckingSharp
             var account = Account;
             account.Wanted = wantedLevel;
             WantedLevel = wantedLevel;
-            await _accountRepository.UpdateAsync(account).ConfigureAwait(false);
+            await AccountRepository.UpdateAsync(account).ConfigureAwait(false);
         }
 
         public override void OnClickPlayer(ClickPlayerEventArgs e)
@@ -192,12 +181,12 @@ namespace TruckingSharp
         {
             base.OnRequestClass(e);
 
-            if (!IsLoggedIn)
-            {
-                SendClientMessage(Color.Red, Messages.FailedToLoginProperly);
-                await Task.Delay(Configuration.Instance.KickDelay);
-                Kick();
-            }
+            if (IsLoggedIn)
+                return;
+
+            SendClientMessage(Color.Red, Messages.FailedToLoginProperly);
+            await Task.Delay(Configuration.Instance.KickDelay);
+            Kick();
         }
 
         public override void OnSpawned(SpawnEventArgs e)
@@ -212,13 +201,13 @@ namespace TruckingSharp
             if (Account.RulesRead == 0)
                 SendClientMessage(Color.Red, Messages.RulesNotYetAccepted);
 
-            if (IsSpectating)
-            {
-                Position = SpectatePosition;
+            if (!IsSpectating)
+                return;
 
-                SpectatePosition = Vector3.Zero;
-                IsSpectating = false;
-            }
+            Position = SpectatePosition;
+
+            SpectatePosition = Vector3.Zero;
+            IsSpectating = false;
 
             // TODO Send player to jail
         }
@@ -227,30 +216,28 @@ namespace TruckingSharp
         {
             base.OnStateChanged(e);
 
-            if (e.NewState == PlayerState.Driving)
-            {
-                if (PlayerClass != PlayerClassType.Police)
+            if (e.NewState != PlayerState.Driving)
+                return;
+
+            if (PlayerClass != PlayerClassType.Police)
+                if (MissionVehicles.PoliceJobVehicles.Contains(Vehicle))
                 {
-                    if (MissionVehicles.PoliceJobVehicles.Contains(Vehicle))
-                    {
-                        RemoveFromVehicle();
-                        Vehicle.Engine = false;
-                        Vehicle.Lights = false;
-                        SendClientMessage(Color.Red, "You can't use police vehicles.");
-                    }
+                    RemoveFromVehicle();
+                    Vehicle.Engine = false;
+                    Vehicle.Lights = false;
+                    SendClientMessage(Color.Red, "You can't use police vehicles.");
                 }
 
-                if (PlayerClass != PlayerClassType.Pilot)
-                {
-                    if (MissionVehicles.PilotJobVehicles.Contains(Vehicle))
-                    {
-                        RemoveFromVehicle();
-                        Vehicle.Engine = false;
-                        Vehicle.Lights = false;
-                        SendClientMessage(Color.Red, "You can't use pilot vehicles.");
-                    }
-                }
-            }
+            if (PlayerClass == PlayerClassType.Pilot)
+                return;
+
+            if (!MissionVehicles.PilotJobVehicles.Contains(Vehicle))
+                return;
+
+            RemoveFromVehicle();
+            Vehicle.Engine = false;
+            Vehicle.Lights = false;
+            SendClientMessage(Color.Red, "You can't use pilot vehicles.");
 
             // TODO: Kick player out of vehicle if vehicle is owned by other/clmaped
         }
@@ -276,7 +263,8 @@ namespace TruckingSharp
         public void ShowRemainingMuteTime()
         {
             var remainingMuteTime = Account.Muted - DateTime.Now;
-            SendClientMessage(Color.Silver, $"Mute time remaining: Minutes: {remainingMuteTime.Minutes}, Seconds: {remainingMuteTime.Seconds}");
+            SendClientMessage(Color.Silver,
+                $"Mute time remaining: Minutes: {remainingMuteTime.Minutes}, Seconds: {remainingMuteTime.Seconds}");
         }
 
         protected override void Dispose(bool disposing)

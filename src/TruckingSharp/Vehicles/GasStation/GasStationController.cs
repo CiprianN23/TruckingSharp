@@ -1,9 +1,12 @@
 ﻿using SampSharp.GameMode;
 using SampSharp.GameMode.Controllers;
+using SampSharp.GameMode.Definitions;
+using SampSharp.GameMode.Events;
 using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.Tools;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TruckingSharp.Extensions.PlayersExtensions;
 
 namespace TruckingSharp.Vehicles.GasStation
@@ -11,7 +14,7 @@ namespace TruckingSharp.Vehicles.GasStation
     [Controller]
     public class GasStationController : IEventListener
     {
-        public static List<GasStation> GasStations = new List<GasStation>();
+        private static readonly List<GasStation> GasStations = new List<GasStation>();
 
         public void RegisterEvents(BaseMode gameMode)
         {
@@ -19,35 +22,32 @@ namespace TruckingSharp.Vehicles.GasStation
             gameMode.PlayerKeyStateChanged += GasStation_PlayerKeyStateChange;
         }
 
-        private void GasStation_PlayerKeyStateChange(object sender, SampSharp.GameMode.Events.KeyStateChangedEventArgs e)
+        private void GasStation_PlayerKeyStateChange(object sender, KeyStateChangedEventArgs e)
         {
-            var player = sender as Player;
+            if (!(sender is Player player))
+                return;
 
-            if (KeyUtils.HasPressed(e.NewKeys, e.OldKeys, SampSharp.GameMode.Definitions.Keys.Crouch))
-            {
-                if (!player.IsPlayerDriving())
-                    return;
+            if (!KeyUtils.HasPressed(e.NewKeys, e.OldKeys, Keys.Crouch))
+                return;
 
-                foreach (var gasStation in GasStations)
-                {
-                    if (player.IsInRangeOfPoint(2.5f, gasStation.Position))
-                    {
-                        player.GameText("~g~Refuelling...", 3000, 4);
-                        player.ToggleControllable(false);
+            if (!player.IsPlayerDriving())
+                return;
 
-                        Timer refuelTimer = new Timer(TimeSpan.FromSeconds(5), false);
-                        refuelTimer.Tick += (sender, e) => RefuelVehicle(sender, e, player);
-                        break;
-                    }
-                }
-            }
+            if (!GasStations.Any(gasStation => player.IsInRangeOfPoint(2.5f, gasStation.Position)))
+                return;
+
+            player.GameText("~g~Refuelling...", 3000, 4);
+            player.ToggleControllable(false);
+
+            var refuelTimer = new Timer(TimeSpan.FromSeconds(5), false);
+            refuelTimer.Tick += (senderObject, ev) => RefuelVehicle(senderObject, ev, player);
         }
 
         private void RefuelVehicle(object sender, EventArgs e, Player player)
         {
             var playerVehicle = (Vehicle)player.Vehicle;
-            int fuelAmount = Configuration.Instance.MaximumFuel - playerVehicle.Fuel;
-            int refuelPrice = (fuelAmount / Configuration.Instance.RefuelPrice) / Configuration.Instance.MaximumFuel;
+            var fuelAmount = Configuration.Instance.MaximumFuel - playerVehicle.Fuel;
+            var refuelPrice = fuelAmount / Configuration.Instance.RefuelPrice / Configuration.Instance.MaximumFuel;
 
             if (player.Account.Money < refuelPrice)
             {

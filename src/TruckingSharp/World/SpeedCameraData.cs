@@ -6,7 +6,8 @@ namespace TruckingSharp.World
 {
     public class SpeedCameraData
     {
-        public static SpeedCameraData[] SpeedCameras = new SpeedCameraData[Configuration.Instance.MaximumSpeedCameras];
+        public static readonly SpeedCameraData[] SpeedCameras =
+            new SpeedCameraData[Configuration.Instance.MaximumSpeedCameras];
 
         public SpeedCameraData(int camId, Vector3 position, float angle, int maxSpeed)
         {
@@ -18,7 +19,8 @@ namespace TruckingSharp.World
             CameraObject = new GlobalObject(18880, Position, new Vector3(0, 0, FacingAngle), 50.0f);
             CameraObject1 = new GlobalObject(18880, Position, new Vector3(0, 0, FacingAngle + 180.0), 50.0f);
 
-            TextLabel = new TextLabel($"CamID: {camId}\nSpeed: {maxSpeed}", Color.White, position + new Vector3(0, 0, 5), 50.0f, 0, false);
+            TextLabel = new TextLabel($"CamID: {camId}\nSpeed: {maxSpeed}", Color.White,
+                position + new Vector3(0, 0, 5), 50.0f, 0, false);
 
             SpeedCameras[camId] = this;
         }

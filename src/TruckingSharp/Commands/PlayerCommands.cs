@@ -1,5 +1,7 @@
 ﻿using SampSharp.GameMode;
+using SampSharp.GameMode.Definitions;
 using SampSharp.GameMode.Display;
+using SampSharp.GameMode.Events;
 using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.SAMP.Commands;
 using SampSharp.GameMode.World;
@@ -24,21 +26,23 @@ namespace TruckingSharp.Commands
         {
             var dialogAdmins = new ListDialog("Online admins:", "Close");
 
-            foreach (Player player in Player.All)
+            foreach (var basePlayer in Player.All)
             {
+                var player = (Player)basePlayer;
+
                 if (!player.IsLoggedIn)
                     continue;
 
                 if (player.IsAdmin)
                 {
-                    dialogAdmins.AddItem($"{AdminRanks.AdminLevelNames[player.Account.AdminLevel]}: {player.Name} (id: {player.Id}), admin-level: {player.Account.AdminLevel} (RCON admin)");
+                    dialogAdmins.AddItem(
+                        $"{AdminRanks.AdminLevelNames[player.Account.AdminLevel]}: {player.Name} (id: {player.Id}), admin-level: {player.Account.AdminLevel} (RCON admin)");
                     continue;
                 }
 
                 if (player.Account.AdminLevel > 0)
-                {
-                    dialogAdmins.AddItem($"{AdminRanks.AdminLevelNames[player.Account.AdminLevel]}: {player.Name} (id: {player.Id}), admin-level: {player.Account.AdminLevel}");
-                }
+                    dialogAdmins.AddItem(
+                        $"{AdminRanks.AdminLevelNames[player.Account.AdminLevel]}: {player.Name} (id: {player.Id}), admin-level: {player.Account.AdminLevel}");
             }
 
             if (dialogAdmins.Items.Count > 0)
@@ -54,43 +58,45 @@ namespace TruckingSharp.Commands
             {
                 if (sender.BankAccount == null)
                 {
-                    var registerNewBankAccountDialog = new InputDialog("Enter a password", "Please enter a password to register your bank account:", true, "Accept", "Cancel");
+                    var registerNewBankAccountDialog = new InputDialog("Enter a password",
+                        "Please enter a password to register your bank account:", true, "Accept", "Cancel");
                     registerNewBankAccountDialog.Show(sender);
                     registerNewBankAccountDialog.Response += async (senderObject, e) =>
                     {
-                        if (e.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
+                        if (e.DialogButton != DialogButton.Left)
+                            return;
+
+                        if (e.InputText.Length < 1 || e.InputText.Length > 20)
                         {
-                            if (e.InputText.Length < 1 || e.InputText.Length > 20)
-                            {
-                                sender.SendClientMessage(Color.Red, Messages.InvalidPasswordLenght, 1, 20);
-                                registerNewBankAccountDialog.Show(sender);
-                                return;
-                            }
-
-                            var hash = PasswordHashingService.GetPasswordHash(e.InputText);
-                            var newBankAccount = new PlayerBankAccount { Password = hash, PlayerId = sender.Account.Id };
-                            await new PlayerBankAccountRepository(ConnectionFactory.GetConnection).AddAsync(newBankAccount);
-
-                            sender.SendClientMessage(Color.GreenYellow, Messages.BankAccountCreatedSuccessfully);
+                            sender.SendClientMessage(Color.Red, Messages.InvalidPasswordLength, 1, 20);
+                            registerNewBankAccountDialog.Show(sender);
+                            return;
                         }
+
+                        var hash = PasswordHashingService.GetPasswordHash(e.InputText);
+                        var newBankAccount = new PlayerBankAccount { Password = hash, PlayerId = sender.Account.Id };
+                        await new PlayerBankAccountRepository(ConnectionFactory.GetConnection).AddAsync(newBankAccount);
+
+                        sender.SendClientMessage(Color.GreenYellow, Messages.BankAccountCreatedSuccessfully);
                     };
                 }
                 else
                 {
-                    var loginBankAccount = new InputDialog("Enter a password", "Enter a password to login to your bank account:", true, "Accept", "Cancel");
+                    var loginBankAccount = new InputDialog("Enter a password",
+                        "Enter a password to login to your bank account:", true, "Accept", "Cancel");
                     loginBankAccount.Show(sender);
                     loginBankAccount.Response += (senderObject, e) =>
                     {
                         if (e.InputText.Length < 1 || e.InputText.Length > 20)
                         {
-                            sender.SendClientMessage(Color.Red, Messages.InvalidPasswordLenght, 1, 20);
+                            sender.SendClientMessage(Color.Red, Messages.InvalidPasswordLength, 1, 20);
                             loginBankAccount.Show(sender);
                             return;
                         }
 
                         if (!PasswordHashingService.VerifyPasswordHash(e.InputText, sender.BankAccount.Password))
                         {
-                            sender.SendClientMessage(Color.Red, Messages.InvalidPasswordInputed);
+                            sender.SendClientMessage(Color.Red, Messages.InvalidPasswordInputted);
                             loginBankAccount.Show(sender);
                             return;
                         }
@@ -110,55 +116,58 @@ namespace TruckingSharp.Commands
         [Command("changepassword", Shortcut = "changepassword")]
         public static void OnChangedPasswordCommand(Player sender)
         {
-            var oldPasswordDialog = new InputDialog("Enter your old password", "Enter your old password:", true, "Next", "Close");
+            var oldPasswordDialog = new InputDialog("Enter your old password", "Enter your old password:", true, "Next",
+                "Close");
             oldPasswordDialog.Show(sender);
             oldPasswordDialog.Response += (senderObject, ev) =>
             {
-                if (ev.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
+                if (ev.DialogButton != DialogButton.Left)
+                    return;
+
+                if (!PasswordHashingService.VerifyPasswordHash(ev.InputText, sender.Account.Password))
                 {
-                    if (!PasswordHashingService.VerifyPasswordHash(ev.InputText, sender.Account.Password))
+                    sender.SendClientMessage(Color.Red, Messages.PasswordsDontMatch);
+                    oldPasswordDialog.Show(sender);
+                    return;
+                }
+
+                var newPasswordDialog = new InputDialog("Enter your new password", "Enter your new password:", true,
+                    "Next", "Close");
+                newPasswordDialog.Show(sender);
+                newPasswordDialog.Response += (objectSender, e) =>
+                {
+                    if (e.DialogButton != DialogButton.Left)
+                        return;
+
+                    if (e.InputText.Length < 1)
                     {
-                        sender.SendClientMessage(Color.Red, Messages.PasswordsDontMatch);
-                        oldPasswordDialog.Show(sender);
+                        sender.SendClientMessage(Color.Red, Messages.PasswordCanNotBeEmptyOrNull);
+                        newPasswordDialog.Show(sender);
                         return;
                     }
 
-                    var newPasswordDialog = new InputDialog("Enter your new password", "Enter your new password:", true, "Next", "Close");
-                    newPasswordDialog.Show(sender);
-                    newPasswordDialog.Response += (objectSender, e) =>
+                    if (PasswordHashingService.VerifyPasswordHash(e.InputText, sender.Account.Password))
                     {
-                        if (e.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
-                        {
-                            if (e.InputText.Length < 1)
-                            {
-                                sender.SendClientMessage(Color.Red, Messages.PasswordCanNotBeEmptyOrNull);
-                                newPasswordDialog.Show(sender);
-                                return;
-                            }
+                        sender.SendClientMessage(Color.Red, Messages.PasswordCanNotBeAsTheOldOne);
+                        newPasswordDialog.Show(sender);
+                        return;
+                    }
 
-                            if (PasswordHashingService.VerifyPasswordHash(e.InputText, sender.Account.Password))
-                            {
-                                sender.SendClientMessage(Color.Red, Messages.PasswordCanNotBeAsTheOldOne);
-                                newPasswordDialog.Show(sender);
-                                return;
-                            }
+                    var confirmPasswordDialog = new MessageDialog("Confirm password change",
+                        "Are you sure you want to change your password?", "Yes", "No");
+                    confirmPasswordDialog.Show(sender);
+                    confirmPasswordDialog.Response += async (objectSender1, evv) =>
+                    {
+                        if (evv.DialogButton != DialogButton.Left)
+                            return;
 
-                            var confirmPasswordDialog = new MessageDialog("Confirm password change", "Are you sure you want to change your password?", "Yes", "No");
-                            confirmPasswordDialog.Show(sender);
-                            confirmPasswordDialog.Response += async (objectSender1, evv) =>
-                            {
-                                if (evv.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
-                                {
-                                    var account = sender.Account;
-                                    account.Password = PasswordHashingService.GetPasswordHash(e.InputText);
-                                    await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(account);
+                        var account = sender.Account;
+                        account.Password = PasswordHashingService.GetPasswordHash(e.InputText);
+                        await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(account);
 
-                                    sender.SendClientMessage(Color.GreenYellow, Messages.PasswordChangedSuccessfully);
-                                }
-                            };
-                        }
+                        sender.SendClientMessage(Color.GreenYellow, Messages.PasswordChangedSuccessfully);
                     };
-                }
+                };
             };
         }
 
@@ -220,7 +229,8 @@ namespace TruckingSharp.Commands
             target.RemoveFromVehicle();
             target.SendClientMessage(Color.Red, $"You have been ejected from vehicle by {{FFFF00}} {sender.Name}");
 
-            sender.SendClientMessage(Color.White, $"You have ejected {{FFFF00}}{target.Name}{{00FF00}} from your vehicle.");
+            sender.SendClientMessage(Color.White,
+                $"You have ejected {{FFFF00}}{target.Name}{{00FF00}} from your vehicle.");
         }
 
         [Command("engine", Shortcut = "engine")]
@@ -267,9 +277,9 @@ namespace TruckingSharp.Commands
         }
 
         [Command("gobase", Shortcut = "gobase")]
-        public static void OnGobaseCommand(Player sender)
+        public static void OnGoBaseCommand(Player sender)
         {
-            if (sender.State != SampSharp.GameMode.Definitions.PlayerState.OnFoot)
+            if (sender.State != PlayerState.OnFoot)
             {
                 sender.SendClientMessage(Color.Red, Messages.MustBeOnFoot);
                 return;
@@ -307,7 +317,8 @@ namespace TruckingSharp.Commands
                     dialogSpawns.AddItem("Quarry Top");
                     dialogSpawns.AddItem("Shady Creek Depot");
 
-                    dialogSpawns.Response += (sender, e) => DialogSpawns_Response(sender, e, PlayerClassType.TruckDriver);
+                    dialogSpawns.Response += (senderObject, e) =>
+                        DialogSpawns_Response(senderObject, e, PlayerClassType.TruckDriver);
                     break;
 
                 case PlayerClassType.BusDriver:
@@ -315,7 +326,8 @@ namespace TruckingSharp.Commands
                     dialogSpawns.AddItem("San Fierro");
                     dialogSpawns.AddItem("Las Venturas");
 
-                    dialogSpawns.Response += (sender, e) => DialogSpawns_Response(sender, e, PlayerClassType.BusDriver);
+                    dialogSpawns.Response += (senderObject, e) =>
+                        DialogSpawns_Response(senderObject, e, PlayerClassType.BusDriver);
                     break;
 
                 case PlayerClassType.Pilot:
@@ -323,7 +335,8 @@ namespace TruckingSharp.Commands
                     dialogSpawns.AddItem("San Fierro");
                     dialogSpawns.AddItem("Las Venturas");
 
-                    dialogSpawns.Response += (sender, e) => DialogSpawns_Response(sender, e, PlayerClassType.Pilot);
+                    dialogSpawns.Response += (senderObject, e) =>
+                        DialogSpawns_Response(senderObject, e, PlayerClassType.Pilot);
                     break;
 
                 case PlayerClassType.Police:
@@ -331,7 +344,8 @@ namespace TruckingSharp.Commands
                     dialogSpawns.AddItem("San Fierro");
                     dialogSpawns.AddItem("Las Venturas");
 
-                    dialogSpawns.Response += (sender, e) => DialogSpawns_Response(sender, e, PlayerClassType.Police);
+                    dialogSpawns.Response += (senderObject, e) =>
+                        DialogSpawns_Response(senderObject, e, PlayerClassType.Police);
                     break;
 
                 case PlayerClassType.Courier:
@@ -339,7 +353,8 @@ namespace TruckingSharp.Commands
                     dialogSpawns.AddItem("San Fierro");
                     dialogSpawns.AddItem("Las Venturas");
 
-                    dialogSpawns.Response += (sender, e) => DialogSpawns_Response(sender, e, PlayerClassType.Courier);
+                    dialogSpawns.Response += (senderObject, e) =>
+                        DialogSpawns_Response(senderObject, e, PlayerClassType.Courier);
                     break;
             }
 
@@ -363,7 +378,7 @@ namespace TruckingSharp.Commands
         {
             if (sender == target)
             {
-                sender.SendClientMessage(Color.Red, Messages.NoPrivMessageToYou);
+                sender.SendClientMessage(Color.Red, Messages.NoPrivateMessageToYou);
                 return;
             }
 
@@ -379,8 +394,10 @@ namespace TruckingSharp.Commands
                 return;
             }
 
-            sender.SendClientMessage(Color.LightGoldenrodYellow, Messages.PrivMessageTo, target.Name, target.Id, message);
-            target.SendClientMessage(Color.LightGoldenrodYellow, Messages.PrivMessageFrom, sender.Name, sender.Id, message);
+            sender.SendClientMessage(Color.LightGoldenrodYellow, Messages.PrivateMessageTo, target.Name, target.Id,
+                message);
+            target.SendClientMessage(Color.LightGoldenrodYellow, Messages.PrivateMessageFrom, sender.Name, sender.Id,
+                message);
 
             target.PlaySound(1085, Vector3.Zero);
         }
@@ -388,7 +405,7 @@ namespace TruckingSharp.Commands
         [Command("radio", Shortcut = "radio")]
         public static void OnRadioCommand(Player sender, string message)
         {
-            string className = string.Empty;
+            var className = string.Empty;
 
             switch (sender.PlayerClass)
             {
@@ -425,15 +442,16 @@ namespace TruckingSharp.Commands
                     break;
             }
 
-            foreach (Player player in Player.All)
+            foreach (var basePlayer in Player.All)
             {
+                var player = (Player)basePlayer;
+
                 if (!player.IsLoggedIn)
                     continue;
 
                 if (player.PlayerClass == sender.PlayerClass)
-                {
-                    player.SendClientMessage(Color.Gray, $"({className} chat) {{D0D0D0}}{sender.Name}: {{FFFFFF}}{message}");
-                }
+                    player.SendClientMessage(Color.Gray,
+                        $"({className} chat) {{D0D0D0}}{sender.Name}: {{FFFFFF}}{message}");
             }
         }
 
@@ -446,7 +464,7 @@ namespace TruckingSharp.Commands
                 return;
             }
 
-            if (sender.State != SampSharp.GameMode.Definitions.PlayerState.OnFoot)
+            if (sender.State != PlayerState.OnFoot)
             {
                 sender.SendClientMessage(Color.Red, Messages.MustBeOnFoot);
                 return;
@@ -491,31 +509,33 @@ namespace TruckingSharp.Commands
         [Command("rules", Shortcut = "rules")]
         public static async void OnRulesCommandAsync(Player sender)
         {
-            StringBuilder Rules = new StringBuilder();
-            Rules.AppendLine("1. Always drive on the right side of the road");
-            Rules.AppendLine("2. No flaming or disrespecting other players");
-            Rules.AppendLine("3. Main language is english");
-            Rules.AppendLine("4. Don't use any hacks, you'll be banned");
-            Rules.AppendLine("5. No spamming on the chat");
-            Rules.AppendLine("6. No car-jacking allowed");
+            var rules = new StringBuilder();
+            rules.AppendLine("1. Always drive on the right side of the road");
+            rules.AppendLine("2. No flaming or disrespecting other players");
+            rules.AppendLine("3. Main language is english");
+            rules.AppendLine("4. Don't use any hacks, you'll be banned");
+            rules.AppendLine("5. No spamming on the chat");
+            rules.AppendLine("6. No car-jacking allowed");
 
-            var dialogRules = new MessageDialog("Rules of the server:", Rules.ToString(), "Accept", "Cancel");
+            var dialogRules = new MessageDialog("Rules of the server:", rules.ToString(), "Accept", "Cancel");
 
             await dialogRules.ShowAsync(sender);
 
             dialogRules.Response += async (senderObject, e) =>
             {
-                if (e.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left && sender.Account.RulesRead == 0)
-                {
-                    sender.Reward(5000);
+                if (e.DialogButton != DialogButton.Left ||
+                    sender.Account.RulesRead != 0)
+                    return;
 
-                    var account = sender.Account;
-                    account.RulesRead = 1;
+                sender.Reward(5000);
 
-                    await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(account);
+                var account = sender.Account;
+                account.RulesRead = 1;
 
-                    sender.SendClientMessage(Color.FromInteger(65280, ColorFormat.RGB), "You have earned {FFFF00}$5000{00FF00} for accepting the rules");
-                }
+                await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(account);
+
+                sender.SendClientMessage(Color.FromInteger(65280, ColorFormat.RGB),
+                    "You have earned {FFFF00}$5000{00FF00} for accepting the rules");
             };
         }
 
@@ -549,53 +569,54 @@ namespace TruckingSharp.Commands
             sender.Reward(-money);
             target.Reward(money);
 
-            target.SendClientMessage($"{{00FF00}}You have received {{FFFF00}}${money}{{00FF00}} from {{FFFF00}}{sender.Name}");
+            target.SendClientMessage(
+                $"{{00FF00}}You have received {{FFFF00}}${money}{{00FF00}} from {{FFFF00}}{sender.Name}");
             sender.SendClientMessage($"{{00FF00}}You gave {{FFFF00}}${money}{{00FF00}} to {{FFFF00}}{target.Name}");
         }
 
-        private static void DialogSpawns_Response(object sender, SampSharp.GameMode.Events.DialogResponseEventArgs e, PlayerClassType classId)
+        private static void DialogSpawns_Response(object sender, DialogResponseEventArgs e, PlayerClassType classId)
         {
-            if (e.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
+            if (e.DialogButton != DialogButton.Left)
+                return;
+
+            var player = e.Player;
+
+            switch (classId)
             {
-                var player = e.Player;
+                case PlayerClassType.TruckDriver:
+                    player.Position = e.ListItem switch
+                    {
+                        _ => TruckerSpawn.TruckerSpawns[e.ListItem].Position,
+                    };
+                    break;
 
-                switch (classId)
-                {
-                    case PlayerClassType.TruckDriver:
-                        player.Position = e.ListItem switch
-                        {
-                            _ => TruckerSpawn.TruckerSpawns[e.ListItem].Position,
-                        };
-                        break;
+                case PlayerClassType.BusDriver:
+                    player.Position = e.ListItem switch
+                    {
+                        _ => BusDriverSpawn.BusDriverSpawns[e.ListItem].Position,
+                    };
+                    break;
 
-                    case PlayerClassType.BusDriver:
-                        player.Position = e.ListItem switch
-                        {
-                            _ => BusDriverSpawn.BusDriverSpawns[e.ListItem].Position,
-                        };
-                        break;
+                case PlayerClassType.Pilot:
+                    player.Position = e.ListItem switch
+                    {
+                        _ => PilotSpawn.PilotSpawns[e.ListItem].Position,
+                    };
+                    break;
 
-                    case PlayerClassType.Pilot:
-                        player.Position = e.ListItem switch
-                        {
-                            _ => PilotSpawn.PilotSpawns[e.ListItem].Position,
-                        };
-                        break;
+                case PlayerClassType.Police:
+                    player.Position = e.ListItem switch
+                    {
+                        _ => PoliceSpawn.PoliceSpawns[e.ListItem].Position,
+                    };
+                    break;
 
-                    case PlayerClassType.Police:
-                        player.Position = e.ListItem switch
-                        {
-                            _ => PoliceSpawn.PoliceSpawns[e.ListItem].Position,
-                        };
-                        break;
-
-                    case PlayerClassType.Courier:
-                        player.Position = e.ListItem switch
-                        {
-                            _ => CourierSpawn.CourierSpawns[e.ListItem].Position,
-                        };
-                        break;
-                }
+                case PlayerClassType.Courier:
+                    player.Position = e.ListItem switch
+                    {
+                        _ => CourierSpawn.CourierSpawns[e.ListItem].Position,
+                    };
+                    break;
             }
         }
     }

@@ -4,7 +4,7 @@ namespace TruckingSharp.Data
 {
     public static class AdminRanks
     {
-        public static List<string> AdminLevelNames = new List<string>()
+        public static readonly List<string> AdminLevelNames = new List<string>
         {
             "Player",
             "Junior Admin",

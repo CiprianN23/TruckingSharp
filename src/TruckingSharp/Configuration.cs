@@ -13,10 +13,10 @@ namespace TruckingSharp
         {
         }
 
-        public static Configuration Instance { get; set; }
+        public static Configuration Instance { get; private set; }
         public int AutoAssistPrice { get; set; }
 
-        public float BankIntrest { get; set; }
+        public float BankInterest { get; set; }
 
         public bool CanAutoKickAfterWarn { get; set; }
 
@@ -30,7 +30,7 @@ namespace TruckingSharp
 
         public int DefaultJailSeconds { get; set; }
 
-        public int ExitBuildingMiliseconds { get; set; }
+        public int ExitBuildingMilliseconds { get; set; }
 
         public int FailedMissionPrice { get; set; }
 
@@ -42,7 +42,7 @@ namespace TruckingSharp
 
         public int HouseUpgradePercent { get; set; }
 
-        public bool IsIntrestEnabled { get; set; }
+        public bool IsInterestEnabled { get; set; }
 
         public int JailWorld { get; set; }
 
@@ -88,22 +88,22 @@ namespace TruckingSharp
 
         public static void LoadConfigurationFromFile()
         {
-            using StreamReader file = File.OpenText(@"scriptfiles\serverconfig.json");
-            JsonSerializer serializer = new JsonSerializer();
+            using var file = File.OpenText(@"scriptfiles\serverconfig.json");
+            var serializer = new JsonSerializer();
             Instance = (Configuration)serializer.Deserialize(file, typeof(Configuration));
         }
 
         public static void SaveConfigurationToFile()
         {
-            using StreamWriter file = File.CreateText(@"scriptfiles\serverconfig.json");
-            JsonSerializer serializer = new JsonSerializer();
+            using var file = File.CreateText(@"scriptfiles\serverconfig.json");
+            var serializer = new JsonSerializer();
             serializer.Serialize(file, Instance);
         }
 
         public static void LoadDefaultConfigurationFromFile()
         {
-            using StreamReader file = File.OpenText(@"scriptfiles\defaultserverconfig.json");
-            JsonSerializer serializer = new JsonSerializer();
+            using var file = File.OpenText(@"scriptfiles\defaultserverconfig.json");
+            var serializer = new JsonSerializer();
             Instance = (Configuration)serializer.Deserialize(file, typeof(Configuration));
         }
     }

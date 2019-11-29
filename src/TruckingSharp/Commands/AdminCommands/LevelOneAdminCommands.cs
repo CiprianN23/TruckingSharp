@@ -32,7 +32,8 @@ namespace TruckingSharp.Commands.AdminCommands
                 return;
             }
 
-            target.SendClientMessage(Color.Red, $"You have been kicked by {AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name}.");
+            target.SendClientMessage(Color.Red,
+                $"You have been kicked by {AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name}.");
             target.SendClientMessage(Color.Red, $"Reason: {reason}");
 
             sender.SendClientMessage(Color.Red, $"You have kicked {target.Name} for {reason}.");
@@ -72,7 +73,8 @@ namespace TruckingSharp.Commands.AdminCommands
             sender.Interior = target.Interior;
             sender.Position = target.Position + new Vector3(0.0, 0.0, 3);
 
-            sender.SendClientMessage(Color.GreenYellow, $"You have been ported to location: {target.Position.X} {target.Position.Y} {target.Position.Z + 3.0f}");
+            sender.SendClientMessage(Color.GreenYellow,
+                $"You have been ported to location: {target.Position.X} {target.Position.Y} {target.Position.Z + 3.0f}");
         }
 
         [Command("portloc", Shortcut = "portloc")]
@@ -125,11 +127,9 @@ namespace TruckingSharp.Commands.AdminCommands
 
             var reportsDialog = new ListDialog("Reports list:", "Ok");
 
-            for (int i = 0; i < Report.Reports.Length; i++)
-            {
-                if (!Report.Reports[i].IsEmpty)
-                    reportsDialog.AddItem($"{Report.Reports[i].OffenderName}: {Report.Reports[i].Reason}");
-            }
+            foreach (var report in Report.Reports)
+                if (!report.IsEmpty)
+                    reportsDialog.AddItem($"{report.OffenderName}: {report.Reason}");
 
             reportsDialog.Show(sender);
         }
@@ -174,7 +174,8 @@ namespace TruckingSharp.Commands.AdminCommands
             player1.Interior = player2.Interior;
             player1.Position = player2.Position + new Vector3(0.0, 0.0, 3);
 
-            player1.SendClientMessage(Color.GreenYellow, $"{{00FF00}}You have been ported to player {{FFFF00}}{player2.Name}{{00FF00}} by {{FFFF00}}{sender.Name}");
+            player1.SendClientMessage(Color.GreenYellow,
+                $"{{00FF00}}You have been ported to player {{FFFF00}}{player2.Name}{{00FF00}} by {{FFFF00}}{sender.Name}");
         }
 
         [Command("warn", Shortcut = "warn")]
@@ -194,19 +195,24 @@ namespace TruckingSharp.Commands.AdminCommands
 
             target.Warnings++;
 
-            target.SendClientMessage(Color.Red, $"You have been warned by {AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name}.");
+            target.SendClientMessage(Color.Red,
+                $"You have been warned by {AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name}.");
             target.SendClientMessage(Color.Red, $"Reason: {reason}");
-            target.GameText($"~w~Warning {target.Warnings}/{Configuration.Instance.MaximumWarnsBeforeKick}: ~r~{reason}", 5000, 4);
+            target.GameText(
+                $"~w~Warning {target.Warnings}/{Configuration.Instance.MaximumWarnsBeforeKick}: ~r~{reason}", 5000, 4);
 
-            sender.SendClientMessage(Color.GreenYellow, $"You have warned {target.Name} (warnings: {target.Warnings}/{Configuration.Instance.MaximumWarnsBeforeKick}).");
+            sender.SendClientMessage(Color.GreenYellow,
+                $"You have warned {target.Name} (warnings: {target.Warnings}/{Configuration.Instance.MaximumWarnsBeforeKick}).");
             sender.SendClientMessage(Color.Red, $"Reason: {reason}");
 
-            if (target.Warnings == Configuration.Instance.MaximumWarnsBeforeKick && Configuration.Instance.CanAutoKickAfterWarn)
-            {
-                target.SendClientMessage(Color.Red, $"This was the {Configuration.Instance.MaximumWarnsBeforeKick}th and last warning. You have been kicked.");
-                await Task.Delay(Configuration.Instance.KickDelay);
-                target.Kick();
-            }
+            if (target.Warnings != Configuration.Instance.MaximumWarnsBeforeKick ||
+                !Configuration.Instance.CanAutoKickAfterWarn)
+                return;
+
+            target.SendClientMessage(Color.Red,
+                $"This was the {Configuration.Instance.MaximumWarnsBeforeKick}th and last warning. You have been kicked.");
+            await Task.Delay(Configuration.Instance.KickDelay);
+            target.Kick();
         }
 
         [Command("portvehicle", Shortcut = "portvehicle")]
@@ -231,7 +237,8 @@ namespace TruckingSharp.Commands.AdminCommands
             }
 
             sender.Position = vehicle.Position + new Vector3(0, 0, 5);
-            sender.SendClientMessage(Color.GreenYellow, $"You have been ported to location: {vehicle.Position.X} {vehicle.Position.Y} {vehicle.Position.Z + 5.0f}");
+            sender.SendClientMessage(Color.GreenYellow,
+                $"You have been ported to location: {vehicle.Position.X} {vehicle.Position.Y} {vehicle.Position.Z + 5.0f}");
         }
 
         [Command("fuel", Shortcut = "fuel")]
@@ -243,7 +250,7 @@ namespace TruckingSharp.Commands.AdminCommands
                 return;
             }
 
-            Vehicle playerCar = (Vehicle)sender.Vehicle;
+            var playerCar = (Vehicle)sender.Vehicle;
             playerCar.Fuel = Configuration.Instance.MaximumFuel;
 
             sender.SendClientMessage(Color.GreenYellow, Messages.VehicleHasBeenRefuelled);
@@ -266,7 +273,7 @@ namespace TruckingSharp.Commands.AdminCommands
 
             if (target.Account.Jailed != 0)
             {
-                sender.SendClientMessage(Color.Red, Messages.TargetIsinJailCommandNotAllowed);
+                sender.SendClientMessage(Color.Red, Messages.TargetIsInJailCommandNotAllowed);
                 return;
             }
 
@@ -274,7 +281,8 @@ namespace TruckingSharp.Commands.AdminCommands
             target.Interior = sender.Interior;
             target.Position = sender.Position + new Vector3(0.0, 0.0, 3);
 
-            sender.SendClientMessage(Color.GreenYellow, $"{{00FF00}}You have ported {{FFFF00}}{target.Name}{{00FF00}} to your location.");
+            sender.SendClientMessage(Color.GreenYellow,
+                $"{{00FF00}}You have ported {{FFFF00}}{target.Name}{{00FF00}} to your location.");
         }
 
         [Command("nos", Shortcut = "nos")]
@@ -320,14 +328,15 @@ namespace TruckingSharp.Commands.AdminCommands
 
             target.GameText("~w~You have been~n~~r~muted", 2000, 6);
 
-            DateTime currentTime = DateTime.Now;
+            var currentTime = DateTime.Now;
 
             var account = target.Account;
             account.Muted = currentTime.AddMinutes(duration);
 
             await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(account);
 
-            target.SendClientMessage(Color.Red, $"You have been muted by {{FFFF00}}{sender.Name} {{FF0000}}for {{FFFF00}}{reason}");
+            target.SendClientMessage(Color.Red,
+                $"You have been muted by {{FFFF00}}{sender.Name} {{FF0000}}for {{FFFF00}}{reason}");
             target.ShowRemainingMuteTime();
 
             sender.SendClientMessage($"{{00FF00}}You have muted {{FFFF00}}{target.Name}");
@@ -350,7 +359,7 @@ namespace TruckingSharp.Commands.AdminCommands
 
             if (target.Account.Muted < DateTime.Now)
             {
-                sender.SendClientMessage(Color.Red, Messages.TargetIsNotMued);
+                sender.SendClientMessage(Color.Red, Messages.TargetIsNotMuted);
                 return;
             }
 
@@ -369,15 +378,14 @@ namespace TruckingSharp.Commands.AdminCommands
         {
             var mutedPlayersDialog = new ListDialog("Muted players:", "Ok");
 
-            foreach (Player player in Player.All)
+            foreach (var basePlayer in Player.All)
             {
+                var player = (Player)basePlayer;
+
                 if (!player.IsLoggedIn)
                     continue;
 
-                if (player.Account.Muted > DateTime.Now)
-                {
-                    mutedPlayersDialog.AddItem($"{player.Name} (ID:{player.Id})");
-                }
+                if (player.Account.Muted > DateTime.Now) mutedPlayersDialog.AddItem($"{player.Name} (ID:{player.Id})");
             }
 
             if (mutedPlayersDialog.Items.Count != 0)
@@ -416,23 +424,24 @@ namespace TruckingSharp.Commands.AdminCommands
             target.FrozenTime = seconds;
             target.ToggleControllable(false);
 
-            Timer freezeTimer = new Timer(TimeSpan.FromSeconds(1), true);
+            var freezeTimer = new Timer(TimeSpan.FromSeconds(1), true);
             freezeTimer.Tick += (senderObject, args) =>
             {
                 target.FrozenTime--;
 
-                if (target.FrozenTime <= 0)
-                {
-                    target.ToggleControllable(true);
-                    target.FrozenTime = 0;
+                if (target.FrozenTime > 0)
+                    return;
 
-                    freezeTimer.IsRepeating = false;
-                    freezeTimer.IsRunning = false;
-                    freezeTimer.Dispose();
-                }
+                target.ToggleControllable(true);
+                target.FrozenTime = 0;
+
+                freezeTimer.IsRepeating = false;
+                freezeTimer.IsRunning = false;
+                freezeTimer.Dispose();
             };
 
-            target.SendClientMessage(Color.Red, $"You have been frozen by {{FFFF00}}{sender.Name} {{FF0000}}for {{FFFF00}}{reason}");
+            target.SendClientMessage(Color.Red,
+                $"You have been frozen by {{FFFF00}}{sender.Name} {{FF0000}}for {{FFFF00}}{reason}");
             sender.SendClientMessage(Color.GreenYellow, $"You have frozen {{FFFF00}}{target.Name}");
         }
 
@@ -479,8 +488,10 @@ namespace TruckingSharp.Commands.AdminCommands
         [Command("achat", Shortcut = "achat")]
         public static void OnAchatCommand(BasePlayer sender, string message)
         {
-            foreach (Player player in Player.All)
+            foreach (var basePlayer in Player.All)
             {
+                var player = (Player)basePlayer;
+
                 if (!player.IsLoggedIn)
                     continue;
 
@@ -506,16 +517,16 @@ namespace TruckingSharp.Commands.AdminCommands
                 return;
             }
 
-            if (target.State == PlayerState.Spectating)
+            switch (target.State)
             {
-                sender.SendClientMessage(Color.Red, Messages.PlayerIsSpectacting);
-                return;
-            }
+                case PlayerState.Spectating:
+                    sender.SendClientMessage(Color.Red, Messages.PlayerIsSpectating);
+                    return;
 
-            if (target.State == PlayerState.Wasted || target.State == PlayerState.None)
-            {
-                sender.SendClientMessage(Color.Red, Messages.PlayerIsDeadOrNotSpawned);
-                return;
+                case PlayerState.Wasted:
+                case PlayerState.None:
+                    sender.SendClientMessage(Color.Red, Messages.PlayerIsDeadOrNotSpawned);
+                    return;
             }
 
             if (sender.State != PlayerState.Spectating)
@@ -551,7 +562,7 @@ namespace TruckingSharp.Commands.AdminCommands
         {
             if (sender.State != PlayerState.Spectating)
             {
-                sender.SendClientMessage(Color.Red, Messages.PlayerIsNotSpectacting);
+                sender.SendClientMessage(Color.Red, Messages.PlayerIsNotSpectating);
                 return;
             }
 

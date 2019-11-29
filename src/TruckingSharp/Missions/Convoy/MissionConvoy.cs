@@ -6,21 +6,22 @@ using System;
 using System.Collections.Generic;
 using TruckingSharp.Constants;
 using TruckingSharp.Missions.Data;
+using TruckingSharp.PlayerClasses.Data;
 
 namespace TruckingSharp.Missions.Convoy
 {
     public class MissionConvoy
     {
-        public static MissionConvoy[] Convoys = new MissionConvoy[Configuration.MaximumConvoys]
+        public static readonly MissionConvoy[] Convoys =
         {
             new MissionConvoy(),
             new MissionConvoy(),
             new MissionConvoy(),
             new MissionConvoy(),
-            new MissionConvoy(),
+            new MissionConvoy()
         };
 
-        public List<Player> Members = new List<Player>();
+        public readonly List<Player> Members = new List<Player>();
 
         public MissionConvoy()
         {
@@ -65,8 +66,9 @@ namespace TruckingSharp.Missions.Convoy
             {
                 if (!player.IsDoingMission)
                     return true;
-                else
-                    player.SendClientMessage(Color.White, "{FF0000}You already started a job, you cannot create or join a convoy.");
+
+                player.SendClientMessage(Color.White,
+                    "{FF0000}You already started a job, you cannot create or join a convoy.");
             }
             else
             {
@@ -78,46 +80,48 @@ namespace TruckingSharp.Missions.Convoy
 
         public static void MakeLeader(Player leader, MissionConvoy convoy)
         {
-            if (IasPlayerAllowedToJoin(leader))
+            if (!IasPlayerAllowedToJoin(leader))
+                return;
+
+            convoy.Status = ConvoyStatus.Open;
+            convoy.Members.Add(leader);
+
+            leader.IsInConvoy = true;
+            leader.Convoy = convoy;
+
+            convoy.Timer = new Timer(TimeSpan.FromSeconds(1), true);
+            convoy.Timer.Tick += (sender, e) => ConvoyController.ConvoyTimer_Tick(sender, e, convoy);
+
+            foreach (var basePlayer in Player.All)
             {
-                convoy.Status = ConvoyStatus.Open;
-                convoy.Members.Add(leader);
+                var player = (Player)basePlayer;
 
-                leader.IsInConvoy = true;
-                leader.Convoy = convoy;
-
-                convoy.Timer = new Timer(TimeSpan.FromSeconds(1), true);
-                convoy.Timer.Tick += (sender, e) => ConvoyController.ConvoyTimer_Tick(sender, e, convoy);
-
-                foreach (Player player in Player.All)
-                {
-                    if (player.PlayerClass == PlayerClasses.Data.PlayerClassType.TruckDriver)
-                        player.SendClientMessage(Color.White, Messages.MissionConvoyOpened, leader.Name);
-                }
+                if (player.PlayerClass == PlayerClassType.TruckDriver)
+                    player.SendClientMessage(Color.White, Messages.MissionConvoyOpened, leader.Name);
             }
         }
 
         public static void MakeMember(Player member, MissionConvoy convoy)
         {
-            if (IasPlayerAllowedToJoin(member))
-            {
-                if (convoy.Members.Count < Configuration.Instance.MaximumConvoyMembers)
-                {
-                    convoy.SendMessage($"Player {{00FF00}}{member.Name}{{FFFFFF}} has joined the convoy.");
+            if (!IasPlayerAllowedToJoin(member))
+                return;
 
-                    member.SendClientMessage(Color.White, "{00FF00}You have joined the convoy");
+            if (convoy.Members.Count >= Configuration.Instance.MaximumConvoyMembers)
+                return;
 
-                    convoy.Members.Add(member);
+            convoy.SendMessage($"Player {{00FF00}}{member.Name}{{FFFFFF}} has joined the convoy.");
 
-                    member.IsInConvoy = true;
-                    member.Convoy = convoy;
+            member.SendClientMessage(Color.White, "{00FF00}You have joined the convoy");
 
-                    if (convoy.Members.Count == Configuration.Instance.MaximumConvoyMembers)
-                        convoy.Status = ConvoyStatus.Full;
+            convoy.Members.Add(member);
 
-                    convoy.MemberText.Text = "Waiting for the leader to start a job.";
-                }
-            }
+            member.IsInConvoy = true;
+            member.Convoy = convoy;
+
+            if (convoy.Members.Count == Configuration.Instance.MaximumConvoyMembers)
+                convoy.Status = ConvoyStatus.Full;
+
+            convoy.MemberText.Text = "Waiting for the leader to start a job.";
         }
 
         public static void PlayerLeaveConvoy(Player player)
@@ -158,10 +162,7 @@ namespace TruckingSharp.Missions.Convoy
 
         public void SendMessage(string message)
         {
-            foreach (var member in Members)
-            {
-                member.SendClientMessage(Color.White, message);
-            }
+            foreach (var member in Members) member.SendClientMessage(Color.White, message);
         }
 
         public void StartMemberJob(Player member)
@@ -176,16 +177,19 @@ namespace TruckingSharp.Missions.Convoy
 
             member.MissionStep = 1;
             member.MissionVehicleTime = Configuration.Instance.FailMissionSeconds;
-            member.MissionTextDraw.Text = string.Format(Messages.MissionTruckerHaulingToPickupCargo, MissionCargo.Name, FromLocation.Name, ToLocation.Name);
+            member.MissionTextDraw.Text = string.Format(Messages.MissionTruckerHaulingToPickupCargo, MissionCargo.Name,
+                FromLocation.Name, ToLocation.Name);
             member.SetCheckpoint(FromLocation.Position, 7.0f);
-            member.SendClientMessage(Color.White, Messages.MissionTruckerDeliverFrom, MissionCargo.Name, FromLocation.Name);
+            member.SendClientMessage(Color.White, Messages.MissionTruckerDeliverFrom, MissionCargo.Name,
+                FromLocation.Name);
             member.SendClientMessage(Color.White, "{00FF00}Meet the other members of the convoy at the loading point.");
         }
 
         public void UpdateMemberJob(Player member)
         {
             member.MissionStep = 3;
-            member.MissionTextDraw.Text = string.Format(Messages.MissionTruckerHaulingToDeliverCargo, MissionCargo.Name, FromLocation.Name, ToLocation.Name);
+            member.MissionTextDraw.Text = string.Format(Messages.MissionTruckerHaulingToDeliverCargo, MissionCargo.Name,
+                FromLocation.Name, ToLocation.Name);
 
             member.SetCheckpoint(ToLocation.Position, 7.0f);
             member.SendClientMessage(Color.White, Messages.MissionTruckerDeliverTo, MissionCargo.Name, ToLocation.Name);
@@ -210,7 +214,8 @@ namespace TruckingSharp.Missions.Convoy
                 distanceFromLeader = 0.0f;
             }
 
-            LeaderText.Text = $"Members: ~g~{numberOfMembers}~w~, Furthest member: ~g~{furthestMemberName}~w~, Distance: ~r~{distanceFromLeader}~w~";
+            LeaderText.Text =
+                $"Members: ~g~{numberOfMembers}~w~, Furthest member: ~g~{furthestMemberName}~w~, Distance: ~r~{distanceFromLeader}~w~";
             LeaderText.Show(leader);
 
             foreach (var member in Members)
@@ -219,7 +224,8 @@ namespace TruckingSharp.Missions.Convoy
                     continue;
 
                 distanceFromLeader = GetDistanceBetweenMembers(leader, member);
-                MemberText.Text = $"Leader: ~r~{leader.Name}~w~, distance: ~r~{distanceFromLeader}~w~, members: ~r~{numberOfMembers}~w~";
+                MemberText.Text =
+                    $"Leader: ~r~{leader.Name}~w~, distance: ~r~{distanceFromLeader}~w~, members: ~r~{numberOfMembers}~w~";
                 MemberText.Show(member);
             }
         }
@@ -252,12 +258,13 @@ namespace TruckingSharp.Missions.Convoy
 
         private float GetDistanceBetweenMembers(Player member1, Player member2)
         {
-            return (float)Math.Sqrt(Math.Pow(member1.Position.X - member2.Position.X, 2) + Math.Pow(member1.Position.Y - member2.Position.Y, 2));
+            return (float)Math.Sqrt(Math.Pow(member1.Position.X - member2.Position.X, 2) +
+                                     Math.Pow(member1.Position.Y - member2.Position.Y, 2));
         }
 
         private Player GetFurthestMember()
         {
-            float oldDistance = 0, newDistance = 0;
+            float oldDistance = 0;
             var leader = Members[0];
 
             foreach (var member in Members)
@@ -265,13 +272,13 @@ namespace TruckingSharp.Missions.Convoy
                 if (member == Members[0])
                     continue;
 
-                newDistance = GetDistanceBetweenMembers(leader, member);
+                var newDistance = GetDistanceBetweenMembers(leader, member);
 
-                if (newDistance > oldDistance)
-                {
-                    oldDistance = newDistance;
-                    return member;
-                }
+                if (!(newDistance > oldDistance))
+                    continue;
+
+                oldDistance = newDistance;
+                return member;
             }
 
             return null;

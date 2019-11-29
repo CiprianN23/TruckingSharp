@@ -10,14 +10,36 @@ using TruckingSharp.Database.Repositories.Interfaces;
 
 namespace TruckingSharp.Database.Repositories
 {
-    public class SpeedCameraRepository : IRepository<SpeedCamera>, IDisposable
+    public sealed class SpeedCameraRepository : IRepository<SpeedCamera>, IDisposable
     {
-        private MySqlConnection _connection;
-        private bool isDisposed;
+        private readonly MySqlConnection _connection;
+        private bool _isDisposed;
 
-        public SpeedCameraRepository(MySqlConnection conenction)
+        public SpeedCameraRepository(MySqlConnection connection)
         {
-            _connection = conenction;
+            _connection = connection;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!_isDisposed && disposing)
+            {
+                // Dispose other resources here
+            }
+
+            _connection.Dispose();
+            _isDisposed = true;
+        }
+
+        ~SpeedCameraRepository()
+        {
+            Dispose(false);
         }
 
         #region Sync
@@ -26,7 +48,9 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                return _connection.Execute("INSERT INTO speedcameras (Id, Speed, PositionX, PositionY, PositionZ, Angle) VALUES (@Id, @Speed, @PositionX, @PositionY, @PositionZ, @Angle)", entity);
+                return _connection.Execute(
+                    "INSERT INTO speedcameras (Id, Speed, PositionX, PositionY, PositionZ, Angle) VALUES (@Id, @Speed, @PositionX, @PositionY, @PositionZ, @Angle)",
+                    entity);
             }
             catch (Exception ex)
             {
@@ -69,7 +93,7 @@ namespace TruckingSharp.Database.Repositories
             }
             catch (Exception ex)
             {
-                Log.Error(ex, $"Failed to get all speed cameras.");
+                Log.Error(ex, "Failed to get all speed cameras.");
                 throw;
             }
         }
@@ -95,7 +119,9 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                return await _connection.ExecuteAsync("INSERT INTO speedcameras (Id, Speed, PositionX, PositionY, PositionZ, Angle) VALUES (@Id, @Speed, @PositionX, @PositionY, @PositionZ, @Angle)", entity);
+                return await _connection.ExecuteAsync(
+                    "INSERT INTO speedcameras (Id, Speed, PositionX, PositionY, PositionZ, Angle) VALUES (@Id, @Speed, @PositionX, @PositionY, @PositionZ, @Angle)",
+                    entity);
             }
             catch (Exception ex)
             {
@@ -125,7 +151,7 @@ namespace TruckingSharp.Database.Repositories
             }
             catch (Exception ex)
             {
-                Log.Error(ex, $"Failed to get all speed cameras async.");
+                Log.Error(ex, "Failed to get all speed cameras async.");
                 throw;
             }
         }
@@ -144,27 +170,5 @@ namespace TruckingSharp.Database.Repositories
         }
 
         #endregion Async
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!isDisposed && disposing)
-            {
-                // Dispose other resources here
-            }
-
-            _connection.Dispose();
-            isDisposed = true;
-        }
-
-        ~SpeedCameraRepository()
-        {
-            Dispose(false);
-        }
     }
 }

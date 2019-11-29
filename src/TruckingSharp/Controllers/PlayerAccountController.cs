@@ -13,12 +13,12 @@ using TruckingSharp.Services;
 namespace TruckingSharp.Controllers
 {
     [Controller]
-    public class PlayerAccountController : IController, IEventListener
+    public class PlayerAccountController : IEventListener
     {
-        private PlayerAccountRepository _accountRepository => new PlayerAccountRepository(ConnectionFactory.GetConnection);
-        private PlayerBanRepository _banRepository => new PlayerBanRepository(ConnectionFactory.GetConnection);
+        private PlayerAccountRepository _accountRepository =>
+            new PlayerAccountRepository(ConnectionFactory.GetConnection);
 
-        public event EventHandler<PlayerLoginEventArgs> PlayerLogin;
+        private PlayerBanRepository _banRepository => new PlayerBanRepository(ConnectionFactory.GetConnection);
 
         public void RegisterEvents(BaseMode gameMode)
         {
@@ -26,9 +26,12 @@ namespace TruckingSharp.Controllers
             gameMode.PlayerConnected += GameMode_PlayerConnected;
         }
 
+        public event EventHandler<PlayerLoginEventArgs> PlayerLogin;
+
         private async void GameMode_PlayerConnected(object sender, EventArgs e)
         {
-            Player player = sender as Player;
+            if (!(sender is Player player))
+                return;
 
             var playerBan = _banRepository.Find(player.Name);
 
@@ -63,7 +66,8 @@ namespace TruckingSharp.Controllers
 
         private void LoginPlayer(Player player)
         {
-            var message = $"Insert your password. Tries left: {player.LoginTries}/{Configuration.Instance.MaximumLogins}";
+            var message =
+                $"Insert your password. Tries left: {player.LoginTries}/{Configuration.Instance.MaximumLogins}";
             var dialog = new InputDialog("Login", message, true, "Login", "Cancel");
             dialog.Show(player);
             dialog.Response += async (sender, ev) =>
@@ -72,7 +76,8 @@ namespace TruckingSharp.Controllers
                 {
                     if (player.LoginTries >= Configuration.Instance.MaximumLogins)
                     {
-                        player.SendClientMessage(Color.OrangeRed, "You exceed maximum login tries. You have been kicked!");
+                        player.SendClientMessage(Color.OrangeRed,
+                            "You exceed maximum login tries. You have been kicked!");
                         await Task.Delay(Configuration.Instance.KickDelay);
                         player.Kick();
                     }
@@ -80,14 +85,15 @@ namespace TruckingSharp.Controllers
                     {
                         player.IsLoggedIn = true;
 
-                        PlayerLogin?.Invoke(player, new PlayerLoginEventArgs() { Success = true });
+                        PlayerLogin?.Invoke(player, new PlayerLoginEventArgs { Success = true });
                     }
                     else
                     {
                         player.LoginTries++;
                         player.SendClientMessage(Color.Red, "Wrong password");
 
-                        dialog.Message = $"Wrong password! Retype your password! Tries left: {player.LoginTries}/{Configuration.Instance.MaximumLogins}";
+                        dialog.Message =
+                            $"Wrong password! Retype your password! Tries left: {player.LoginTries}/{Configuration.Instance.MaximumLogins}";
 
                         LoginPlayer(player);
                     }
@@ -101,14 +107,15 @@ namespace TruckingSharp.Controllers
 
         private void PlayerAccountController_PlayerLogin(object sender, PlayerLoginEventArgs e)
         {
-            Player player = sender as Player;
+            if (!(sender is Player player))
+                return;
 
-            if (e.Success)
-            {
-                player.ToggleSpectating(false);
-                player.Money = player.Account.Money;
-                player.Score = player.Account.Score;
-            }
+            if (!e.Success)
+                return;
+
+            player.ToggleSpectating(false);
+            player.Money = player.Account.Money;
+            player.Score = player.Account.Score;
         }
 
         private void RegisterPlayer(Player player)

@@ -15,9 +15,9 @@ namespace TruckingSharp
             DapperConnection.SetupConnectionString();
 
             Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .WriteTo.File("logs\\my_log.log", rollingInterval: RollingInterval.Day)
-            .CreateLogger();
+                .MinimumLevel.Debug()
+                .WriteTo.File("logs\\my_log.log", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
 
             Configuration.LoadConfigurationFromFile();
         }

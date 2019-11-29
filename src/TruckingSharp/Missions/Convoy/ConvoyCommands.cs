@@ -19,11 +19,13 @@ namespace TruckingSharp.Missions.Convoy
                 return;
             }
 
-            string leaderName, convoyStatus = string.Empty;
-            int memberCount;
-            var convoyListDialog = new ListDialog("Select convoy:", Messages.DialogButtonSelect, Messages.DialogButtonCancel);
+            var convoyStatus = string.Empty;
+            var convoyListDialog =
+                new ListDialog("Select convoy:", Messages.DialogButtonSelect, Messages.DialogButtonCancel);
             foreach (var convoy in MissionConvoy.Convoys)
             {
+                string leaderName;
+                int memberCount;
                 if (convoy.Status == ConvoyStatus.Empty)
                 {
                     memberCount = 0;
@@ -51,7 +53,8 @@ namespace TruckingSharp.Missions.Convoy
                     }
                 }
 
-                convoyListDialog.AddItem($"Leader: {{00FF00}}{leaderName}{{FFFFFF}}, members: {{FF0000}}{memberCount}{{FFFFFF}}, Status: {{00FF00}}{convoyStatus}{{FFFFFF}}");
+                convoyListDialog.AddItem(
+                    $"Leader: {{00FF00}}{leaderName}{{FFFFFF}}, members: {{FF0000}}{memberCount}{{FFFFFF}}, Status: {{00FF00}}{convoyStatus}{{FFFFFF}}");
             }
 
             convoyListDialog.Show(sender);
@@ -86,8 +89,10 @@ namespace TruckingSharp.Missions.Convoy
             {
                 MissionConvoy.PlayerLeaveConvoy(target);
 
-                sender.SendClientMessage(Color.GreenYellow, $"You've kicked {{0000FF}}{target.Name}{{00FF00}} from the convoy.");
-                target.SendClientMessage(Color.GreenYellow, $"Leader {{0000FF}}{sender.Name}{{00FF00}} kicked you from the convoy.");
+                sender.SendClientMessage(Color.GreenYellow,
+                    $"You've kicked {{0000FF}}{target.Name}{{00FF00}} from the convoy.");
+                target.SendClientMessage(Color.GreenYellow,
+                    $"Leader {{0000FF}}{sender.Name}{{00FF00}} kicked you from the convoy.");
             }
             else
             {
@@ -141,10 +146,7 @@ namespace TruckingSharp.Missions.Convoy
             var convoy = sender.Convoy;
             var membersListDialog = new ListDialog("Convoy members:", Messages.DialogButtonOk);
 
-            foreach (var member in convoy.Members)
-            {
-                membersListDialog.AddItem($"{member.Name}\n");
-            }
+            foreach (var member in convoy.Members) membersListDialog.AddItem($"{member.Name}\n");
 
             membersListDialog.Show(sender);
         }

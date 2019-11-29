@@ -10,14 +10,36 @@ using TruckingSharp.Database.Repositories.Interfaces;
 
 namespace TruckingSharp.Database.Repositories
 {
-    public class PlayerAccountRepository : IRepository<PlayerAccount>, IDisposable
+    public sealed class PlayerAccountRepository : IRepository<PlayerAccount>, IDisposable
     {
-        private MySqlConnection _connection;
-        private bool isDisposed;
+        private readonly MySqlConnection _connection;
+        private bool _isDisposed;
 
-        public PlayerAccountRepository(MySqlConnection conenction)
+        public PlayerAccountRepository(MySqlConnection connection)
         {
-            _connection = conenction;
+            _connection = connection;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!_isDisposed && disposing)
+            {
+                // Dispose other resources here
+            }
+
+            _connection.Dispose();
+            _isDisposed = true;
+        }
+
+        ~PlayerAccountRepository()
+        {
+            Dispose(false);
         }
 
         #region Sync
@@ -78,7 +100,8 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                return _connection.QueryFirstOrDefault<PlayerAccount>("SELECT * FROM accounts WHERE Name = @Name;", new { Name = name });
+                return _connection.QueryFirstOrDefault<PlayerAccount>("SELECT * FROM accounts WHERE Name = @Name;",
+                    new { Name = name });
             }
             catch (Exception ex)
             {
@@ -157,27 +180,5 @@ namespace TruckingSharp.Database.Repositories
         }
 
         #endregion Async
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!isDisposed && disposing)
-            {
-                // Dispose other resources here
-            }
-
-            _connection.Dispose();
-            isDisposed = true;
-        }
-
-        ~PlayerAccountRepository()
-        {
-            Dispose(false);
-        }
     }
 }

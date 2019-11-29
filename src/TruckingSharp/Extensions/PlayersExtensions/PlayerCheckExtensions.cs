@@ -1,4 +1,5 @@
-﻿using SampSharp.GameMode.World;
+﻿using SampSharp.GameMode.Definitions;
+using SampSharp.GameMode.World;
 
 namespace TruckingSharp.Extensions.PlayersExtensions
 {
@@ -11,7 +12,7 @@ namespace TruckingSharp.Extensions.PlayersExtensions
 
         public static bool IsPlayerDriving(this BasePlayer player)
         {
-            return player.State == SampSharp.GameMode.Definitions.PlayerState.Driving;
+            return player.State == PlayerState.Driving;
         }
     }
 }

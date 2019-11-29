@@ -37,11 +37,13 @@ namespace TruckingSharp.Commands.AdminCommands
             targetAccount.AdminLevel = (byte)level;
             await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
 
-            target.SendClientMessage(Color.GreenYellow, $"Your admin level have been seted to {level} by {sender.Name}.");
+            target.SendClientMessage(Color.GreenYellow,
+                $"Your admin level have been seted to {level} by {sender.Name}.");
         }
 
         [Command("resetplayer", Shortcut = "resetplayer")]
-        public static async void OnResetPlayerCommand(BasePlayer sender, Player target, int money, int score, int stats, string reason)
+        public static async void OnResetPlayerCommand(BasePlayer sender, Player target, int money, int score, int stats,
+            string reason)
         {
             if (!target.IsLoggedIn)
             {
@@ -55,7 +57,7 @@ namespace TruckingSharp.Commands.AdminCommands
                 return;
             }
 
-            if ((money + score + stats) == 0)
+            if (money + score + stats == 0)
                 return;
 
             var targetAccount = target.Account;

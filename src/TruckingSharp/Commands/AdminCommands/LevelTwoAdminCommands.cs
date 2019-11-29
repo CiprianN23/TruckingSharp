@@ -1,4 +1,5 @@
 ﻿using SampSharp.GameMode;
+using SampSharp.GameMode.Definitions;
 using SampSharp.GameMode.Display;
 using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.SAMP.Commands;
@@ -23,7 +24,8 @@ namespace TruckingSharp.Commands.AdminCommands
             foreach (var vehicle in BaseVehicle.All)
                 vehicle.Repair();
 
-            BasePlayer.SendClientMessageToAll(Color.GreenYellow, $"{AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name} has repaired all vehicles.");
+            BasePlayer.SendClientMessageToAll(Color.GreenYellow,
+                $"{AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name} has repaired all vehicles.");
         }
 
         [Command("healall", Shortcut = "healall")]
@@ -32,17 +34,19 @@ namespace TruckingSharp.Commands.AdminCommands
             foreach (var player in BasePlayer.All)
                 player.Health = 100;
 
-            BasePlayer.SendClientMessageToAll(Color.GreenYellow, $"{AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name} has healed all players.");
+            BasePlayer.SendClientMessageToAll(Color.GreenYellow,
+                $"{AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name} has healed all players.");
         }
 
         [Command("loc", Shortcut = "loc")]
         public static void OnLocCommand(BasePlayer sender)
         {
-            sender.SendClientMessage(Color.Red, $"Location: x: {sender.Position.X} y: {sender.Position.Y} z: {sender.Position.Z} interior: {sender.Interior} world: {sender.VirtualWorld}");
+            sender.SendClientMessage(Color.Red,
+                $"Location: x: {sender.Position.X} y: {sender.Position.Y} z: {sender.Position.Z} interior: {sender.Interior} world: {sender.VirtualWorld}");
         }
 
         [Command("ban", Shortcut = "ban")]
-        public static async void OnBancommand(Player sender, Player target, int days, string reason)
+        public static async void OnBanCommand(Player sender, Player target, int days, string reason)
         {
             if (!target.IsLoggedIn)
             {
@@ -58,7 +62,7 @@ namespace TruckingSharp.Commands.AdminCommands
 
             if (days < 1)
             {
-                sender.SendClientMessage(Color.Red, "You must enter atleast one day.");
+                sender.SendClientMessage(Color.Red, "You must enter at least one day.");
                 return;
             }
 
@@ -71,7 +75,7 @@ namespace TruckingSharp.Commands.AdminCommands
             var account = target.Account;
             account.Bans++;
 
-            var playerBan = new PlayerBan()
+            var playerBan = new PlayerBan
             {
                 Reason = reason,
                 AdminId = sender.Account.Id,
@@ -84,7 +88,8 @@ namespace TruckingSharp.Commands.AdminCommands
             {
                 playerBan.Duration = DateTime.MaxValue;
 
-                target.SendClientMessage(Color.Red, $"This was the {Configuration.Instance.MaximumBans}ith and last ban. You have been banned permanently by {AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name}.");
+                target.SendClientMessage(Color.Red,
+                    $"This was the {Configuration.Instance.MaximumBans}ith and last ban. You have been banned permanently by {AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name}.");
             }
             else
             {
@@ -97,7 +102,8 @@ namespace TruckingSharp.Commands.AdminCommands
             await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(account);
             await new PlayerBanRepository(ConnectionFactory.GetConnection).AddAsync(playerBan);
 
-            BasePlayer.SendClientMessageToAll(Color.LightGray, $"{AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name} has banned {target.Name} for {days} day/s.");
+            BasePlayer.SendClientMessageToAll(Color.LightGray,
+                $"{AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name} has banned {target.Name} for {days} day/s.");
 
             await Task.Delay(Configuration.Instance.KickDelay);
             target.Kick();
@@ -115,12 +121,13 @@ namespace TruckingSharp.Commands.AdminCommands
                 return;
             }
 
-            var wasDEletedSuccessfully = await playerBanRepository.DeleteAsync(playerBan);
+            var wasDeletedSuccessfully = await playerBanRepository.DeleteAsync(playerBan);
 
-            if (wasDEletedSuccessfully)
+            if (wasDeletedSuccessfully)
             {
                 sender.SendClientMessage(Color.GreenYellow, "Player has been unbanned successfully.");
-                BasePlayer.SendClientMessageToAll(Color.LightGray, $"{AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name} has un-banned {name}.");
+                BasePlayer.SendClientMessageToAll(Color.LightGray,
+                    $"{AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name} has un-banned {name}.");
             }
             else
             {
@@ -131,11 +138,11 @@ namespace TruckingSharp.Commands.AdminCommands
         [Command("jetpack", Shortcut = "jetpack")]
         public static void OnJetpackComamnd(BasePlayer sender)
         {
-            sender.SpecialAction = SampSharp.GameMode.Definitions.SpecialAction.Usejetpack;
+            sender.SpecialAction = SpecialAction.Usejetpack;
         }
 
         [Command("caroption", Shortcut = "caroption")]
-        public static void OnCaroptioncommand(BasePlayer sender)
+        public static void OnCaroptionCommand(BasePlayer sender)
         {
             if (!sender.IsPlayerDriving())
             {
@@ -143,46 +150,47 @@ namespace TruckingSharp.Commands.AdminCommands
                 return;
             }
 
-            var carOptionsDialog = new ListDialog("Select option for your vehicle:", Messages.DialogButtonToggle, Messages.DialogButtonCancel);
+            var carOptionsDialog = new ListDialog("Select option for your vehicle:", Messages.DialogButtonToggle,
+                Messages.DialogButtonCancel);
             carOptionsDialog.AddItem("Engine\nLights\nAlarm\nDoors\nBonnet\nBoot\nObjective");
             carOptionsDialog.Show(sender);
 
             carOptionsDialog.Response += (objectSender, e) =>
             {
-                if (e.DialogButton == SampSharp.GameMode.Definitions.DialogButton.Left)
+                if (e.DialogButton != DialogButton.Left)
+                    return;
+
+                var playerVehicle = sender.Vehicle;
+
+                switch (e.ListItem)
                 {
-                    var playerVehicle = sender.Vehicle;
+                    case 0:
+                        playerVehicle.Engine = !playerVehicle.Engine;
+                        break;
 
-                    switch (e.ListItem)
-                    {
-                        case 0:
-                            playerVehicle.Engine = !playerVehicle.Engine;
-                            break;
+                    case 1:
+                        playerVehicle.Lights = !playerVehicle.Lights;
+                        break;
 
-                        case 1:
-                            playerVehicle.Lights = !playerVehicle.Lights;
-                            break;
+                    case 2:
+                        playerVehicle.Alarm = !playerVehicle.Alarm;
+                        break;
 
-                        case 2:
-                            playerVehicle.Alarm = !playerVehicle.Alarm;
-                            break;
+                    case 3:
+                        playerVehicle.Doors = !playerVehicle.Doors;
+                        break;
 
-                        case 3:
-                            playerVehicle.Doors = !playerVehicle.Doors;
-                            break;
+                    case 4:
+                        playerVehicle.Bonnet = !playerVehicle.Bonnet;
+                        break;
 
-                        case 4:
-                            playerVehicle.Bonnet = !playerVehicle.Bonnet;
-                            break;
+                    case 5:
+                        playerVehicle.Boot = !playerVehicle.Boot;
+                        break;
 
-                        case 5:
-                            playerVehicle.Boot = !playerVehicle.Boot;
-                            break;
-
-                        case 6:
-                            playerVehicle.Objective = !playerVehicle.Objective;
-                            break;
-                    }
+                    case 6:
+                        playerVehicle.Objective = !playerVehicle.Objective;
+                        break;
                 }
             };
         }
@@ -190,8 +198,10 @@ namespace TruckingSharp.Commands.AdminCommands
         [Command("cleanupallvehicles", Shortcut = "cleanupallvehicles")]
         public static async void OnCleanupAllVehiclesCommand(BasePlayer sender)
         {
-            foreach (Vehicle vehicle in Vehicle.All)
+            foreach (var baseVehicle in Vehicle.All)
             {
+                var vehicle = (Vehicle)baseVehicle;
+
                 if (vehicle.IsOwned || !vehicle.IsAdminSpawned)
                     continue;
 
@@ -239,7 +249,8 @@ namespace TruckingSharp.Commands.AdminCommands
             target.SendClientMessage(Color.Red, $"You have been ip-banned permanently by {sender.Name}");
             target.SendClientMessage(Color.Red, $"Reason: {reason}");
 
-            BasePlayer.SendClientMessageToAll(Color.Gray, $"{AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name} has ip-banned {target.Name}.");
+            BasePlayer.SendClientMessageToAll(Color.Gray,
+                $"{AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name} has ip-banned {target.Name}.");
 
             await Task.Delay(TimeSpan.FromSeconds(1));
             target.Ban(reason);
@@ -260,18 +271,19 @@ namespace TruckingSharp.Commands.AdminCommands
                 return;
             }
 
-            string targetIP = target.IP;
-            string firstPartOfTheIP = targetIP.Substring(0, targetIP.LastIndexOf(".") + 1);
+            var targetIp = target.IP;
+            var firstPartOfTheIp = targetIp.Substring(0, targetIp.LastIndexOf(".", StringComparison.Ordinal) + 1);
 
             target.SendClientMessage(Color.Red, $"You have been ip-range-banned permanently by {sender.Name}.");
             target.SendClientMessage(Color.Red, $"Reason: {reason}.");
 
-            for (int i = 0; i < 256; i++)
-                BaseMode.Instance.SendRconCommand($"banip {firstPartOfTheIP}{i}");
+            for (var i = 0; i < 256; i++)
+                BaseMode.Instance.SendRconCommand($"banip {firstPartOfTheIp}{i}");
 
             BaseMode.Instance.SendRconCommand("reloadbans");
 
-            BasePlayer.SendClientMessageToAll(Color.Gray, $"{AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name} has ip-range-banned {target.Name}.");
+            BasePlayer.SendClientMessageToAll(Color.Gray,
+                $"{AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name} has ip-range-banned {target.Name}.");
         }
 
         [Command("setscore", Shortcut = "setscore")]
@@ -304,14 +316,19 @@ namespace TruckingSharp.Commands.AdminCommands
             await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
 
             sender.SendClientMessage(Color.GreenYellow, $"You've given {target.Name} a trucker's license.");
-            target.SendClientMessage(Color.GreenYellow, $"You've been given a free trucker's license by {sender.Name}.");
+            target.SendClientMessage(Color.GreenYellow,
+                $"You've been given a free trucker's license by {sender.Name}.");
         }
 
         [Command("fuelall", Shortcut = "fuelall")]
         public static void OnFuelAllCommand(BasePlayer sender)
         {
-            foreach (Vehicle vehicle in Vehicle.All)
+            foreach (var baseVehicle in Vehicle.All)
+            {
+                var vehicle = (Vehicle)baseVehicle;
+
                 vehicle.Fuel = Configuration.Instance.MaximumFuel;
+            }
 
             sender.SendClientMessage(Color.GreenYellow, "All vehicles have been refueled.");
         }
@@ -319,8 +336,10 @@ namespace TruckingSharp.Commands.AdminCommands
         [Command("weather", Shortcut = "weather")]
         public static void OnWeatherCommand(BasePlayer sender)
         {
-            var weatherListDialog = new ListDialog("Select weather type:", Messages.DialogButtonSelect, Messages.DialogButtonCancel);
-            weatherListDialog.AddItem("Normal\nStormy\nFoggy\nScorching Hot\nDull, cloudy, rainy\nSandstorm\nGreen Fog\nDark, cloudy, brown\nExtremely bright\nDark toxic clouds\nBlack & white sky");
+            var weatherListDialog = new ListDialog("Select weather type:", Messages.DialogButtonSelect,
+                Messages.DialogButtonCancel);
+            weatherListDialog.AddItem(
+                "Normal\nStormy\nFoggy\nScorching Hot\nDull, cloudy, rainy\nSandstorm\nGreen Fog\nDark, cloudy, brown\nExtremely bright\nDark toxic clouds\nBlack & white sky");
             weatherListDialog.Show(sender);
             weatherListDialog.Response += (objectSender, e) =>
             {
@@ -391,7 +410,8 @@ namespace TruckingSharp.Commands.AdminCommands
             target.Skin = skin;
 
             sender.SendClientMessage(Color.GreenYellow, $"You've changed the skin for {target.Name} to {skin}.");
-            target.SendClientMessage(Color.GreenYellow, $"Your skin has been changed by admin {sender.Name} to {skin}.");
+            target.SendClientMessage(Color.GreenYellow,
+                $"Your skin has been changed by admin {sender.Name} to {skin}.");
         }
     }
 }

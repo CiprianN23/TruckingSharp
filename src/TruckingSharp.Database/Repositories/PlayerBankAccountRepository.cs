@@ -10,14 +10,36 @@ using TruckingSharp.Database.Repositories.Interfaces;
 
 namespace TruckingSharp.Database.Repositories
 {
-    public class PlayerBankAccountRepository : IRepository<PlayerBankAccount>, IDisposable
+    public sealed class PlayerBankAccountRepository : IRepository<PlayerBankAccount>, IDisposable
     {
-        private MySqlConnection _connection;
-        private bool isDisposed;
+        private readonly MySqlConnection _connection;
+        private bool _isDisposed;
 
         public PlayerBankAccountRepository(MySqlConnection connection)
         {
             _connection = connection;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!_isDisposed && disposing)
+            {
+                // Dispose other resources here
+            }
+
+            _connection.Dispose();
+            _isDisposed = true;
+        }
+
+        ~PlayerBankAccountRepository()
+        {
+            Dispose(false);
         }
 
         #region Sync
@@ -30,7 +52,7 @@ namespace TruckingSharp.Database.Repositories
             }
             catch (Exception ex)
             {
-                Log.Error(ex, $"Failed to get all player bank accounts from database.");
+                Log.Error(ex, "Failed to get all player bank accounts from database.");
                 throw;
             }
         }
@@ -39,7 +61,8 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                return _connection.QueryFirstOrDefault<PlayerBankAccount>("SELECT * FROM bankaccounts WHERE PlayerId = @Id;", new { Id = id });
+                return _connection.QueryFirstOrDefault<PlayerBankAccount>(
+                    "SELECT * FROM bankaccounts WHERE PlayerId = @Id;", new { Id = id });
             }
             catch (Exception ex)
             {
@@ -99,7 +122,7 @@ namespace TruckingSharp.Database.Repositories
             }
             catch (Exception ex)
             {
-                Log.Error(ex, $"Failed to get all player bank accounts async.");
+                Log.Error(ex, "Failed to get all player bank accounts async.");
                 throw;
             }
         }
@@ -144,27 +167,5 @@ namespace TruckingSharp.Database.Repositories
         }
 
         #endregion Async
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!isDisposed && disposing)
-            {
-                // Dispose other resources here
-            }
-
-            _connection.Dispose();
-            isDisposed = true;
-        }
-
-        ~PlayerBankAccountRepository()
-        {
-            Dispose(false);
-        }
     }
 }

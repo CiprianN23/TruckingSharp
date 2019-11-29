@@ -5,13 +5,13 @@ namespace TruckingSharp.Missions.Data
 {
     public static class MissionVehicles
     {
-        public static List<BaseVehicle> TruckerJobVehicles = new List<BaseVehicle>();
-        public static List<BaseVehicle> BusDriverJobVehicles = new List<BaseVehicle>();
-        public static List<BaseVehicle> PoliceJobVehicles = new List<BaseVehicle>();
-        public static List<BaseVehicle> MafiaJobVehicles = new List<BaseVehicle>();
-        public static List<BaseVehicle> PilotJobVehicles = new List<BaseVehicle>();
-        public static List<BaseVehicle> AssistanceJobVehicles = new List<BaseVehicle>();
-        public static List<BaseVehicle> CourierJobVehicles = new List<BaseVehicle>();
-        public static List<BaseVehicle> RoadworkerJobVehicles = new List<BaseVehicle>();
+        public static readonly List<BaseVehicle> TruckerJobVehicles = new List<BaseVehicle>();
+        public static readonly List<BaseVehicle> BusDriverJobVehicles = new List<BaseVehicle>();
+        public static readonly List<BaseVehicle> PoliceJobVehicles = new List<BaseVehicle>();
+        public static readonly List<BaseVehicle> MafiaJobVehicles = new List<BaseVehicle>();
+        public static readonly List<BaseVehicle> PilotJobVehicles = new List<BaseVehicle>();
+        public static readonly List<BaseVehicle> AssistanceJobVehicles = new List<BaseVehicle>();
+        public static readonly List<BaseVehicle> CourierJobVehicles = new List<BaseVehicle>();
+        public static readonly List<BaseVehicle> RoadworkerJobVehicles = new List<BaseVehicle>();
     }
 }

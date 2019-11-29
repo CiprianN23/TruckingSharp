@@ -1,6 +1,8 @@
 ﻿using SampSharp.GameMode;
 using SampSharp.GameMode.Controllers;
+using SampSharp.GameMode.Definitions;
 using SampSharp.GameMode.Display;
+using SampSharp.GameMode.Events;
 using SampSharp.GameMode.SAMP;
 using System;
 using TruckingSharp.Database.Repositories;
@@ -11,19 +13,21 @@ namespace TruckingSharp.Vehicles.Speedometer
     [Controller]
     public class SpeedometerController : IEventListener
     {
-        private PlayerAccountRepository _playerAccountRepository => new PlayerAccountRepository(ConnectionFactory.GetConnection);
+        private PlayerAccountRepository _playerAccountRepository =>
+            new PlayerAccountRepository(ConnectionFactory.GetConnection);
 
         public void RegisterEvents(BaseMode gameMode)
         {
             gameMode.PlayerConnected += Speedometer_PlayerConnected;
-            gameMode.PlayerStateChanged += Speedoemeter_PlayerStateChanged;
+            gameMode.PlayerStateChanged += Speedometer_PlayerStateChanged;
         }
 
-        private void Speedoemeter_PlayerStateChanged(object sender, SampSharp.GameMode.Events.StateEventArgs e)
+        private void Speedometer_PlayerStateChanged(object sender, StateEventArgs e)
         {
-            var player = sender as Player;
+            if (!(sender is Player player))
+                return;
 
-            if (e.NewState == SampSharp.GameMode.Definitions.PlayerState.Driving || e.NewState == SampSharp.GameMode.Definitions.PlayerState.Passenger)
+            if (e.NewState == PlayerState.Driving || e.NewState == PlayerState.Passenger)
             {
                 player.VehicleNameTextDraw.Show();
                 player.SpeedometerTextDraw.Show();
@@ -33,7 +37,7 @@ namespace TruckingSharp.Vehicles.Speedometer
 
                 player.SpeedometerTimer.IsRunning = true;
             }
-            else if (e.OldState == SampSharp.GameMode.Definitions.PlayerState.Driving || e.OldState == SampSharp.GameMode.Definitions.PlayerState.Passenger)
+            else if (e.OldState == PlayerState.Driving || e.OldState == PlayerState.Passenger)
             {
                 player.VehicleNameTextDraw.Hide();
                 player.SpeedometerTextDraw.Hide();
@@ -47,81 +51,83 @@ namespace TruckingSharp.Vehicles.Speedometer
 
         private void Speedometer_PlayerConnected(object sender, EventArgs e)
         {
-            var player = sender as Player;
+            if (!(sender is Player player))
+                return;
 
             player.VehicleNameTextDraw = new PlayerTextDraw(player, new Vector2(500.0, 380.0), " ");
             player.SpeedometerTextDraw = new PlayerTextDraw(player, new Vector2(500.0, 395.0), " ");
             player.FuelGaugeTextDraw = new PlayerTextDraw(player, new Vector2(500.0, 410.0), " ");
 
-            player.SpeedometerTimer = new Timer(TimeSpan.FromMilliseconds(500), true);
-            player.SpeedometerTimer.IsRunning = false;
-            player.SpeedometerTimer.Tick += (sender, e) => SpeedometerTimer_Tick(sender, e, player);
-            player.SpeedometerTimer.Tick += (sender, e) => SpeedCameraController.SpeedometerTimer_Tick(sender, e, player);
+            player.SpeedometerTimer = new Timer(TimeSpan.FromMilliseconds(500), true) { IsRunning = false };
+
+            player.SpeedometerTimer.Tick += (senderObject, ev) => SpeedometerTimer_Tick(senderObject, ev, player);
+            player.SpeedometerTimer.Tick += (senderObject, ev) =>
+                SpeedCameraController.SpeedometerTimer_Tick(senderObject, ev, player);
         }
 
         private async void SpeedometerTimer_Tick(object sender, EventArgs e, Player player)
         {
-            if (player.Vehicle != null)
-            {
-                var playerVehicle = (Vehicle)player.Vehicle;
-                var playerVehicleVelocity = playerVehicle.Velocity;
+            if (player.Vehicle == null)
+                return;
 
-                int playerVehicleSpeed = GetPlayerVehicleSpeed(playerVehicleVelocity);
+            var playerVehicle = (Vehicle)player.Vehicle;
+            var playerVehicleVelocity = playerVehicle.Velocity;
 
-                player.SpeedometerTextDraw.Text = $"~w~Speed: ~b~{playerVehicleSpeed}~w~ kph";
+            var playerVehicleSpeed = GetPlayerVehicleSpeed(playerVehicleVelocity);
 
-                player.Speed = playerVehicleSpeed;
+            player.SpeedometerTextDraw.Text = $"~w~Speed: ~b~{playerVehicleSpeed}~w~ kph";
 
-                var account = player.Account;
-                account.MetersDriven = (float)(account.MetersDriven + (playerVehicleSpeed / 7.2));
-                await _playerAccountRepository.UpdateAsync(account);
+            player.Speed = playerVehicleSpeed;
 
-                player.VehicleNameTextDraw.Text = $"{playerVehicle.ModelInfo.Name}";
+            var account = player.Account;
+            account.MetersDriven = (float)(account.MetersDriven + playerVehicleSpeed / 7.2);
+            await _playerAccountRepository.UpdateAsync(account);
 
-                if (playerVehicleSpeed > 10 && playerVehicle.Fuel > 0 && playerVehicle.Engine)
-                    playerVehicle.Fuel--;
+            player.VehicleNameTextDraw.Text = $"{playerVehicle.ModelInfo.Name}";
 
-                player.FuelGaugeTextDraw.Text = ConstructFuelGauge(playerVehicle.Fuel);
+            if (playerVehicleSpeed > 10 && playerVehicle.Fuel > 0 && playerVehicle.Engine)
+                playerVehicle.Fuel--;
 
-                if (playerVehicle.Fuel == 0)
-                {
-                    playerVehicle.Engine = false;
-                    playerVehicle.Lights = false;
-                }
-            }
+            player.FuelGaugeTextDraw.Text = ConstructFuelGauge(playerVehicle.Fuel);
+
+            if (playerVehicle.Fuel != 0)
+                return;
+
+            playerVehicle.Engine = false;
+            playerVehicle.Lights = false;
         }
 
-        private int GetPlayerVehicleSpeed(Vector3 velocity)
+        private static int GetPlayerVehicleSpeed(Vector3 velocity)
         {
-            return (int)(Math.Sqrt(Math.Pow(velocity.X, 2) + Math.Pow(velocity.Y, 2) + Math.Pow(velocity.Z, 2)) * Configuration.Instance.KilometersPerHourMultiplier);
+            return (int)(Math.Sqrt(Math.Pow(velocity.X, 2) + Math.Pow(velocity.Y, 2) + Math.Pow(velocity.Z, 2)) *
+                          Configuration.Instance.KilometersPerHourMultiplier);
         }
 
-        private string ConstructFuelGauge(int fuel)
+        private static string ConstructFuelGauge(int fuel)
         {
-            int MaxFuel = Configuration.Instance.MaximumFuel;
+            var maxFuel = Configuration.Instance.MaximumFuel;
 
-            if (fuel > 0 && fuel < (MaxFuel / 10))
+            if (fuel > 0 && fuel < maxFuel / 10)
                 return "~g~I~r~IIIIIIIII";
-            else if (fuel >= ((MaxFuel / 10) * 1) && fuel < ((MaxFuel / 10) * 2))
+            if (fuel >= maxFuel / 10 * 1 && fuel < maxFuel / 10 * 2)
                 return "~g~II~r~IIIIIIII";
-            else if (fuel >= ((MaxFuel / 10) * 2) && fuel < ((MaxFuel / 10) * 3))
+            if (fuel >= maxFuel / 10 * 2 && fuel < maxFuel / 10 * 3)
                 return "~g~III~r~IIIIIII";
-            else if (fuel >= ((MaxFuel / 10) * 3) && fuel < ((MaxFuel / 10) * 4))
+            if (fuel >= maxFuel / 10 * 3 && fuel < maxFuel / 10 * 4)
                 return "~g~IIII~r~IIIIII";
-            else if (fuel >= ((MaxFuel / 10) * 4) && fuel < ((MaxFuel / 10) * 5))
+            if (fuel >= maxFuel / 10 * 4 && fuel < maxFuel / 10 * 5)
                 return "~g~IIIII~r~IIIII";
-            else if (fuel >= ((MaxFuel / 10) * 5) && fuel < ((MaxFuel / 10) * 6))
+            if (fuel >= maxFuel / 10 * 5 && fuel < maxFuel / 10 * 6)
                 return "~g~IIIIII~r~IIII";
-            else if (fuel >= ((MaxFuel / 10) * 6) && fuel < ((MaxFuel / 10) * 7))
+            if (fuel >= maxFuel / 10 * 6 && fuel < maxFuel / 10 * 7)
                 return "~g~IIIIIII~r~III";
-            else if (fuel >= ((MaxFuel / 10) * 7) && fuel < ((MaxFuel / 10) * 8))
+            if (fuel >= maxFuel / 10 * 7 && fuel < maxFuel / 10 * 8)
                 return "~g~IIIIIIII~r~II";
-            else if (fuel >= ((MaxFuel / 10) * 8) && fuel < ((MaxFuel / 10) * 9))
+            if (fuel >= maxFuel / 10 * 8 && fuel < maxFuel / 10 * 9)
                 return "~g~IIIIIIIII~r~I";
-            else if (fuel >= ((MaxFuel / 10) * 9) && fuel <= MaxFuel)
+            if (fuel >= maxFuel / 10 * 9 && fuel <= maxFuel)
                 return "~g~IIIIIIIIII";
-            else
-                return "~r~IIIIIIIIII";
+            return "~r~IIIIIIIIII";
         }
     }
 }

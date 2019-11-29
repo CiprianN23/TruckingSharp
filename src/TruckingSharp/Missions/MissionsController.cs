@@ -2,6 +2,7 @@
 using SampSharp.GameMode.Controllers;
 using SampSharp.GameMode.Definitions;
 using SampSharp.GameMode.Display;
+using SampSharp.GameMode.Events;
 using SampSharp.GameMode.SAMP;
 using System;
 using TruckingSharp.Constants;
@@ -12,19 +13,9 @@ using TruckingSharp.PlayerClasses.Data;
 namespace TruckingSharp.Missions
 {
     [Controller]
-    public class MissionsController : IController, IEventListener
+    public class MissionsController : IEventListener
     {
         private Timer _missionTimer;
-
-        public static void ClassEndMission(Player player)
-        {
-            switch (player.PlayerClass)
-            {
-                case PlayerClassType.TruckDriver:
-                    TruckerController.EndMission(player);
-                    break;
-            }
-        }
 
         public void RegisterEvents(BaseMode gameMode)
         {
@@ -36,10 +27,22 @@ namespace TruckingSharp.Missions
             gameMode.PlayerSpawned += Mission_PlayerSpawned;
         }
 
-        private void _missionTimer_Tick(object sender, System.EventArgs e)
+        public static void ClassEndMission(Player player)
         {
-            foreach (Player player in Player.All)
+            switch (player.PlayerClass)
             {
+                case PlayerClassType.TruckDriver:
+                    TruckerController.EndMission(player);
+                    break;
+            }
+        }
+
+        private void _missionTimer_Tick(object sender, EventArgs e)
+        {
+            foreach (var basePlayer in Player.All)
+            {
+                var player = (Player)basePlayer;
+
                 if (!player.IsLoggedIn || !player.IsDoingMission)
                     continue;
 
@@ -56,18 +59,15 @@ namespace TruckingSharp.Missions
                         if (player.MissionVehicleTime != 0)
                         {
                             if (oldVehicle == newVehicle && oldTrailer == newTrailer)
-                            {
                                 player.MissionVehicleTime = Configuration.Instance.FailMissionSeconds;
-                            }
                             else
-                            {
                                 PlayerLeftVehicle(player);
-                            }
                         }
                         else
                         {
                             PlayerFailMission(player);
                         }
+
                         break;
 
                     case PlayerClassType.BusDriver:
@@ -76,29 +76,26 @@ namespace TruckingSharp.Missions
                         if (player.MissionVehicleTime != 0)
                         {
                             if (oldVehicle == newVehicle)
-                            {
                                 player.MissionVehicleTime = Configuration.Instance.FailMissionSeconds;
-                            }
                             else
-                            {
                                 PlayerLeftVehicle(player);
-                            }
                         }
                         else
                         {
                             PlayerFailMission(player);
                         }
+
                         break;
                 }
             }
         }
 
-        private void Mission_GamemodeExited(object sender, System.EventArgs e)
+        private void Mission_GamemodeExited(object sender, EventArgs e)
         {
             _missionTimer.Dispose();
         }
 
-        private void Mission_GamemodeInitialized(object sender, System.EventArgs e)
+        private void Mission_GamemodeInitialized(object sender, EventArgs e)
         {
             _missionTimer = new Timer(TimeSpan.FromSeconds(1), true);
             _missionTimer.Tick += _missionTimer_Tick;
@@ -106,7 +103,9 @@ namespace TruckingSharp.Missions
 
         private void Mission_PlayerConnected(object sender, EventArgs e)
         {
-            var player = sender as Player;
+            if (!(sender is Player player))
+                return;
+
             player.MissionTextDraw = new PlayerTextDraw(player, new Vector2(320.0, 430.0), string.Empty)
             {
                 Alignment = TextDrawAlignment.Center,
@@ -115,26 +114,31 @@ namespace TruckingSharp.Missions
             };
         }
 
-        private void Mission_PlayerDied(object sender, SampSharp.GameMode.Events.DeathEventArgs e)
+        private void Mission_PlayerDied(object sender, DeathEventArgs e)
         {
-            var player = sender as Player;
+            if (!(sender is Player player))
+                return;
+
             ClassEndMission(player);
 
             player.MissionTextDraw.Text = string.Empty;
             player.MissionTextDraw.Hide();
         }
 
-        private void Mission_PlayerDisconnected(object sender, SampSharp.GameMode.Events.DisconnectEventArgs e)
+        private void Mission_PlayerDisconnected(object sender, DisconnectEventArgs e)
         {
-            var player = sender as Player;
+            if (!(sender is Player player))
+                return;
+
             ClassEndMission(player);
 
             player.MissionTextDraw.Dispose();
         }
 
-        private void Mission_PlayerSpawned(object sender, SampSharp.GameMode.Events.SpawnEventArgs e)
+        private void Mission_PlayerSpawned(object sender, SpawnEventArgs e)
         {
-            var player = sender as Player;
+            if (!(sender is Player player))
+                return;
 
             switch (player.PlayerClass)
             {
@@ -177,26 +181,26 @@ namespace TruckingSharp.Missions
             player.MissionVehicleTime -= 1;
             player.GameText($"{player.MissionVehicleTime}", 1000, 4);
 
-            if (player.MissionVehicleTime == (Configuration.Instance.FailMissionSeconds - 1))
+            if (player.MissionVehicleTime != Configuration.Instance.FailMissionSeconds - 1)
+                return;
+
+            switch (player.PlayerClass)
             {
-                switch (player.PlayerClass)
-                {
-                    case PlayerClassType.TruckDriver:
-                        player.SendClientMessage(Color.Red, Messages.MissionTruckerMustEnterVehicle);
-                        break;
+                case PlayerClassType.TruckDriver:
+                    player.SendClientMessage(Color.Red, Messages.MissionTruckerMustEnterVehicle);
+                    break;
 
-                    case PlayerClassType.BusDriver:
-                        player.SendClientMessage(Color.Red, Messages.MissionBusDriverMustEnterVehicle);
-                        break;
+                case PlayerClassType.BusDriver:
+                    player.SendClientMessage(Color.Red, Messages.MissionBusDriverMustEnterVehicle);
+                    break;
 
-                    case PlayerClassType.Mafia:
-                        player.SendClientMessage(Color.Red, Messages.MissionMafiaMustEnterVehicle);
-                        break;
+                case PlayerClassType.Mafia:
+                    player.SendClientMessage(Color.Red, Messages.MissionMafiaMustEnterVehicle);
+                    break;
 
-                    case PlayerClassType.RoadWorker:
-                        player.SendClientMessage(Color.Red, Messages.MissionRoadWorkerMustEnterVehicle);
-                        break;
-                }
+                case PlayerClassType.RoadWorker:
+                    player.SendClientMessage(Color.Red, Messages.MissionRoadWorkerMustEnterVehicle);
+                    break;
             }
         }
     }
