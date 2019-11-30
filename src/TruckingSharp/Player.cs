@@ -11,6 +11,7 @@ using TruckingSharp.Constants;
 using TruckingSharp.Data;
 using TruckingSharp.Database.Entities;
 using TruckingSharp.Database.Repositories;
+using TruckingSharp.Missions.BusDriver;
 using TruckingSharp.Missions.Convoy;
 using TruckingSharp.Missions.Data;
 using TruckingSharp.PlayerClasses.Data;
@@ -56,6 +57,8 @@ namespace TruckingSharp
         public int MissionVehicleTime { get; set; }
         public PlayerTextDraw MissionTextDraw { get; set; }
         public MissionConvoy Convoy { get; set; }
+        public BusRoute BusRoute { get; set; }
+        public int BusPassengers { get; set; }
 
         public PlayerTextDraw VehicleNameTextDraw { get; set; }
         public PlayerTextDraw SpeedometerTextDraw { get; set; }

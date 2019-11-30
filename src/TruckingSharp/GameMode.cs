@@ -2,6 +2,7 @@
 using SampSharp.GameMode.Controllers;
 using SampSharp.GameMode.Definitions;
 using SampSharp.GameMode.World;
+using SampSharp.Streamer.World;
 using System;
 using System.Reflection;
 using TruckingSharp.Controllers;
@@ -726,6 +727,28 @@ namespace TruckingSharp
                 new Vector3(-1886.5, -1744.25, 21.7), 30.0f, -1, -1, 300));
         }
 
+        private void CreateBusStops()
+        {
+            new DynamicObject(1257, new Vector3(-2571.25, 2316.0, 5.2), new Vector3(0.0, 0.0, 180.0));
+            new DynamicObject(1257, new Vector3(-2333.25, 2371.5, 6.0), new Vector3(0.0, 0.0, 320.0));
+            new DynamicObject(1257, new Vector3(-1467.0, 2679.0, 56.0), new Vector3(0.0, 0.0, 90.0));
+            new DynamicObject(1257, new Vector3(-1528.5, 2543.0, 56.0), new Vector3(0.0, 0.0, 270.0));
+            new DynamicObject(1257, new Vector3(-800.5, 1562.0, 27.4), new Vector3(0.0, 0.0, 0.0));
+            new DynamicObject(1257, new Vector3(-853.5, 1529.5, 22.4), new Vector3(0.0, 0.0, 180.0));
+            new DynamicObject(1257, new Vector3(-269.0, 2620.5, 63.2), new Vector3(0.0, 0.0, 270.0));
+            new DynamicObject(1257, new Vector3(-45.5, 1206.5, 19.6), new Vector3(0.0, 0.0, 90.0));
+            new DynamicObject(1257, new Vector3(-100.5, 1190.75, 20.0), new Vector3(0.0, 0.0, 270.0));
+            new DynamicObject(1257, new Vector3(-249.5, 1010.75, 20.0), new Vector3(0.0, 0.0, 270.0));
+            new DynamicObject(1257, new Vector3(-2172.5, -2309.5, 30.9), new Vector3(0.0, 0.0, 230.0));
+            new DynamicObject(1257, new Vector3(-2094.25, -2503.0, 30.9), new Vector3(0.0, 0.0, 322.0));
+            new DynamicObject(1257, new Vector3(2263.75, -35.75, 26.7), new Vector3(0.0, 0.0, 270.0));
+            new DynamicObject(1257, new Vector3(2456.25, 1.0, 26.5), new Vector3(0.0, 0.0, 180.0));
+            new DynamicObject(1257, new Vector3(1290.25, 333.5, 19.8), new Vector3(0.0, 0.0, 65.0));
+            new DynamicObject(1257, new Vector3(1284.75, 319.5, 19.8), new Vector3(0.0, 0.0, 245.0));
+            new DynamicObject(1257, new Vector3(736.0, -522.5, 16.6), new Vector3(0.0, 0.0, 90.0));
+            new DynamicObject(1257, new Vector3(736.0, -537.75, 16.6), new Vector3(0.0, 0.0, 270.0));
+        }
+
         #region Overrides of BaseMode
 
         protected override void OnInitialized(EventArgs e)
@@ -734,6 +757,7 @@ namespace TruckingSharp
             CreateClasses();
             SpawnTrucks();
             SpawnBuses();
+            CreateBusStops();
             SpawnPoliceCars();
             SpawnMafiaCars();
             SpawnPilotPlanes();

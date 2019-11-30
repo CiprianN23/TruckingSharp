@@ -6,6 +6,7 @@ using SampSharp.GameMode.Events;
 using SampSharp.GameMode.SAMP;
 using System;
 using TruckingSharp.Constants;
+using TruckingSharp.Missions.BusDriver;
 using TruckingSharp.Missions.Convoy;
 using TruckingSharp.Missions.Trucker;
 using TruckingSharp.PlayerClasses.Data;
@@ -33,6 +34,9 @@ namespace TruckingSharp.Missions
             {
                 case PlayerClassType.TruckDriver:
                     TruckerController.EndMission(player);
+                    break;
+                case PlayerClassType.BusDriver:
+                    BusDriverController.EndMission(player);
                     break;
             }
         }

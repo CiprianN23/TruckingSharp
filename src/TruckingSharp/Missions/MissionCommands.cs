@@ -7,6 +7,7 @@ using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
 using TruckingSharp.Extensions.PlayersExtensions;
 using TruckingSharp.Missions.Bonus;
+using TruckingSharp.Missions.BusDriver;
 using TruckingSharp.Missions.Convoy;
 using TruckingSharp.Missions.Trucker;
 using TruckingSharp.PlayerClasses.Data;
@@ -78,10 +79,37 @@ namespace TruckingSharp.Missions
                             }
 
                             break;
+                        default:
+                            sender.SendClientMessage(Color.Red, "You need to be the driver of a trucking vehicle to start a mission.");
+                            break;
                     }
 
                     dialogTruckerMission.Response += TruckerController.MissionDialogResponse;
 
+                    break;
+
+                case PlayerClassType.BusDriver:
+                    var dialogBusDriverMission = new ListDialog(Messages.MissionTruckerSelectMissionMethod,
+                        Messages.DialogButtonSelect, Messages.DialogButtonCancel);
+                    dialogBusDriverMission.AddItem("Choose your own busroute\r\nAuto assigned busroute");
+
+                    var random = new Random();
+
+                    switch(playerVehicleModel)
+                    {
+                        case VehicleModelType.Coach:
+                        case VehicleModelType.Bus:
+                            if (sender.Account.BusLicense == 1)
+                                dialogBusDriverMission.Show(sender);
+                            else
+                                BusDriverController.StartMission(sender, BusRoute.BusRoutes[random.Next(BusRoute.BusRoutes.Count)]);
+                            break;
+                        default:
+                            sender.SendClientMessage(Color.Red, "You need to be the driver of a bus to start a mission.");
+                            break;
+                    }
+
+                    dialogBusDriverMission.Response += BusDriverController.DialogBusDriverMission_Response;
                     break;
             }
         }
