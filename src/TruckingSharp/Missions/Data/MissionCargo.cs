@@ -57,7 +57,11 @@ namespace TruckingSharp.Missions.Data
             new MissionCargo("Building Materials", false, 0.6, MissionCargoVehicleType.NoTrailer, new[] {4}, new[] {1, 2, 3, 5}),
             new MissionCargo("LiveStock", false, 0.6, MissionCargoVehicleType.NoTrailer, new[] {21, 22}, new[] {23, 43, 47}),
             new MissionCargo("Meat", false, 0.6, MissionCargoVehicleType.NoTrailer, new[] {43}, new[] {44, 49, 50, 51, 52, 53}),
-            new MissionCargo("Paper", false, 0.6, MissionCargoVehicleType.NoTrailer, new[] {14}, new[] {9, 62})
+            new MissionCargo("Paper", false, 0.6, MissionCargoVehicleType.NoTrailer, new[] {14}, new[] {9, 62}),
+
+            new MissionCargo("Passangers", false, 1.0, MissionCargoVehicleType.Plane, new[] { 121, 122, 125, 126, 130, 131, 134}, new[] { 121, 122, 125, 126, 130, 131, 134}),
+            new MissionCargo("Cargo", false, 1.0, MissionCargoVehicleType.Plane, new[] { 123, 124, 127, 128, 129, 132, 133, 135}, new[] { 123, 124, 127, 128, 129, 132, 133, 135}),
+            new MissionCargo("Passengers", false, 1.0, MissionCargoVehicleType.Helicopter, new[] { 121, 122, 125, 126, 130, 131, 134}, new[] { 121, 122, 125, 126, 130, 131, 134})
         };
 
         private static readonly Random Random = new Random();

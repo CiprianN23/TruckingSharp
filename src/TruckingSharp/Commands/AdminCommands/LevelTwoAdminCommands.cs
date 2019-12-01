@@ -144,7 +144,7 @@ namespace TruckingSharp.Commands.AdminCommands
         [Command("caroption", Shortcut = "caroption")]
         public static void OnCaroptionCommand(BasePlayer sender)
         {
-            if (!sender.IsPlayerDriving())
+            if (!sender.IsDriving())
             {
                 sender.SendClientMessage(Color.Red, Messages.CommandAllowedOnlyAsDriver);
                 return;

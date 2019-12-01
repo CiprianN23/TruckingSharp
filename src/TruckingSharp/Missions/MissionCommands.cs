@@ -9,6 +9,7 @@ using TruckingSharp.Extensions.PlayersExtensions;
 using TruckingSharp.Missions.Bonus;
 using TruckingSharp.Missions.BusDriver;
 using TruckingSharp.Missions.Convoy;
+using TruckingSharp.Missions.Pilot;
 using TruckingSharp.Missions.Trucker;
 using TruckingSharp.PlayerClasses.Data;
 
@@ -26,7 +27,7 @@ namespace TruckingSharp.Missions
                 return;
             }
 
-            if (!sender.IsPlayerDriving())
+            if (!sender.IsDriving())
             {
                 sender.SendClientMessage(Color.Red, Messages.CommandAllowedOnlyAsDriver);
                 return;
@@ -110,6 +111,18 @@ namespace TruckingSharp.Missions
                     }
 
                     dialogBusDriverMission.Response += BusDriverController.DialogBusDriverMission_Response;
+                    break;
+                case PlayerClassType.Pilot:
+                    switch (playerVehicleModel)
+                    {
+                        case VehicleModelType.Nevada:
+                        case VehicleModelType.Shamal:
+                        case VehicleModelType.Maverick:
+                        case VehicleModelType.Cargobob:
+                            PilotController.StartRandomMission(sender);
+                            break;
+                    }
+
                     break;
             }
         }

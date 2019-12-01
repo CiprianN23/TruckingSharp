@@ -174,13 +174,13 @@ namespace TruckingSharp.Commands
         [Command("detach", Shortcut = "detach")]
         public static void OnDetachCommand(BasePlayer sender)
         {
-            if (sender.IsPlayerInBuilding())
+            if (sender.IsInBuilding())
             {
                 sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedInsideBuilding);
                 return;
             }
 
-            if (!sender.IsPlayerDriving())
+            if (!sender.IsDriving())
             {
                 sender.SendClientMessage(Color.Red, Messages.CommandAllowedOnlyAsDriver);
                 return;
@@ -236,7 +236,7 @@ namespace TruckingSharp.Commands
         [Command("engine", Shortcut = "engine")]
         public static void OnEngineCommand(BasePlayer sender)
         {
-            if (!sender.IsPlayerDriving())
+            if (!sender.IsDriving())
             {
                 sender.SendClientMessage(Color.Red, Messages.CommandAllowedOnlyAsDriver);
                 return;
@@ -257,13 +257,13 @@ namespace TruckingSharp.Commands
         [Command("flip", Shortcut = "flip")]
         public static void OnFlipCommand(BasePlayer sender)
         {
-            if (sender.IsPlayerInBuilding())
+            if (sender.IsInBuilding())
             {
                 sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedInsideBuilding);
                 return;
             }
 
-            if (!sender.IsPlayerDriving())
+            if (!sender.IsDriving())
             {
                 sender.SendClientMessage(Color.Red, Messages.CommandAllowedOnlyAsDriver);
                 return;
@@ -458,7 +458,7 @@ namespace TruckingSharp.Commands
         [Command("reclass", Shortcut = "reclass")]
         public static void OnReclassCommand(Player sender)
         {
-            if (sender.IsPlayerInBuilding())
+            if (sender.IsInBuilding())
             {
                 sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedInsideBuilding);
                 return;

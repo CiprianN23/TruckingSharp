@@ -175,7 +175,7 @@ namespace TruckingSharp.Missions.Convoy
                 case 3:
                     var numberOfMembers = convoy.Members.Count;
 
-                    var payment = TruckerController.CalculatePayment(convoy.FromLocation, convoy.ToLocation,
+                    var payment = MissionsController.CalculatePayment(convoy.FromLocation, convoy.ToLocation,
                         convoy.MissionCargo);
 
                     if (!BonusMission.IsMissionFinished

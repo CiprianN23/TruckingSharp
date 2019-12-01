@@ -51,15 +51,15 @@ namespace TruckingSharp.Missions.Trucker
             player.DisableCheckpoint();
             player.MissionTextDraw.Text = Messages.NoMissionText;
 
-            if (!player.IsOverloaded)
-                return;
-
-            player.IsOverloaded = false;
-
             if (player.Account.Wanted >= 2)
                 player.SetWantedLevel(player.Account.Wanted - 2);
             else
                 player.SetWantedLevel(0);
+
+            if (!player.IsOverloaded)
+                return;
+
+            player.IsOverloaded = false;
         }
 
         public static void MissionDialogResponse(object sender, DialogResponseEventArgs e)
@@ -280,19 +280,6 @@ namespace TruckingSharp.Missions.Trucker
             return true;
         }
 
-        public static int CalculatePayment(MissionLocation fromLocation, MissionLocation toLocation,
-            MissionCargo missionCargo)
-        {
-            var distance = GetDistance(fromLocation, toLocation);
-            return (int)Math.Floor(distance * missionCargo.PayPerUnit);
-        }
-
-        private static double GetDistance(MissionLocation fromLocation, MissionLocation toLocation)
-        {
-            return Math.Sqrt(Math.Pow(toLocation.Position.X - fromLocation.Position.X, 2) +
-                             Math.Pow(toLocation.Position.Y - fromLocation.Position.Y, 2));
-        }
-
         private void SetRandomOverload(Player player)
         {
             var playerTrailerModel = player.Vehicle?.Trailer?.Model;
@@ -318,7 +305,8 @@ namespace TruckingSharp.Missions.Trucker
             if (!(sender is Player player))
                 return;
 
-            if (player.PlayerClass != PlayerClassType.TruckDriver) return;
+            if (player.PlayerClass != PlayerClassType.TruckDriver)
+                return;
 
             if (player.Vehicle != player.MissionVehicle)
             {
@@ -415,7 +403,7 @@ namespace TruckingSharp.Missions.Trucker
                     BasePlayer.SendClientMessageToAll(Messages.MissionTruckerCompletedInfo, player.FromLocation.Name,
                         player.ToLocation.Name);
 
-                    var payment = CalculatePayment(player.FromLocation, player.ToLocation, player.MissionCargo);
+                    var payment = MissionsController.CalculatePayment(player.FromLocation, player.ToLocation, player.MissionCargo);
 
                     if (!BonusMission.IsMissionFinished
                         && BonusMission.RandomCargo == player.MissionCargo
@@ -452,7 +440,7 @@ namespace TruckingSharp.Missions.Trucker
                         player.SendClientMessage(Messages.MissionTruckerBonusOwnedVehicle, bonus);
                     }
 
-                    player.Reward(0, GetDistance(player.FromLocation, player.ToLocation) > 3000.0f ? 2 : 1);
+                    player.Reward(0, MissionsController.GetDistance(player.FromLocation, player.ToLocation) > 3000.0f ? 2 : 1);
 
                     var account = player.Account;
                     account.TruckerJobs++;

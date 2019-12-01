@@ -130,6 +130,22 @@ namespace TruckingSharp.Missions.Data
             new MissionLocation("Busstop 2 Montgomery", new Vector3(1286.75, 323.75, 19.40)),
             new MissionLocation("Busstop 1 Dillimore", new Vector3(736.00, -527.50, 16.18)),
             new MissionLocation("Busstop 2 Dillimore", new Vector3(736.00, -532.50, 16.18)),
+
+            new MissionLocation("SF Airport Gate 1", new Vector3(-1337.94, -222.79, 14.14)),
+            new MissionLocation("SF Airport Gate 2", new Vector3(-1395.26, -104.20, 14.14)),
+            new MissionLocation("SF Airport Cargo Bay 1", new Vector3(-1337.16, -542.29, 14.14)),
+            new MissionLocation("SF Airport Cargo Bay 2", new Vector3(-1412.96, -579.85, 14.14)),
+            new MissionLocation("LS Airport Gate 1", new Vector3(1747.04, -2441.04, 13.55)),
+            new MissionLocation("LS Airport Gate 2", new Vector3(1902.16, -2350.11, 13.54)),
+            new MissionLocation("LS Airport Cargo Bay 1", new Vector3(1889.10, -2625.49, 13.54)),
+            new MissionLocation("LS Airport Cargo Bay 2", new Vector3(1754.74, -2622.69, 13.54)),
+            new MissionLocation("LS Airport Cargo Bay 3", new Vector3(1617.61, -2622.30, 13.54)),
+            new MissionLocation("LV Airport Gate 1", new Vector3(1564.77, 1536.77, 10.82)),
+            new MissionLocation("LV Airport Gate 2", new Vector3(1569.85, 1358.58, 10.86)),
+            new MissionLocation("LV Airport Cargo Bay 1", new Vector3(1307.41, 1324.01, 10.82)),
+            new MissionLocation("LV Airport Cargo Bay 2", new Vector3(1308.47, 1361.32, 10.82)),
+            new MissionLocation("Verdant Meadows Gate", new Vector3(392.13, 2531.27, 16.54)),
+            new MissionLocation("Verdant Meadows Cargo Bay", new Vector3(291.08, 2525.75, 16.79))
         };
 
         private MissionLocation(string locationName, Vector3 location)

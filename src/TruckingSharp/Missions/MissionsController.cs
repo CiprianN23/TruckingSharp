@@ -8,6 +8,8 @@ using System;
 using TruckingSharp.Constants;
 using TruckingSharp.Missions.BusDriver;
 using TruckingSharp.Missions.Convoy;
+using TruckingSharp.Missions.Data;
+using TruckingSharp.Missions.Pilot;
 using TruckingSharp.Missions.Trucker;
 using TruckingSharp.PlayerClasses.Data;
 
@@ -35,8 +37,12 @@ namespace TruckingSharp.Missions
                 case PlayerClassType.TruckDriver:
                     TruckerController.EndMission(player);
                     break;
+
                 case PlayerClassType.BusDriver:
                     BusDriverController.EndMission(player);
+                    break;
+                case PlayerClassType.Pilot:
+                    PilotController.EndMission(player);
                     break;
             }
         }
@@ -206,6 +212,24 @@ namespace TruckingSharp.Missions
                     player.SendClientMessage(Color.Red, Messages.MissionRoadWorkerMustEnterVehicle);
                     break;
             }
+        }
+
+        public static int CalculatePayment(MissionLocation fromLocation, MissionLocation toLocation,
+            MissionCargo missionCargo)
+        {
+            var distance = GetDistance(fromLocation, toLocation);
+            return (int)Math.Floor(distance * missionCargo.PayPerUnit);
+        }
+
+        public static double GetDistance(MissionLocation fromLocation, MissionLocation toLocation)
+        {
+            return Math.Sqrt(Math.Pow(toLocation.Position.X - fromLocation.Position.X, 2) +
+                             Math.Pow(toLocation.Position.Y - fromLocation.Position.Y, 2));
+        }
+
+        public static bool CheckDistanceBetweenLocations(MissionLocation location1, MissionLocation location2, float range)
+        {
+            return Vector3.Distance(location1.Position, location2.Position) > range;
         }
     }
 }

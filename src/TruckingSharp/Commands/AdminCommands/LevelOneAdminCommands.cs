@@ -99,13 +99,13 @@ namespace TruckingSharp.Commands.AdminCommands
         [Command("repair", Shortcut = "repair")]
         public static void OnRepairCommand(BasePlayer sender)
         {
-            if (sender.IsPlayerInBuilding())
+            if (sender.IsInBuilding())
             {
                 sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedInsideBuilding);
                 return;
             }
 
-            if (!sender.IsPlayerDriving())
+            if (!sender.IsDriving())
             {
                 sender.SendClientMessage(Color.Red, Messages.CommandAllowedOnlyAsDriver);
                 return;
@@ -244,7 +244,7 @@ namespace TruckingSharp.Commands.AdminCommands
         [Command("fuel", Shortcut = "fuel")]
         public static void OnFuelCommand(BasePlayer sender)
         {
-            if (!sender.IsPlayerDriving())
+            if (!sender.IsDriving())
             {
                 sender.SendClientMessage(Color.Red, Messages.CommandAllowedOnlyAsDriver);
                 return;
@@ -288,7 +288,7 @@ namespace TruckingSharp.Commands.AdminCommands
         [Command("nos", Shortcut = "nos")]
         public static void OnNosCommand(BasePlayer sender)
         {
-            if (!sender.IsPlayerDriving())
+            if (!sender.IsDriving())
             {
                 sender.SendClientMessage(Color.Red, Messages.CommandAllowedOnlyAsDriver);
                 return;

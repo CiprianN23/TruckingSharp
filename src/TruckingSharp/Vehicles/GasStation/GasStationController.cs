@@ -30,7 +30,7 @@ namespace TruckingSharp.Vehicles.GasStation
             if (!KeyUtils.HasPressed(e.NewKeys, e.OldKeys, Keys.Crouch))
                 return;
 
-            if (!player.IsPlayerDriving())
+            if (!player.IsDriving())
                 return;
 
             if (!GasStations.Any(gasStation => player.IsInRangeOfPoint(2.5f, gasStation.Position)))

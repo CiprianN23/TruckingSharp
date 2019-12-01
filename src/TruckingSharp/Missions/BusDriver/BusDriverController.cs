@@ -26,6 +26,9 @@ namespace TruckingSharp.Missions.BusDriver
             if (!(sender is Player player))
                 return;
 
+            if (player.PlayerClass != PlayerClasses.Data.PlayerClassType.BusDriver)
+                return;
+
             if (player.Vehicle != player.MissionVehicle)
                 return;
 

@@ -5,14 +5,8 @@ namespace TruckingSharp.Extensions.PlayersExtensions
 {
     public static class PlayerCheckExtensions
     {
-        public static bool IsPlayerInBuilding(this BasePlayer player)
-        {
-            return player.Interior != 0;
-        }
+        public static bool IsInBuilding(this BasePlayer player) => player.Interior != 0;
 
-        public static bool IsPlayerDriving(this BasePlayer player)
-        {
-            return player.State == PlayerState.Driving;
-        }
+        public static bool IsDriving(this BasePlayer player) => player.State == PlayerState.Driving;
     }
 }
