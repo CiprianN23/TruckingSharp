@@ -9,8 +9,8 @@ using System.Text;
 using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
 using TruckingSharp.Data;
+using TruckingSharp.Database;
 using TruckingSharp.Database.Entities;
-using TruckingSharp.Database.Repositories;
 using TruckingSharp.Extensions.PlayersExtensions;
 using TruckingSharp.PlayerClasses.ClassesSpawn;
 using TruckingSharp.PlayerClasses.Data;
@@ -75,7 +75,7 @@ namespace TruckingSharp.Commands
 
                         var hash = PasswordHashingService.GetPasswordHash(e.InputText);
                         var newBankAccount = new PlayerBankAccount { Password = hash, PlayerId = sender.Account.Id };
-                        await new PlayerBankAccountRepository(ConnectionFactory.GetConnection).AddAsync(newBankAccount);
+                        await RepositoriesInstances.PlayerBankAccountRepository.AddAsync(newBankAccount);
 
                         sender.SendClientMessage(Color.GreenYellow, Messages.BankAccountCreatedSuccessfully);
                     };
@@ -116,8 +116,7 @@ namespace TruckingSharp.Commands
         [Command("changepassword", Shortcut = "changepassword")]
         public static void OnChangedPasswordCommand(Player sender)
         {
-            var oldPasswordDialog = new InputDialog("Enter your old password", "Enter your old password:", true, "Next",
-                "Close");
+            var oldPasswordDialog = new InputDialog("Enter your old password", "Enter your old password:", true, "Next", "Close");
             oldPasswordDialog.Show(sender);
             oldPasswordDialog.Response += (senderObject, ev) =>
             {
@@ -131,8 +130,7 @@ namespace TruckingSharp.Commands
                     return;
                 }
 
-                var newPasswordDialog = new InputDialog("Enter your new password", "Enter your new password:", true,
-                    "Next", "Close");
+                var newPasswordDialog = new InputDialog("Enter your new password", "Enter your new password:", true, "Next", "Close");
                 newPasswordDialog.Show(sender);
                 newPasswordDialog.Response += (objectSender, e) =>
                 {
@@ -163,7 +161,7 @@ namespace TruckingSharp.Commands
 
                         var account = sender.Account;
                         account.Password = PasswordHashingService.GetPasswordHash(e.InputText);
-                        await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(account);
+                        await RepositoriesInstances.AccountRepository.UpdateAsync(account);
 
                         sender.SendClientMessage(Color.GreenYellow, Messages.PasswordChangedSuccessfully);
                     };
@@ -394,10 +392,8 @@ namespace TruckingSharp.Commands
                 return;
             }
 
-            sender.SendClientMessage(Color.LightGoldenrodYellow, Messages.PrivateMessageTo, target.Name, target.Id,
-                message);
-            target.SendClientMessage(Color.LightGoldenrodYellow, Messages.PrivateMessageFrom, sender.Name, sender.Id,
-                message);
+            sender.SendClientMessage(Color.LightGoldenrodYellow, Messages.PrivateMessageTo, target.Name, target.Id, message);
+            target.SendClientMessage(Color.LightGoldenrodYellow, Messages.PrivateMessageFrom, sender.Name, sender.Id, message);
 
             target.PlaySound(1085, Vector3.Zero);
         }
@@ -450,8 +446,7 @@ namespace TruckingSharp.Commands
                     continue;
 
                 if (player.PlayerClass == sender.PlayerClass)
-                    player.SendClientMessage(Color.Gray,
-                        $"({className} chat) {{D0D0D0}}{sender.Name}: {{FFFFFF}}{message}");
+                    player.SendClientMessage(Color.Gray, $"({className} chat) {{D0D0D0}}{sender.Name}: {{FFFFFF}}{message}");
             }
         }
 
@@ -525,14 +520,16 @@ namespace TruckingSharp.Commands
             {
                 if (e.DialogButton != DialogButton.Left ||
                     sender.Account.RulesRead != 0)
+                {
                     return;
+                }
 
                 sender.Reward(5000);
 
                 var account = sender.Account;
                 account.RulesRead = 1;
 
-                await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(account);
+                await RepositoriesInstances.AccountRepository.UpdateAsync(account);
 
                 sender.SendClientMessage(Color.FromInteger(65280, ColorFormat.RGB),
                     "You have earned {FFFF00}$5000{00FF00} for accepting the rules");

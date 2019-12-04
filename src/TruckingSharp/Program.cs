@@ -1,6 +1,5 @@
 ﻿using SampSharp.Core;
 using Serilog;
-using TruckingSharp.Database;
 
 namespace TruckingSharp
 {
@@ -12,14 +11,12 @@ namespace TruckingSharp
                 .Use<GameMode>()
                 .Run();
 
-            DapperConnection.SetupConnectionString();
-
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.File("logs\\my_log.log", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
 
-            Configuration.LoadConfigurationFromFile();
+            Configuration.LoadConfigurationFromFileAsync();
         }
     }
 }

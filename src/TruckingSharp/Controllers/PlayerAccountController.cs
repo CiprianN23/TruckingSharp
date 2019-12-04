@@ -5,6 +5,7 @@ using SampSharp.GameMode.Display;
 using SampSharp.GameMode.SAMP;
 using System;
 using System.Threading.Tasks;
+using TruckingSharp.Database;
 using TruckingSharp.Database.Entities;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Events;
@@ -15,10 +16,9 @@ namespace TruckingSharp.Controllers
     [Controller]
     public class PlayerAccountController : IEventListener
     {
-        private PlayerAccountRepository _accountRepository =>
-            new PlayerAccountRepository(ConnectionFactory.GetConnection);
+        private static PlayerAccountRepository _accountRepository => RepositoriesInstances.AccountRepository;
 
-        private PlayerBanRepository _banRepository => new PlayerBanRepository(ConnectionFactory.GetConnection);
+        private PlayerBanRepository _banRepository => RepositoriesInstances.PlayerBanRepository;
 
         public void RegisterEvents(BaseMode gameMode)
         {
@@ -33,7 +33,7 @@ namespace TruckingSharp.Controllers
             if (!(sender is Player player))
                 return;
 
-            var playerBan = _banRepository.Find(player.Name);
+            var playerBan = await _banRepository.FindAsync(player.Name);
 
             if (playerBan != null)
             {

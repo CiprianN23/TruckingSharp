@@ -1,137 +1,119 @@
 ﻿using Dapper;
-using Dapper.Contrib.Extensions;
-using MySql.Data.MySqlClient;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TruckingSharp.Database.Entities;
-using TruckingSharp.Database.Repositories.Interfaces;
 
 namespace TruckingSharp.Database.Repositories
 {
-    public sealed class PlayerAccountRepository : IRepository<PlayerAccount>, IDisposable
+    public sealed class PlayerAccountRepository
     {
-        private readonly MySqlConnection _connection;
-        private bool _isDisposed;
+        private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
 
-        public PlayerAccountRepository(MySqlConnection connection)
-        {
-            _connection = connection;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (!_isDisposed && disposing)
-            {
-                // Dispose other resources here
-            }
-
-            _connection.Dispose();
-            _isDisposed = true;
-        }
-
-        ~PlayerAccountRepository()
-        {
-            Dispose(false);
-        }
-
-        #region Sync
-
-        public long Add(PlayerAccount entity)
-        {
-            try
-            {
-                return _connection.Insert(entity);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"Failed to insert player account with name: {entity.Name}.");
-                throw;
-            }
-        }
-
-        public bool Delete(PlayerAccount entity)
-        {
-            try
-            {
-                return _connection.Delete(entity);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"Failed to delete player account with name: {entity.Name}.");
-                throw;
-            }
-        }
-
-        public IEnumerable<PlayerAccount> GetAll()
-        {
-            try
-            {
-                return _connection.GetAll<PlayerAccount>();
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Failed to get all player accounts from database.");
-                throw;
-            }
-        }
-
-        public PlayerAccount Find(int id)
-        {
-            try
-            {
-                return _connection.Get<PlayerAccount>(id);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"Failed to find player account with id: {id}.");
-                throw;
-            }
-        }
+        public PlayerAccountRepository(IDatabaseConnectionFactory databaseConnectionFactory) => _databaseConnectionFactory = databaseConnectionFactory;
 
         public PlayerAccount Find(string name)
         {
             try
             {
-                return _connection.QueryFirstOrDefault<PlayerAccount>("SELECT * FROM accounts WHERE Name = @Name;",
-                    new { Name = name });
+                const string command = "SELECT * FROM playeraccounts WHERE name = @Name;";
+
+                using (var sqlConnection = _databaseConnectionFactory.CreateConnection())
+                {
+                    return sqlConnection.QueryFirstOrDefault<PlayerAccount>(command, new { Name = name });
+                }
             }
             catch (Exception ex)
             {
-                Log.Error(ex, $"Failed to find player account with name: {name}.");
+                Log.Error(ex, $"Failed to fetch player account with name: {name}.");
                 throw;
             }
         }
-
-        public bool Update(PlayerAccount entity)
-        {
-            try
-            {
-                return _connection.Update(entity);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"Failed to update player account with name: {entity.Name}.");
-                throw;
-            }
-        }
-
-        #endregion Sync
 
         #region Async
 
-        public async Task<bool> UpdateAsync(PlayerAccount entity)
+        public async Task<PlayerAccount> FindAsync(int id)
         {
             try
             {
-                return await _connection.UpdateAsync(entity);
+                const string command = "SELECT * FROM playeraccounts WHERE id = @Id;";
+
+                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                {
+                    return await sqlConnection.QueryFirstOrDefaultAsync(command, new
+                    {
+                        Id = id
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Failed to fetch async player account with id: {id}.");
+                throw;
+            }
+        }
+
+        public async Task<PlayerAccount> FindAsync(string name)
+        {
+            try
+            {
+                const string command = "SELECT * FROM playeraccounts WHERE name = @Name;";
+
+                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                {
+                    return await sqlConnection.QueryFirstOrDefaultAsync(command, new { Name = name });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Failed to fetch async player account with name: {name}.");
+                throw;
+            }
+        }
+
+        public async Task<int> UpdateAsync(PlayerAccount entity)
+        {
+            try
+            {
+                const string command = "UPDATE playeraccounts " +
+                    "SET name = @Name, password = @Password, money = @Money, score = @Score, admin_level = @AdminLevel, rules_read = @RulesRead, muted = @Muted, jailed = @Jailed," +
+                    " wanted = @Wanted, bans = @Bans, trucker_license = @TruckerLicense, bus_license = @BusLicense, meters_driven = @MetersDriven, trucker_jobs = @TruckerJobs," +
+                    " convoy_jobs = @ConvoyJobs, busdriver_jobs = @BusDriverJobs," +
+                    " pilot_jobs = @PilotJobs, mafia_jobs = @MafiaJobs, mafia_stolen = @MafiaStolen, police_fined = @PoliceFined, police_jailed = @PoliceJailed, assistance_jobs = @AssistanceJobs," +
+                    " courier_jobs = @CourierJobs, roadworker_jobs = @RoadWorkerJobs WHERE id = @Id;";
+
+                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                {
+                    return await sqlConnection.ExecuteAsync(command, new
+                    {
+                        entity.Name,
+                        entity.Password,
+                        entity.Money,
+                        entity.Score,
+                        entity.AdminLevel,
+                        entity.RulesRead,
+                        entity.Muted,
+                        entity.Jailed,
+                        entity.Wanted,
+                        entity.Bans,
+                        entity.TruckerLicense,
+                        entity.BusLicense,
+                        entity.MetersDriven,
+                        entity.TruckerJobs,
+                        entity.ConvoyJobs,
+                        entity.BusDriverJobs,
+                        entity.PilotJobs,
+                        entity.MafiaJobs,
+                        entity.MafiaStolen,
+                        entity.PoliceFined,
+                        entity.PoliceJailed,
+                        entity.AssistanceJobs,
+                        entity.CourierJobs,
+                        entity.RoadWorkerJobs,
+                        entity.Id
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -144,11 +126,16 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                return await _connection.GetAllAsync<PlayerAccount>();
+                const string command = "SELECT * FROM playeraccounts;";
+
+                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                {
+                    return await sqlConnection.QueryAsync<PlayerAccount>(command);
+                }
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Failed to get all player accounts from database async.");
+                Log.Error(ex, "Failed to fetch all player accounts from database async.");
                 throw;
             }
         }
@@ -157,7 +144,16 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                return await _connection.InsertAsync(entity);
+                const string command = "INSERT INTO playeraccounts (name, password) VALUES (@Name, @Password);";
+
+                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                {
+                    return await sqlConnection.ExecuteAsync(command, new
+                    {
+                        entity.Name,
+                        entity.Password
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -166,11 +162,19 @@ namespace TruckingSharp.Database.Repositories
             }
         }
 
-        public async Task<bool> DeleteAsync(PlayerAccount entity)
+        public async Task<int> DeleteAsync(PlayerAccount entity)
         {
             try
             {
-                return await _connection.DeleteAsync(entity);
+                const string command = "DELETE FROM playeraccounts WHERE id = @Id;";
+
+                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                {
+                    return await sqlConnection.ExecuteAsync(command, new
+                    {
+                        entity.Id
+                    });
+                }
             }
             catch (Exception ex)
             {

@@ -1,116 +1,35 @@
 ﻿using Dapper;
-using Dapper.Contrib.Extensions;
-using MySql.Data.MySqlClient;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TruckingSharp.Database.Entities;
-using TruckingSharp.Database.Repositories.Interfaces;
 
 namespace TruckingSharp.Database.Repositories
 {
-    public sealed class PlayerBankAccountRepository : IRepository<PlayerBankAccount>, IDisposable
+    public sealed class PlayerBankAccountRepository
     {
-        private readonly MySqlConnection _connection;
-        private bool _isDisposed;
+        private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
 
-        public PlayerBankAccountRepository(MySqlConnection connection)
-        {
-            _connection = connection;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (!_isDisposed && disposing)
-            {
-                // Dispose other resources here
-            }
-
-            _connection.Dispose();
-            _isDisposed = true;
-        }
-
-        ~PlayerBankAccountRepository()
-        {
-            Dispose(false);
-        }
-
-        #region Sync
-
-        public IEnumerable<PlayerBankAccount> GetAll()
-        {
-            try
-            {
-                return _connection.GetAll<PlayerBankAccount>();
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Failed to get all player bank accounts from database.");
-                throw;
-            }
-        }
+        public PlayerBankAccountRepository(IDatabaseConnectionFactory databaseConnectionFactory) => _databaseConnectionFactory = databaseConnectionFactory;
 
         public PlayerBankAccount Find(int id)
         {
             try
             {
-                return _connection.QueryFirstOrDefault<PlayerBankAccount>(
-                    "SELECT * FROM bankaccounts WHERE PlayerId = @Id;", new { Id = id });
+                const string command = "SELECT * FROM playerbankaccounts WHERE player_id = @Id;";
+
+                using (var sqlConnection = _databaseConnectionFactory.CreateConnection())
+                {
+                    return sqlConnection.QueryFirstOrDefault<PlayerBankAccount>(command, new { Id = id });
+                }
             }
             catch (Exception ex)
             {
-                Log.Error(ex, $"Failed to get player bank account with id: {id}.");
+                Log.Error(ex, $"Failed to fwtch player bank account with id: {id}.");
                 throw;
             }
         }
-
-        public long Add(PlayerBankAccount entity)
-        {
-            try
-            {
-                return _connection.Insert(entity);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"Failed to insert player bank account with player id: {entity.PlayerId}.");
-                throw;
-            }
-        }
-
-        public bool Update(PlayerBankAccount entity)
-        {
-            try
-            {
-                return _connection.Update(entity);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"Failed to update player bank account with player id: {entity.PlayerId}.");
-                throw;
-            }
-        }
-
-        public bool Delete(PlayerBankAccount entity)
-        {
-            try
-            {
-                return _connection.Delete(entity);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"Failed to delete player bank account with player id: {entity.PlayerId}.");
-                throw;
-            }
-        }
-
-        #endregion Sync
 
         #region Async
 
@@ -118,11 +37,16 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                return await _connection.GetAllAsync<PlayerBankAccount>();
+                const string command = "SELECT * FROM playerbankaccounts;";
+
+                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                {
+                    return await sqlConnection.QueryAsync<PlayerBankAccount>(command);
+                }
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Failed to get all player bank accounts async.");
+                Log.Error(ex, "Failed to fetch all player bank accounts async.");
                 throw;
             }
         }
@@ -131,7 +55,16 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                return await _connection.InsertAsync(entity);
+                const string command = "INSERT INTO playerbankaccounts (password, player_id) VALUES (@Password, @PlayerId);";
+
+                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                {
+                    return await sqlConnection.ExecuteAsync(command, new
+                    {
+                        entity.Password,
+                        entity.PlayerId
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -140,11 +73,22 @@ namespace TruckingSharp.Database.Repositories
             }
         }
 
-        public async Task<bool> UpdateAsync(PlayerBankAccount entity)
+        public async Task<int> UpdateAsync(PlayerBankAccount entity)
         {
             try
             {
-                return await _connection.UpdateAsync(entity);
+                const string command = "UPDATE playerbankaccounts SET password = @Password, money = @Money, player_id = @PlayerId WHERE id = @Id;";
+
+                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                {
+                    return await sqlConnection.ExecuteAsync(command, new
+                    {
+                        entity.Password,
+                        entity.Money,
+                        entity.PlayerId,
+                        entity.Id
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -153,15 +97,44 @@ namespace TruckingSharp.Database.Repositories
             }
         }
 
-        public async Task<bool> DeleteAsync(PlayerBankAccount entity)
+        public async Task<int> DeleteAsync(PlayerBankAccount entity)
         {
             try
             {
-                return await _connection.DeleteAsync(entity);
+                const string command = "DELETE FROM playerbankaccounts WHERE id = @Id;";
+
+                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                {
+                    return await sqlConnection.ExecuteAsync(command, new
+                    {
+                        entity.Id
+                    });
+                }
             }
             catch (Exception ex)
             {
                 Log.Error(ex, $"Failed to delete async player bank account with player id: {entity.PlayerId}.");
+                throw;
+            }
+        }
+
+        public async Task<PlayerBankAccount> FindAsync(int id)
+        {
+            try
+            {
+                const string command = "SELECT * FROM playerbankaccounts WHERE player_id = @Id;";
+
+                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                {
+                    return await sqlConnection.QueryFirstOrDefaultAsync(command, new
+                    {
+                        Id = id
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Failed to fetch async player bank account with player id: {id}.");
                 throw;
             }
         }

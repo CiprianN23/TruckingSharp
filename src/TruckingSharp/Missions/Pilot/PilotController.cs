@@ -5,6 +5,7 @@ using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.World;
 using System;
 using TruckingSharp.Constants;
+using TruckingSharp.Database;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Extensions.PlayersExtensions;
 using TruckingSharp.Missions.Data;
@@ -14,7 +15,7 @@ namespace TruckingSharp.Missions.Pilot
     [Controller]
     public class PilotController : IEventListener
     {
-        private PlayerAccountRepository AccountRepository => new PlayerAccountRepository(ConnectionFactory.GetConnection);
+        private PlayerAccountRepository AccountRepository => RepositoriesInstances.AccountRepository;
 
         public static void EndMission(Player player)
         {

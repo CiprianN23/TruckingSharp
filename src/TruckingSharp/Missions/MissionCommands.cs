@@ -136,7 +136,11 @@ namespace TruckingSharp.Missions
                 return;
             }
 
-            if (sender.IsInConvoy) MissionConvoy.PlayerLeaveConvoy(sender);
+            if (sender.PlayerClass == PlayerClassType.Police)
+                return;
+
+            if (sender.IsInConvoy) 
+                MissionConvoy.PlayerLeaveConvoy(sender);
 
             if (sender.MissionStep == 1)
             {

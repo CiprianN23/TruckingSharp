@@ -9,8 +9,8 @@ using System;
 using System.Threading.Tasks;
 using TruckingSharp.Constants;
 using TruckingSharp.Data;
+using TruckingSharp.Database;
 using TruckingSharp.Database.Entities;
-using TruckingSharp.Database.Repositories;
 using TruckingSharp.Missions.BusDriver;
 using TruckingSharp.Missions.Convoy;
 using TruckingSharp.Missions.Data;
@@ -23,13 +23,9 @@ namespace TruckingSharp
     {
         public PlayerClassType PlayerClass;
 
-        private static PlayerAccountRepository AccountRepository =>
-            new PlayerAccountRepository(ConnectionFactory.GetConnection);
+        public PlayerAccount Account => RepositoriesInstances.AccountRepository.Find(Name);
 
-        public PlayerAccount Account => AccountRepository.Find(Name);
-
-        public PlayerBankAccount BankAccount =>
-            new PlayerBankAccountRepository(ConnectionFactory.GetConnection).Find(Account.Id);
+        public PlayerBankAccount BankAccount => RepositoriesInstances.PlayerBankAccountRepository.Find(Account.Id);
 
         public bool IsLoggedIn { get; set; }
         public bool IsLoggedInBankAccount { get; set; }
@@ -66,46 +62,60 @@ namespace TruckingSharp
         public Timer SpeedometerTimer { get; set; }
         public int Speed { get; set; }
         public int TimeSincePlayerCaughtSpeedingInSeconds { get; set; }
+        public Timer PolicePlayersCheckTimer { get; set; }
+        public Timer TimerUntilPoliceCanJail { get; set; }
+        public Timer JailingTimer { get; set; }
+        public bool IsWarnedByPolice { get; set; }
+        public int SecondsUntilPoliceCanJail { get; set; }
+        public bool CanPoliceJail { get; set; }
 
         public bool CheckIfPlayerCanJoinPolice()
         {
-            if (Configuration.Instance.PlayersBeforePolice <= 0)
-                return false;
-
             var normalPlayers = 0;
             var policePlayers = 0;
-            foreach (var basePlayer in All)
+            bool canSpawnAsCop;
+
+            if (Configuration.Instance.PlayersBeforePolice > 0)
             {
-                var player = (Player)basePlayer;
-
-                if (player == this)
-                    continue;
-
-                if (player.Interior == 14)
-                    continue;
-
-                if (!IsLoggedIn)
-                    continue;
-
-                switch (player.PlayerClass)
+                foreach (var basePlayer in All)
                 {
-                    case PlayerClassType.Police:
-                        policePlayers++;
-                        break;
+                    var player = (Player)basePlayer;
 
-                    default:
-                        normalPlayers++;
-                        break;
+                    if (player == this)
+                        continue;
+
+                    if (player.Interior == 14)
+                        continue;
+
+                    if (!IsLoggedIn)
+                        continue;
+
+                    switch (player.PlayerClass)
+                    {
+                        case PlayerClassType.Police:
+                            policePlayers++;
+                            break;
+
+                        default:
+                            normalPlayers++;
+                            break;
+                    }
+                }
+
+                if (policePlayers < (normalPlayers / Configuration.Instance.PlayersBeforePolice))
+                    canSpawnAsCop = true; // There are less police players than allowed, so the player can choose this class
+                else
+                    canSpawnAsCop = false;
+
+                if (!canSpawnAsCop)
+                {
+                    GameText("Maximum amount of cops already reached", 5000, 4);
+                    SendClientMessage(Color.Red, "The maximum amount of cops has been reached already, please select another class");
+                    return false;
                 }
             }
 
-            var canSpawnAsCop = policePlayers < normalPlayers / Configuration.Instance.PlayersBeforePolice;
-            if (canSpawnAsCop) return true;
-            GameText("Maximum amount of cops already reached", 5000, 4);
-            SendClientMessage(Color.Red,
-                "The maximum amount of cops has been reached already, please select another class");
-
-            return false;
+            return true;
         }
 
         public async void Reward(int money, int score = 0)
@@ -118,7 +128,7 @@ namespace TruckingSharp
             Money = account.Money;
             Score = account.Score;
 
-            await AccountRepository.UpdateAsync(account).ConfigureAwait(false);
+            await RepositoriesInstances.AccountRepository.UpdateAsync(account).ConfigureAwait(false);
         }
 
         public async void SetWantedLevel(int wantedLevel)
@@ -126,7 +136,7 @@ namespace TruckingSharp
             var account = Account;
             account.Wanted = wantedLevel;
             WantedLevel = wantedLevel;
-            await AccountRepository.UpdateAsync(account).ConfigureAwait(false);
+            await RepositoriesInstances.AccountRepository.UpdateAsync(account).ConfigureAwait(false);
         }
 
         public override void OnClickPlayer(ClickPlayerEventArgs e)
@@ -143,13 +153,6 @@ namespace TruckingSharp
             SendClientMessageToAll(Color.LightGray, Messages.PlayerJoinedTheServer, Name, Id);
 
             base.OnConnected(e);
-        }
-
-        public override void OnDeath(DeathEventArgs e)
-        {
-            base.OnDeath(e);
-
-            // TODO: Wanted for killer
         }
 
         public override void OnDisconnected(DisconnectEventArgs e)
@@ -194,12 +197,9 @@ namespace TruckingSharp
 
         public override void OnSpawned(SpawnEventArgs e)
         {
-            base.OnSpawned(e);
-
             VirtualWorld = 0;
             Interior = 0;
             ToggleClock(false);
-            ResetWeapons();
 
             if (Account.RulesRead == 0)
                 SendClientMessage(Color.Red, Messages.RulesNotYetAccepted);
@@ -212,7 +212,7 @@ namespace TruckingSharp
             SpectatePosition = Vector3.Zero;
             IsSpectating = false;
 
-            // TODO Send player to jail
+            base.OnSpawned(e);
         }
 
         public override void OnStateChanged(StateEventArgs e)
@@ -222,14 +222,13 @@ namespace TruckingSharp
             if (e.NewState != PlayerState.Driving)
                 return;
 
-            if (PlayerClass != PlayerClassType.Police)
-                if (MissionVehicles.PoliceJobVehicles.Contains(Vehicle))
-                {
-                    RemoveFromVehicle();
-                    Vehicle.Engine = false;
-                    Vehicle.Lights = false;
-                    SendClientMessage(Color.Red, "You can't use police vehicles.");
-                }
+            if (PlayerClass != PlayerClassType.Police && MissionVehicles.PoliceJobVehicles.Contains(Vehicle))
+            {
+                RemoveFromVehicle();
+                Vehicle.Engine = false;
+                Vehicle.Lights = false;
+                SendClientMessage(Color.Red, "You can't use police vehicles.");
+            }
 
             if (PlayerClass == PlayerClassType.Pilot)
                 return;
@@ -275,6 +274,7 @@ namespace TruckingSharp
             SpeedometerTimer?.Dispose();
             SpectateTimer?.Dispose();
             MissionLoadingTimer?.Dispose();
+            PolicePlayersCheckTimer?.Dispose();
 
             base.Dispose(disposing);
         }

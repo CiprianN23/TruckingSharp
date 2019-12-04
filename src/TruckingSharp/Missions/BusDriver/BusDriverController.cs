@@ -6,6 +6,7 @@ using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.World;
 using System;
 using TruckingSharp.Constants;
+using TruckingSharp.Database;
 using TruckingSharp.Database.Repositories;
 
 namespace TruckingSharp.Missions.BusDriver
@@ -13,8 +14,7 @@ namespace TruckingSharp.Missions.BusDriver
     [Controller]
     public class BusDriverController : IEventListener
     {
-        private static PlayerAccountRepository AccountRepository =>
-            new PlayerAccountRepository(ConnectionFactory.GetConnection);
+        private static PlayerAccountRepository AccountRepository => RepositoriesInstances.AccountRepository;
 
         public void RegisterEvents(BaseMode gameMode)
         {

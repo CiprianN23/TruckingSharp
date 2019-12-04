@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
 using TruckingSharp.Data;
+using TruckingSharp.Database;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Extensions.PlayersExtensions;
 
@@ -333,7 +334,7 @@ namespace TruckingSharp.Commands.AdminCommands
             var account = target.Account;
             account.Muted = currentTime.AddMinutes(duration);
 
-            await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(account);
+            await RepositoriesInstances.AccountRepository.UpdateAsync(account);
 
             target.SendClientMessage(Color.Red,
                 $"You have been muted by {{FFFF00}}{sender.Name} {{FF0000}}for {{FFFF00}}{reason}");
@@ -366,7 +367,7 @@ namespace TruckingSharp.Commands.AdminCommands
             var account = target.Account;
             account.Muted = DateTime.Now;
 
-            await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(account);
+            await RepositoriesInstances.AccountRepository.UpdateAsync(account);
 
             target.SendClientMessage(Color.GreenYellow, $"You have been un-muted by {{FFFF00}}{sender.Name}");
 

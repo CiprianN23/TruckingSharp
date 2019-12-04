@@ -1,16 +1,13 @@
-﻿using Dapper.Contrib.Extensions;
-using System;
+﻿using System;
 
 namespace TruckingSharp.Database.Entities
 {
-    [Table("accounts")]
     public class PlayerAccount
     {
-        [Key] public int Id { get; set; }
+        public int Id { get; set; }
 
         public string Name { get; set; }
         public string Password { get; set; }
-        public int Level { get; set; }
         public int Money { get; set; }
         public int Score { get; set; }
         public byte AdminLevel { get; set; }
@@ -19,7 +16,6 @@ namespace TruckingSharp.Database.Entities
         public int Jailed { get; set; }
         public int Wanted { get; set; }
         public int Bans { get; set; }
-        public DateTime BanTime { get; set; }
         public byte TruckerLicense { get; set; }
         public byte BusLicense { get; set; }
         public float MetersDriven { get; set; }

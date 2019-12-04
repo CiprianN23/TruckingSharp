@@ -10,6 +10,7 @@ using TruckingSharp.Missions.BusDriver;
 using TruckingSharp.Missions.Convoy;
 using TruckingSharp.Missions.Data;
 using TruckingSharp.Missions.Pilot;
+using TruckingSharp.Missions.Police;
 using TruckingSharp.Missions.Trucker;
 using TruckingSharp.PlayerClasses.Data;
 
@@ -43,6 +44,9 @@ namespace TruckingSharp.Missions
                     break;
                 case PlayerClassType.Pilot:
                     PilotController.EndMission(player);
+                    break;
+                case PlayerClassType.Police:
+                    PoliceController.EndMission(player);
                     break;
             }
         }
@@ -102,7 +106,7 @@ namespace TruckingSharp.Missions
 
         private void Mission_GamemodeExited(object sender, EventArgs e)
         {
-            _missionTimer.Dispose();
+            _missionTimer?.Dispose();
         }
 
         private void Mission_GamemodeInitialized(object sender, EventArgs e)

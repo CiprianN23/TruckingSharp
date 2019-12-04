@@ -3,16 +3,17 @@ using SampSharp.GameMode.Controllers;
 using SampSharp.GameMode.SAMP;
 using System;
 using System.Linq;
+using TruckingSharp.Database;
 using TruckingSharp.Database.Entities;
 using TruckingSharp.Database.Repositories;
+using TruckingSharp.Missions.Police;
 
 namespace TruckingSharp.World
 {
     [Controller]
     public class SpeedCameraController : IEventListener
     {
-        private static SpeedCameraRepository SpeedCameraRepository =>
-            new SpeedCameraRepository(ConnectionFactory.GetConnection);
+        private static SpeedCameraRepository SpeedCameraRepository => RepositoriesInstances.SpeedCameraRepository;
 
         public void RegisterEvents(BaseMode gameMode)
         {
@@ -63,7 +64,7 @@ namespace TruckingSharp.World
             if (SpeedCameraData.SpeedCameras[camId] == null)
                 return;
 
-            var databaseSpeedCamera = SpeedCameraRepository.Find(camId);
+            var databaseSpeedCamera = await SpeedCameraRepository.FindAsync(camId);
             await SpeedCameraRepository.DeleteAsync(databaseSpeedCamera);
 
             SpeedCameraData.SpeedCameras[camId].CameraObject.Dispose();
@@ -95,7 +96,7 @@ namespace TruckingSharp.World
                 player.SetWantedLevel(player.Account.Wanted + 1);
                 player.SendClientMessage(Color.Red, "You've been caught by a speedtrap, slow down!");
 
-                // TODO: Inform police
+                PoliceController.SendMessage(Color.GreenYellow, $"Player {{FFFF00}}{player.Name}{{00FF00}} is caught speeding, pursue and fine him.");
             }
         }
     }

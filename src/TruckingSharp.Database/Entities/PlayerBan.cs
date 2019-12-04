@@ -1,11 +1,10 @@
-﻿using Dapper.Contrib.Extensions;
-using System;
+﻿using System;
 
 namespace TruckingSharp.Database.Entities
 {
     public class PlayerBan
     {
-        [Key] public int Id { get; set; }
+        public int Id { get; set; }
 
         public string Reason { get; set; }
         public DateTime Duration { get; set; }

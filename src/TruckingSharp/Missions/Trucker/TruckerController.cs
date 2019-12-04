@@ -8,9 +8,11 @@ using SampSharp.GameMode.World;
 using System;
 using System.Collections.Generic;
 using TruckingSharp.Constants;
+using TruckingSharp.Database;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Missions.Bonus;
 using TruckingSharp.Missions.Data;
+using TruckingSharp.Missions.Police;
 using TruckingSharp.PlayerClasses.Data;
 
 namespace TruckingSharp.Missions.Trucker
@@ -18,8 +20,7 @@ namespace TruckingSharp.Missions.Trucker
     [Controller]
     public class TruckerController : IEventListener
     {
-        private static PlayerAccountRepository AccountRepository =>
-            new PlayerAccountRepository(ConnectionFactory.GetConnection);
+        private static PlayerAccountRepository AccountRepository => RepositoriesInstances.AccountRepository;
 
         public void RegisterEvents(BaseMode gameMode)
         {
@@ -286,7 +287,9 @@ namespace TruckingSharp.Missions.Trucker
 
             if (playerTrailerModel != VehicleModelType.ArticleTrailer &&
                 playerTrailerModel != VehicleModelType.ArticleTrailer2)
+            {
                 return;
+            }
 
             var random = new Random();
             var chance = random.Next(100);
@@ -297,7 +300,7 @@ namespace TruckingSharp.Missions.Trucker
             player.IsOverloaded = true;
             player.SetWantedLevel(player.Account.Wanted + 2);
 
-            // TODO: Inform police about it
+            PoliceController.SendMessage(Color.GreenYellow ,$"Trucker {{FFFF00}}{player.Name}{{00FF00}} is overloaded, pursue and fine him.");
         }
 
         private void Trucker_PlayerEnterCheckpoint(object sender, EventArgs e)

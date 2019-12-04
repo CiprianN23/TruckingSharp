@@ -1,117 +1,17 @@
 ﻿using Dapper;
-using Dapper.Contrib.Extensions;
-using MySql.Data.MySqlClient;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TruckingSharp.Database.Entities;
-using TruckingSharp.Database.Repositories.Interfaces;
 
 namespace TruckingSharp.Database.Repositories
 {
-    public sealed class SpeedCameraRepository : IRepository<SpeedCamera>, IDisposable
+    public sealed class SpeedCameraRepository
     {
-        private readonly MySqlConnection _connection;
-        private bool _isDisposed;
+        private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
 
-        public SpeedCameraRepository(MySqlConnection connection)
-        {
-            _connection = connection;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (!_isDisposed && disposing)
-            {
-                // Dispose other resources here
-            }
-
-            _connection.Dispose();
-            _isDisposed = true;
-        }
-
-        ~SpeedCameraRepository()
-        {
-            Dispose(false);
-        }
-
-        #region Sync
-
-        public long Add(SpeedCamera entity)
-        {
-            try
-            {
-                return _connection.Execute(
-                    "INSERT INTO speedcameras (Id, Speed, PositionX, PositionY, PositionZ, Angle) VALUES (@Id, @Speed, @PositionX, @PositionY, @PositionZ, @Angle)",
-                    entity);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"Failed to insert speed camera with id: {entity.Id}.");
-                throw;
-            }
-        }
-
-        public bool Delete(SpeedCamera entity)
-        {
-            try
-            {
-                return _connection.Delete(entity);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"Failed to delete speed camera with id: {entity.Id}.");
-                throw;
-            }
-        }
-
-        public SpeedCamera Find(int id)
-        {
-            try
-            {
-                return _connection.Get<SpeedCamera>(id);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"Failed to find speed camera with id: {id}.");
-                throw;
-            }
-        }
-
-        public IEnumerable<SpeedCamera> GetAll()
-        {
-            try
-            {
-                return _connection.GetAll<SpeedCamera>();
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Failed to get all speed cameras.");
-                throw;
-            }
-        }
-
-        public bool Update(SpeedCamera entity)
-        {
-            try
-            {
-                return _connection.Update(entity);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"Failed to update speed camera with id: {entity.Id}.");
-                throw;
-            }
-        }
-
-        #endregion Sync
+        public SpeedCameraRepository(IDatabaseConnectionFactory databaseConnectionFactory) => _databaseConnectionFactory = databaseConnectionFactory;
 
         #region Async
 
@@ -119,9 +19,20 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                return await _connection.ExecuteAsync(
-                    "INSERT INTO speedcameras (Id, Speed, PositionX, PositionY, PositionZ, Angle) VALUES (@Id, @Speed, @PositionX, @PositionY, @PositionZ, @Angle)",
-                    entity);
+                const string command = "INSERT INTO speedcameras (id, position_x, position_y, position_z, angle, speed) VALUES (@Id, @PositionX, @PositionY, @PositionZ, @Angle, @Speed);";
+
+                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                {
+                    return await sqlConnection.ExecuteAsync(command, new
+                    {
+                        entity.Id,
+                        entity.PositionX,
+                        entity.PositionY,
+                        entity.PositionZ,
+                        entity.Angle,
+                        entity.Speed
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -130,11 +41,19 @@ namespace TruckingSharp.Database.Repositories
             }
         }
 
-        public async Task<bool> DeleteAsync(SpeedCamera entity)
+        public async Task<int> DeleteAsync(SpeedCamera entity)
         {
             try
             {
-                return await _connection.DeleteAsync(entity);
+                const string command = "DELETE FROM speedcameras WHERE id = @Id;";
+
+                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                {
+                    return await sqlConnection.ExecuteAsync(command, new
+                    {
+                        entity.Id
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -143,24 +62,64 @@ namespace TruckingSharp.Database.Repositories
             }
         }
 
-        public async Task<IEnumerable<SpeedCamera>> GetAllAsync()
+        public async Task<SpeedCamera> FindAsync(int id)
         {
             try
             {
-                return await _connection.GetAllAsync<SpeedCamera>();
+                const string command = "SELECT * FROM speedcameras WHERE id = @Id;";
+
+                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                {
+                    return await sqlConnection.QueryFirstOrDefaultAsync<SpeedCamera>(command, new
+                    {
+                        Id = id
+                    });
+                }
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Failed to get all speed cameras async.");
+                Log.Error(ex, $"Failed to fetch async speed camera with id: {id}.");
                 throw;
             }
         }
 
-        public async Task<bool> UpdateAsync(SpeedCamera entity)
+        public async Task<IEnumerable<SpeedCamera>> GetAllAsync()
         {
             try
             {
-                return await _connection.UpdateAsync(entity);
+                const string command = "SELECT * FROM speedcameras;";
+
+                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                {
+                    return await sqlConnection.QueryAsync<SpeedCamera>(command);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to fetch all speed cameras async.");
+                throw;
+            }
+        }
+
+        public async Task<int> UpdateAsync(SpeedCamera entity)
+        {
+            try
+            {
+                const string command = "UPDATE speedcameras SET id = @Id, position_x = @PositionX, position_y = @PositionY, position_z = @PositionZ, angle = @Angle, speed = @Speed WHERE id = @Id1;";
+
+                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                {
+                    return await sqlConnection.ExecuteAsync(command, new
+                    {
+                        entity.Id,
+                        entity.PositionX,
+                        entity.PositionY,
+                        entity.PositionZ,
+                        entity.Angle,
+                        entity.Speed,
+                        Id1 = entity.Id
+                    });
+                }
             }
             catch (Exception ex)
             {

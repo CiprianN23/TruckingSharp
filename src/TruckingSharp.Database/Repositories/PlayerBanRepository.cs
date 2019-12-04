@@ -1,133 +1,17 @@
 ﻿using Dapper;
-using Dapper.Contrib.Extensions;
-using MySql.Data.MySqlClient;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using TruckingSharp.Database.Entities;
-using TruckingSharp.Database.Repositories.Interfaces;
 
 namespace TruckingSharp.Database.Repositories
 {
-    public sealed class PlayerBanRepository : IRepository<PlayerBan>, IDisposable
+    public sealed class PlayerBanRepository
     {
-        private readonly MySqlConnection _connection;
-        private bool _isDisposed;
+        private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
 
-        public PlayerBanRepository(MySqlConnection connection)
-        {
-            _connection = connection;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (!_isDisposed && disposing)
-            {
-                // Dispose other resources here
-            }
-
-            _connection.Dispose();
-            _isDisposed = true;
-        }
-
-        ~PlayerBanRepository()
-        {
-            Dispose(false);
-        }
-
-        #region Sync
-
-        public long Add(PlayerBan entity)
-        {
-            try
-            {
-                return _connection.Insert(entity);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"Failed to insert player ban with owner id: {entity.OwnerId}.");
-                throw;
-            }
-        }
-
-        public bool Delete(PlayerBan entity)
-        {
-            try
-            {
-                return _connection.Delete(entity);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"Failed to delete player ban with owner id: {entity.OwnerId}.");
-                throw;
-            }
-        }
-
-        public PlayerBan Find(int ownerId)
-        {
-            try
-            {
-                return _connection.QueryFirstOrDefault("SELECT * FROM playerbans WHERE OwnerId = @Id",
-                    new { Id = ownerId });
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"Failed to find player ban with owner id: {ownerId}.");
-                throw;
-            }
-        }
-
-        public PlayerBan Find(string ownerName)
-        {
-            try
-            {
-                return _connection
-                    .Query<PlayerBan>(
-                        "SELECT playerbans.* FROM playerbans LEFT JOIN accounts ON playerbans.OwnerId = accounts.Id WHERE accounts.Name = @Name",
-                        new { Name = ownerName }).FirstOrDefault();
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"Failed to find player ban with owner name: {ownerName}.");
-                throw;
-            }
-        }
-
-        public IEnumerable<PlayerBan> GetAll()
-        {
-            try
-            {
-                return _connection.GetAll<PlayerBan>();
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Failed to get all player bans.");
-                throw;
-            }
-        }
-
-        public bool Update(PlayerBan entity)
-        {
-            try
-            {
-                return _connection.Update(entity);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"Failed to to update player ban with owner id: {entity.OwnerId}.");
-                throw;
-            }
-        }
-
-        #endregion Sync
+        public PlayerBanRepository(IDatabaseConnectionFactory databaseConnectionFactory) => _databaseConnectionFactory = databaseConnectionFactory;
 
         #region Async
 
@@ -135,7 +19,18 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                return await _connection.InsertAsync(entity);
+                const string command = "INSERT INTO playerbans (reason, duration, admin_id, owner_id) VALUES (@Reason, @Duration, @AdminId, @OwnerId);";
+
+                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                {
+                    return await sqlConnection.ExecuteAsync(command, new
+                    {
+                        entity.Reason,
+                        entity.Duration,
+                        entity.AdminId,
+                        entity.OwnerId
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -144,11 +39,19 @@ namespace TruckingSharp.Database.Repositories
             }
         }
 
-        public async Task<bool> DeleteAsync(PlayerBan entity)
+        public async Task<int> DeleteAsync(PlayerBan entity)
         {
             try
             {
-                return await _connection.DeleteAsync(entity);
+                const string command = "DELETE FROM playerbans WHERE id = @Id;";
+
+                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                {
+                    return await sqlConnection.ExecuteAsync(command, new
+                    {
+                        entity.Id
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -157,24 +60,83 @@ namespace TruckingSharp.Database.Repositories
             }
         }
 
-        public async Task<IEnumerable<PlayerBan>> GetAllAsync()
+        public async Task<PlayerBan> FindAsync(int id)
         {
             try
             {
-                return await _connection.GetAllAsync<PlayerBan>();
+                const string command = "SELECT * FROM playerbans WHERE owner_id = @Id;";
+
+                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                {
+                    return await sqlConnection.QueryFirstOrDefaultAsync<PlayerBan>(command, new
+                    {
+                        Id = id
+                    });
+                }
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Failed to get all players bans async.");
+                Log.Error(ex, $"Failed to to fetch async player ban with owner id: {id}.");
                 throw;
             }
         }
 
-        public async Task<bool> UpdateAsync(PlayerBan entity)
+        public async Task<PlayerBan> FindAsync(string name)
         {
             try
             {
-                return await _connection.UpdateAsync(entity);
+                const string command = "SELECT playerbans.* FROM playerbans LEFT JOIN playeraccounts ON playerbans.owner_id = playeraccounts.id WHERE playeraccounts.name = @Name;";
+
+                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                {
+                    return await sqlConnection.QueryFirstOrDefaultAsync<PlayerBan>(command, new
+                    {
+                        Name = name
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Failed to to fetch async player ban with owner name: {name}.");
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<PlayerBan>> GetAllAsync()
+        {
+            try
+            {
+                const string command = "SELECT * FROM playerbans;";
+
+                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                {
+                    return await sqlConnection.QueryAsync<PlayerBan>(command);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to fetch all players bans async.");
+                throw;
+            }
+        }
+
+        public async Task<int> UpdateAsync(PlayerBan entity)
+        {
+            try
+            {
+                const string command = "UPDATE playerbans SET reason = @Reason, duration = @Duration, admin_id = @AdminId, owner_id = @OwnerId WHERE id = @Id;";
+
+                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                {
+                    return await sqlConnection.ExecuteAsync(command, new
+                    {
+                        entity.Reason,
+                        entity.Duration,
+                        entity.AdminId,
+                        entity.OwnerId,
+                        entity.Id
+                    });
+                }
             }
             catch (Exception ex)
             {

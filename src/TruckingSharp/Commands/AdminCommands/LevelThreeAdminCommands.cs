@@ -4,6 +4,7 @@ using SampSharp.GameMode.SAMP.Commands;
 using SampSharp.GameMode.World;
 using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
+using TruckingSharp.Database;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.World;
 
@@ -35,7 +36,7 @@ namespace TruckingSharp.Commands.AdminCommands
 
             var targetAccount = target.Account;
             targetAccount.AdminLevel = (byte)level;
-            await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
+            await RepositoriesInstances.AccountRepository.UpdateAsync(targetAccount);
 
             target.SendClientMessage(Color.GreenYellow,
                 $"Your admin level have been seted to {level} by {sender.Name}.");
@@ -98,7 +99,7 @@ namespace TruckingSharp.Commands.AdminCommands
 
             target.SendClientMessage(Color.Red, $"Reason: {reason}.");
 
-            await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
+            await RepositoriesInstances.AccountRepository.UpdateAsync(targetAccount);
         }
 
         [Command("createcamera", Shortcut = "createcamera")]

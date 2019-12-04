@@ -1,5 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using SampSharp.GameMode.Definitions;
+using Serilog;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 
 namespace TruckingSharp
 {
@@ -7,13 +11,14 @@ namespace TruckingSharp
     {
         public const int MaximumConvoys = 5;
 
-        public int[] PoliceWeapons;
+        public static List<Weapon> PoliceWeapons = new List<Weapon> { Weapon.Nitestick, Weapon.Teargas, Weapon.Colt45, Weapon.Shotgun, Weapon.MP5, Weapon.Rifle, Weapon.Spraycan };
 
         private Configuration()
         {
         }
 
-        public static Configuration Instance { get; private set; }
+        public static Configuration Instance { get; set; } = new Configuration();
+
         public int AutoAssistPrice { get; set; }
 
         public float BankInterest { get; set; }
@@ -86,25 +91,52 @@ namespace TruckingSharp
 
         public int WarnSecondsBeforeJail { get; set; }
 
-        public static void LoadConfigurationFromFile()
+        public static async void LoadConfigurationFromFileAsync()
         {
-            using var file = File.OpenText(@"scriptfiles\serverconfig.json");
-            var serializer = new JsonSerializer();
-            Instance = (Configuration)serializer.Deserialize(file, typeof(Configuration));
+            try
+            {
+                using (var file = File.OpenRead(@"scriptfiles\serverconfig.json"))
+                {
+                    Instance = await JsonSerializer.DeserializeAsync<Configuration>(file);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to load configuration file.");
+                throw;
+            }
         }
 
-        public static void SaveConfigurationToFile()
+        public static async void SaveConfigurationToFileAsync()
         {
-            using var file = File.CreateText(@"scriptfiles\serverconfig.json");
-            var serializer = new JsonSerializer();
-            serializer.Serialize(file, Instance);
+            try
+            {
+                using (var file = File.Create(@"scriptfiles\serverconfig.json"))
+                {
+                    await JsonSerializer.SerializeAsync(file, Instance);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to save configuration file.");
+                throw;
+            }
         }
 
-        public static void LoadDefaultConfigurationFromFile()
+        public static async void LoadDefaultConfigurationFromFileAsync()
         {
-            using var file = File.OpenText(@"scriptfiles\defaultserverconfig.json");
-            var serializer = new JsonSerializer();
-            Instance = (Configuration)serializer.Deserialize(file, typeof(Configuration));
+            try
+            {
+                using (var file = File.OpenRead(@"scriptfiles\defaultserverconfig.json"))
+                {
+                    Instance = await JsonSerializer.DeserializeAsync<Configuration>(file);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to load default configuration file.");
+                throw;
+            }
         }
     }
 }

@@ -2,6 +2,7 @@
 *.dll
 *.so
 *.pdb
+*log
 
 server_log.txt
 

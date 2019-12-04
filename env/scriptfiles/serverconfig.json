@@ -33,7 +33,6 @@
     "ParkingRange" : 150.0,
     "PaymentPerPackage" : 500,
     "PlayersBeforePolice" : 0,
-    "PoliceWeapons" : [3, 17, 22, 25, 29, 33, 41],
     "PoliceWeaponsAmmo" : 5000,
     "RefuelPrice" : 1000,
     "ResprayPrice" : 150,
