@@ -18,7 +18,7 @@ namespace TruckingSharp.Missions
     [CommandGroup("player", PermissionChecker = typeof(LoggedPermission))]
     public class MissionCommands
     {
-        [Command("startmission", Shortcut = "startmission")]
+        [Command("work", Shortcut = "work")]
         public static void OnStartMissionCommand(Player sender)
         {
             if (sender.IsDoingMission)
@@ -127,7 +127,7 @@ namespace TruckingSharp.Missions
             }
         }
 
-        [Command("endmission", Shortcut = "endmission")]
+        [Command("stopwork", Shortcut = "stopwork")]
         public static void OnEndMissionCommand(Player sender)
         {
             if (!sender.IsDoingMission)

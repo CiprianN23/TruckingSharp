@@ -10,14 +10,81 @@ using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
 using TruckingSharp.Data;
 using TruckingSharp.Database;
-using TruckingSharp.Database.Repositories;
 using TruckingSharp.Extensions.PlayersExtensions;
+using TruckingSharp.Missions.Police;
 
 namespace TruckingSharp.Commands.AdminCommands
 {
     [CommandGroup("admin", PermissionChecker = typeof(LevelOneAdminPermission))]
     public class LevelOneAdminCommands
     {
+        [Command("jail", Shortcut = "jail")]
+        public static async void OnJailCommand(Player sender, Player target, int seconds, string reason)
+        {
+            if (!target.IsLoggedIn)
+            {
+                sender.SendClientMessage(Color.Red, Messages.PlayerNotLoggedIn);
+                return;
+            }
+
+            if (target == sender)
+            {
+                sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedOnSelf);
+                return;
+            }
+
+            if (target.Account.Jailed != 0)
+            {
+                sender.SendClientMessage(Color.Red, "Player is already jailed.");
+                return;
+            }
+
+            if (seconds < 1)
+            {
+                sender.SendClientMessage(Color.Red, "Seconds must be higher than 1.");
+                return;
+            }
+
+            PoliceController.JailPlayer(target, seconds);
+
+            target.SendClientMessage(Color.Red, $"You have been jailed by {AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name} for {seconds} seconds.");
+            target.SendClientMessage(Color.Red, $"Reason: {reason}.");
+
+            sender.SendClientMessage(Color.White, $"You have jailed {{FFFF00}}{target.Name}{{00FF00}} for {{FFFF00}}{seconds}{{00FF00}} seconds.");
+        }
+
+        [Command("unjail", Shortcut = "unjail")]
+        public static async void OnUnJailCommand(Player sender, Player target)
+        {
+            if (!target.IsLoggedIn)
+            {
+                sender.SendClientMessage(Color.Red, Messages.PlayerNotLoggedIn);
+                return;
+            }
+
+            if (target == sender)
+            {
+                sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedOnSelf);
+                return;
+            }
+
+            if (target.Account.Jailed == 0)
+            {
+                sender.SendClientMessage(Color.Red, "Player is not jailed.");
+                return;
+            }
+
+            var targetAccount = target.Account;
+            targetAccount.Jailed = 0;
+            await RepositoriesInstances.AccountRepository.UpdateAsync(targetAccount);
+
+            PoliceController.ReleasePlayerFromJail(target);
+
+            target.SendClientMessage(Color.GreenYellow, $"You have been un-jailed by {AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name}.");
+
+            sender.SendClientMessage(Color.GreenYellow, $"You have un-jailed {{FFFF00}}{target.Name}.");
+        }
+
         [Command("kick", Shortcut = "kick")]
         public static async void OnKickCommand(Player sender, Player target, string reason)
         {

@@ -201,6 +201,9 @@ namespace TruckingSharp
             Interior = 0;
             ToggleClock(false);
 
+            if (PlayerClass != PlayerClassType.Police)
+                ResetWeapons();
+
             if (Account.RulesRead == 0)
                 SendClientMessage(Color.Red, Messages.RulesNotYetAccepted);
 

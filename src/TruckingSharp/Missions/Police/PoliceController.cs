@@ -33,7 +33,7 @@ namespace TruckingSharp.Missions.Police
             }
         }
 
-        public static void JailPlayer(Player finedPlayer)
+        public static async void JailPlayer(Player finedPlayer, int jailSeconds)
         {
             var finedPlayerAccount = finedPlayer.Account;
 
@@ -42,7 +42,8 @@ namespace TruckingSharp.Missions.Police
             finedPlayer.Interior = 10;
             finedPlayer.Position = new Vector3(220.0, 110.0, 999.1);
 
-            finedPlayerAccount.Jailed = Configuration.Instance.DefaultJailSeconds;
+            finedPlayerAccount.Jailed = jailSeconds;
+            await AccountRepository.UpdateAsync(finedPlayerAccount);
             finedPlayer.JailingTimer?.Dispose();
             finedPlayer.JailingTimer = new Timer(TimeSpan.FromSeconds(1), true);
             finedPlayer.JailingTimer.Tick += (sender, e) => JailingTimer_Tick(sender, e, finedPlayer);
@@ -108,7 +109,7 @@ namespace TruckingSharp.Missions.Police
                 return;
 
             if (player.Account.Jailed != 0)
-                JailPlayer(player);
+                JailPlayer(player, player.Account.Jailed);
         }
 
         private void Police_PlayerDied(object sender, SampSharp.GameMode.Events.DeathEventArgs e)
@@ -148,7 +149,7 @@ namespace TruckingSharp.Missions.Police
             }
         }
 
-        private static void ReleasePlayerFromJail(Player jailedPlayer)
+        public static void ReleasePlayerFromJail(Player jailedPlayer)
         {
             jailedPlayer.VirtualWorld = 0;
             jailedPlayer.Interior = 0;
@@ -255,7 +256,7 @@ namespace TruckingSharp.Missions.Police
                 finedPlayer.Reward(-fine);
                 finedPlayer.SendClientMessage(Color.Red, $"You have been jailed by {policePlayer.Name} for {Configuration.Instance.DefaultJailSeconds / 60} minutes.");
 
-                JailPlayer(finedPlayer);
+                JailPlayer(finedPlayer, Configuration.Instance.DefaultJailSeconds);
 
                 BasePlayer.SendClientMessageToAll(Color.GreenYellow, $"Officer {policePlayer.Name} has jailed {finedPlayer.Name} for {Configuration.Instance.DefaultJailSeconds / 60} minutes.");
 

@@ -1,5 +1,6 @@
 ﻿using SampSharp.GameMode.Pools;
 using SampSharp.GameMode.World;
+using System.Threading.Tasks;
 
 namespace TruckingSharp
 {
@@ -19,8 +20,9 @@ namespace TruckingSharp
             Driver?.RemoveFromVehicle();
         }
 
-        protected override void Initialize()
+        protected override async void Initialize()
         {
+            await Task.Delay(100);
             Fuel = Configuration.Instance.MaximumFuel;
             base.Initialize();
         }

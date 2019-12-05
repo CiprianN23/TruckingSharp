@@ -180,13 +180,13 @@
             "{{00FF00}}Player {{FFFF00}}{0}{{00FF00}} joined {{FFFF00}}Roadworker class";
 
         public const string NoMissionText =
-            "No mission at the moment. Enter \"~y~/startmission~w~\" to start a mission.";
+            "No mission at the moment. Enter \"~y~/work~w~\" to start a mission.";
 
         public const string NoMissionTextPolice =
             "~r~'RMB'~w~ fines a player (on foot), ~r~'LCTRL'~w~ warns the player (in vehicle).";
 
         public const string NoMissionTextMafia =
-            "Hijack a ~r~marked~w~ vehicle or enter \"~y~/startmission~w~\" to start a mission.";
+            "Hijack a ~r~marked~w~ vehicle or enter \"~y~/work~w~\" to start a mission.";
 
         public const string NoMissionTextAssistance =
             "~r~'RMB'~w~ repairs/refuels a vehicle (on foot), ~r~'LCTRL'~w~ fixes your own vehicle.";
