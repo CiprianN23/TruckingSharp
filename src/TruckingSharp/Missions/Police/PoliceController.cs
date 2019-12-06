@@ -17,10 +17,10 @@ namespace TruckingSharp.Missions.Police
 
         public static void EndMission(Player player)
         {
-            if (player.PolicePlayersCheckTimer != null)
-                player.PolicePlayersCheckTimer.IsRunning = false;
+            if (player.CheckTimer != null)
+                player.CheckTimer.IsRunning = false;
 
-            player.PolicePlayersCheckTimer?.Dispose();
+            player.CheckTimer?.Dispose();
 
             foreach (var basePlayer in BasePlayer.All)
             {

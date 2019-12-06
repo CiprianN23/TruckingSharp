@@ -5,6 +5,7 @@ using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.World;
 using System;
 using TruckingSharp.Constants;
+using TruckingSharp.Missions.Mafia;
 using TruckingSharp.Missions.Police;
 using TruckingSharp.PlayerClasses.ClassesSpawn;
 using TruckingSharp.PlayerClasses.Data;
@@ -43,9 +44,9 @@ namespace TruckingSharp.PlayerClasses
                 case PlayerClassType.Police:
                     player.Color = PlayerClassColor.PoliceColor;
 
-                    player.PolicePlayersCheckTimer?.Dispose();
-                    player.PolicePlayersCheckTimer = new Timer(TimeSpan.FromSeconds(1), true);
-                    player.PolicePlayersCheckTimer.Tick += (senderObject, ev) => PoliceController.PoliceCheckTimer_Tick(senderObject, ev, player);
+                    player.CheckTimer?.Dispose();
+                    player.CheckTimer = new Timer(TimeSpan.FromSeconds(1), true);
+                    player.CheckTimer.Tick += (senderObject, ev) => PoliceController.PoliceCheckTimer_Tick(senderObject, ev, player);
 
                     if (Configuration.Instance.CanPoliceHaveWeapons)
                     {
@@ -58,6 +59,10 @@ namespace TruckingSharp.PlayerClasses
 
                 case PlayerClassType.Mafia:
                     player.Color = PlayerClassColor.MafiaColor;
+
+                    player.CheckTimer?.Dispose();
+                    player.CheckTimer = new Timer(TimeSpan.FromSeconds(1), true);
+                    player.CheckTimer.Tick += (senderObject, ev) => MafiaController.PoliceCheckTimer_Tick(senderObject, ev, player);
                     break;
 
                 case PlayerClassType.Courier:

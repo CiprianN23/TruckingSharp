@@ -62,12 +62,13 @@ namespace TruckingSharp
         public Timer SpeedometerTimer { get; set; }
         public int Speed { get; set; }
         public int TimeSincePlayerCaughtSpeedingInSeconds { get; set; }
-        public Timer PolicePlayersCheckTimer { get; set; }
+        public Timer CheckTimer { get; set; }
         public Timer TimerUntilPoliceCanJail { get; set; }
         public Timer JailingTimer { get; set; }
         public bool IsWarnedByPolice { get; set; }
         public int SecondsUntilPoliceCanJail { get; set; }
         public bool CanPoliceJail { get; set; }
+        public bool MafiaLoadHijacked { get; set; }
 
         public bool CheckIfPlayerCanJoinPolice()
         {
@@ -277,7 +278,7 @@ namespace TruckingSharp
             SpeedometerTimer?.Dispose();
             SpectateTimer?.Dispose();
             MissionLoadingTimer?.Dispose();
-            PolicePlayersCheckTimer?.Dispose();
+            CheckTimer?.Dispose();
 
             base.Dispose(disposing);
         }

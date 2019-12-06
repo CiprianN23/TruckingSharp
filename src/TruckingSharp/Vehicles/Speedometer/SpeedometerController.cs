@@ -61,8 +61,7 @@ namespace TruckingSharp.Vehicles.Speedometer
             player.SpeedometerTimer = new Timer(TimeSpan.FromMilliseconds(500), true) { IsRunning = false };
 
             player.SpeedometerTimer.Tick += (senderObject, ev) => SpeedometerTimer_Tick(senderObject, ev, player);
-            player.SpeedometerTimer.Tick += (senderObject, ev) =>
-                SpeedCameraController.SpeedometerTimer_Tick(senderObject, ev, player);
+            player.SpeedometerTimer.Tick += (senderObject, ev) => SpeedCameraController.SpeedometerTimer_Tick(senderObject, ev, player);
         }
 
         private async void SpeedometerTimer_Tick(object sender, EventArgs e, Player player)
@@ -83,7 +82,8 @@ namespace TruckingSharp.Vehicles.Speedometer
             account.MetersDriven = (float)(account.MetersDriven + playerVehicleSpeed / 7.2);
             await _playerAccountRepository.UpdateAsync(account);
 
-            player.VehicleNameTextDraw.Text = $"{playerVehicle.ModelInfo.Name}";
+            if (!player.VehicleNameTextDraw.IsDisposed)
+                player.VehicleNameTextDraw.Text = $"{playerVehicle.ModelInfo.Name}";
 
             if (playerVehicleSpeed > 10 && playerVehicle.Fuel > 0 && playerVehicle.Engine)
                 playerVehicle.Fuel--;

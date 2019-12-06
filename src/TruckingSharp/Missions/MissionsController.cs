@@ -9,6 +9,7 @@ using TruckingSharp.Constants;
 using TruckingSharp.Missions.BusDriver;
 using TruckingSharp.Missions.Convoy;
 using TruckingSharp.Missions.Data;
+using TruckingSharp.Missions.Mafia;
 using TruckingSharp.Missions.Pilot;
 using TruckingSharp.Missions.Police;
 using TruckingSharp.Missions.Trucker;
@@ -47,6 +48,9 @@ namespace TruckingSharp.Missions
                     break;
                 case PlayerClassType.Police:
                     PoliceController.EndMission(player);
+                    break;
+                case PlayerClassType.Mafia:
+                    MafiaController.EndMission(player);
                     break;
             }
         }

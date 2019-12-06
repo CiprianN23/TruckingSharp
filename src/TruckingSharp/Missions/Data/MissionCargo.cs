@@ -61,7 +61,19 @@ namespace TruckingSharp.Missions.Data
 
             new MissionCargo("Passangers", false, 1.0, MissionCargoVehicleType.Plane, new[] { 121, 122, 125, 126, 130, 131, 134}, new[] { 121, 122, 125, 126, 130, 131, 134}),
             new MissionCargo("Cargo", false, 1.0, MissionCargoVehicleType.Plane, new[] { 123, 124, 127, 128, 129, 132, 133, 135}, new[] { 123, 124, 127, 128, 129, 132, 133, 135}),
-            new MissionCargo("Passengers", false, 1.0, MissionCargoVehicleType.Helicopter, new[] { 121, 122, 125, 126, 130, 131, 134}, new[] { 121, 122, 125, 126, 130, 131, 134})
+            new MissionCargo("Passengers", false, 1.0, MissionCargoVehicleType.Helicopter, new[] { 121, 122, 125, 126, 130, 131, 134}, new[] { 121, 122, 125, 126, 130, 131, 134}),
+
+            new MissionCargo("Food", false, 1.50, MissionCargoVehicleType.MafiaVan, new[] { 7, 44, 47, 48}, new[] { 49, 50, 51, 52, 53}),
+            new MissionCargo("Drinks", false, 1.50, MissionCargoVehicleType.MafiaVan, new[] { 15, 54, 55}, new[] { 49, 50, 51, 52, 53}),
+            new MissionCargo("Bottled Beer", false, 1.50, MissionCargoVehicleType.MafiaVan, new[] { 56}, new[] { 57, 58, 59, 60, 61}),
+            new MissionCargo("Luxury Goods", false, 1.50, MissionCargoVehicleType.MafiaVan, new[] { 24, 55}, new[] { 47, 48, 50}),
+            new MissionCargo("Electronics", false, 1.50, MissionCargoVehicleType.MafiaVan, new[] { 7, 24, 48}, new[] { 50, 51, 62, 63}),
+            new MissionCargo("Sport Equipment", false, 1.50, MissionCargoVehicleType.MafiaVan, new[] { 47, 48}, new[] { 50, 53, 57}),
+            new MissionCargo("Boards", false, 1.50, MissionCargoVehicleType.MafiaVan, new[] { 10}, new[] { 4, 7, 18, 22}),
+            new MissionCargo("Building Materials", false, 1.50, MissionCargoVehicleType.MafiaVan, new[] { 4}, new[] { 1, 2, 3, 5}),
+            new MissionCargo("LiveStock", false, 1.50, MissionCargoVehicleType.MafiaVan, new[] { 21, 22}, new[] { 23, 43, 47}),
+            new MissionCargo("Meat", false, 1.50, MissionCargoVehicleType.MafiaVan, new[] { 43}, new[] { 44, 49, 50, 51, 52, 53}),
+            new MissionCargo("Paper", false, 1.50, MissionCargoVehicleType.MafiaVan, new[] { 14}, new[] { 9, 62})
         };
 
         private static readonly Random Random = new Random();

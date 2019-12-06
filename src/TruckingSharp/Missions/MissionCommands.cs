@@ -9,6 +9,7 @@ using TruckingSharp.Extensions.PlayersExtensions;
 using TruckingSharp.Missions.Bonus;
 using TruckingSharp.Missions.BusDriver;
 using TruckingSharp.Missions.Convoy;
+using TruckingSharp.Missions.Mafia;
 using TruckingSharp.Missions.Pilot;
 using TruckingSharp.Missions.Trucker;
 using TruckingSharp.PlayerClasses.Data;
@@ -80,6 +81,7 @@ namespace TruckingSharp.Missions
                             }
 
                             break;
+
                         default:
                             sender.SendClientMessage(Color.Red, "You need to be the driver of a trucking vehicle to start a mission.");
                             break;
@@ -96,7 +98,7 @@ namespace TruckingSharp.Missions
 
                     var random = new Random();
 
-                    switch(playerVehicleModel)
+                    switch (playerVehicleModel)
                     {
                         case VehicleModelType.Coach:
                         case VehicleModelType.Bus:
@@ -105,6 +107,7 @@ namespace TruckingSharp.Missions
                             else
                                 BusDriverController.StartMission(sender, BusRoute.BusRoutes[random.Next(BusRoute.BusRoutes.Count)]);
                             break;
+
                         default:
                             sender.SendClientMessage(Color.Red, "You need to be the driver of a bus to start a mission.");
                             break;
@@ -112,6 +115,7 @@ namespace TruckingSharp.Missions
 
                     dialogBusDriverMission.Response += BusDriverController.DialogBusDriverMission_Response;
                     break;
+
                 case PlayerClassType.Pilot:
                     switch (playerVehicleModel)
                     {
@@ -123,6 +127,16 @@ namespace TruckingSharp.Missions
                             break;
                     }
 
+                    break;
+
+                case PlayerClassType.Mafia:
+                    switch (sender.Vehicle.Model)
+                    {
+                        case VehicleModelType.Sandking:
+                        case VehicleModelType.Moonbeam:
+                            MafiaController.StartRandomMission(sender);
+                            break;
+                    }
                     break;
             }
         }
@@ -139,7 +153,7 @@ namespace TruckingSharp.Missions
             if (sender.PlayerClass == PlayerClassType.Police)
                 return;
 
-            if (sender.IsInConvoy) 
+            if (sender.IsInConvoy)
                 MissionConvoy.PlayerLeaveConvoy(sender);
 
             if (sender.MissionStep == 1)
