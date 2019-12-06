@@ -16,7 +16,7 @@ namespace TruckingSharp.Missions.Convoy
     [Controller]
     public class ConvoyController : IEventListener
     {
-        private static PlayerAccountRepository AccountRepository => RepositoriesInstances.AccountRepository;
+        private static PlayerBankAccountRepository6 AccountRepository => new PlayerBankAccountRepository6(ConnectionFactory.GetConnection);
 
         public void RegisterEvents(BaseMode gameMode)
         {

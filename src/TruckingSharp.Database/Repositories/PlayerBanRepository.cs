@@ -9,9 +9,9 @@ namespace TruckingSharp.Database.Repositories
 {
     public sealed class PlayerBanRepository
     {
-        private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
+        private readonly IDatabaseConnection _databaseConnectionFactory;
 
-        public PlayerBanRepository(IDatabaseConnectionFactory databaseConnectionFactory) => _databaseConnectionFactory = databaseConnectionFactory;
+        public PlayerBanRepository(IDatabaseConnection databaseConnectionFactory) => _databaseConnectionFactory = databaseConnectionFactory;
 
         #region Async
 

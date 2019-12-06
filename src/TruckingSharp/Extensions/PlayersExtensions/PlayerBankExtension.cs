@@ -109,7 +109,7 @@ namespace TruckingSharp.Extensions.PlayersExtensions
             }
 
             var playerBankAccount = player.BankAccount;
-            await RepositoriesInstances.PlayerBankAccountRepository.DeleteAsync(playerBankAccount);
+            await new PlayerBankAccountRepository(ConnectionFactory.GetConnection).DeleteAsync(playerBankAccount);
 
             player.IsLoggedInBankAccount = false;
 
@@ -166,8 +166,8 @@ namespace TruckingSharp.Extensions.PlayersExtensions
                         return;
                     }
 
-                    if (RepositoriesInstances.PlayerBankAccountRepository.Find(
-                            RepositoriesInstances.AccountRepository.Find(ev.InputText).Id) == null)
+                    if (new PlayerBankAccountRepository(ConnectionFactory.GetConnection).Find(
+                            new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).Find(ev.InputText).Id) == null)
                     {
                         player.SendClientMessage(Color.Red, "That player doesn't have a bank account.");
                         playerNameDialog.Show(player);
@@ -176,14 +176,14 @@ namespace TruckingSharp.Extensions.PlayersExtensions
 
                     var playerBankAccount = player.BankAccount;
                     var otherBankAccount =
-                        RepositoriesInstances.PlayerBankAccountRepository.Find(
-                            RepositoriesInstances.AccountRepository.Find(ev.InputText).Id);
+                        new PlayerBankAccountRepository(ConnectionFactory.GetConnection).Find(
+                            new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).Find(ev.InputText).Id);
 
                     otherBankAccount.Money += transferMoney;
                     playerBankAccount.Money -= transferMoney;
 
-                    await RepositoriesInstances.PlayerBankAccountRepository.UpdateAsync(playerBankAccount);
-                    await RepositoriesInstances.PlayerBankAccountRepository.UpdateAsync(otherBankAccount);
+                    await new PlayerBankAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(playerBankAccount);
+                    await new PlayerBankAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(otherBankAccount);
 
                     player.SendClientMessage(Color.GreenYellow,
                         $"{{0FF00}}You have transferred {{FFFF00}}${transferMoney}{{00FF00}} to {{FFFF00}}{ev.InputText}{{00FF00}}'s bank account.");
@@ -229,7 +229,7 @@ namespace TruckingSharp.Extensions.PlayersExtensions
 
                 player.Reward(withdrawMoney);
 
-                await RepositoriesInstances.PlayerBankAccountRepository.UpdateAsync(playerBankAccount);
+                await new PlayerBankAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(playerBankAccount);
 
                 player.SendClientMessage(Color.GreenYellow,
                     $"You have withdrawn {{FFFF00}}${withdrawMoney}{Color.GreenYellow} from your bank account.");
@@ -273,7 +273,7 @@ namespace TruckingSharp.Extensions.PlayersExtensions
 
                 player.Reward(-depositMoney);
 
-                await RepositoriesInstances.PlayerBankAccountRepository.UpdateAsync(playerBankAccount);
+                await new PlayerBankAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(playerBankAccount);
 
                 player.SendClientMessage(Color.GreenYellow,
                     $"You have deposited {{FFFF00}}${depositMoney}{Color.GreenYellow} into your bank account.");

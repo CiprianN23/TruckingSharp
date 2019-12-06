@@ -13,7 +13,7 @@ namespace TruckingSharp.World
     [Controller]
     public class SpeedCameraController : IEventListener
     {
-        private static SpeedCameraRepository SpeedCameraRepository => RepositoriesInstances.SpeedCameraRepository;
+        private static SpeedCameraRepository SpeedCameraRepository => new SpeedCameraRepository(ConnectionFactory.GetConnection);
 
         public void RegisterEvents(BaseMode gameMode)
         {

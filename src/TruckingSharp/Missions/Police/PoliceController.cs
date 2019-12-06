@@ -13,7 +13,7 @@ namespace TruckingSharp.Missions.Police
     [Controller]
     public class PoliceController : IEventListener
     {
-        private static PlayerAccountRepository AccountRepository => RepositoriesInstances.AccountRepository;
+        private static PlayerBankAccountRepository6 AccountRepository => new PlayerBankAccountRepository6(ConnectionFactory.GetConnection);
 
         public static void EndMission(Player player)
         {

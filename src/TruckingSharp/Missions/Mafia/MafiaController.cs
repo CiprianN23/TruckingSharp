@@ -5,6 +5,7 @@ using SampSharp.GameMode.World;
 using System;
 using TruckingSharp.Constants;
 using TruckingSharp.Database;
+using TruckingSharp.Database.Repositories;
 using TruckingSharp.Missions.Data;
 using TruckingSharp.Missions.Police;
 using TruckingSharp.PlayerClasses.Data;
@@ -47,7 +48,7 @@ namespace TruckingSharp.Missions.Mafia
 
                 var playerAccount = player.Account;
                 playerAccount.MafiaStolen++;
-                await RepositoriesInstances.AccountRepository.UpdateAsync(playerAccount);
+                await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(playerAccount);
 
                 player.MissionVehicle = null;
                 player.MissionTrailer = null;
@@ -161,7 +162,7 @@ namespace TruckingSharp.Missions.Mafia
 
                     var playerAccount = player.Account;
                     playerAccount.MafiaJobs++;
-                    await RepositoriesInstances.AccountRepository.UpdateAsync(playerAccount);
+                    await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(playerAccount);
 
                     EndMission(player);
                     break;

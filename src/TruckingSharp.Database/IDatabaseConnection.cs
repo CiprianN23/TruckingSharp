@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace TruckingSharp.Database
 {
-    public interface IDatabaseConnectionFactory
+    public interface IDatabaseConnection
     {
         IDbConnection CreateConnection();
 

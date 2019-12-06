@@ -100,8 +100,8 @@ namespace TruckingSharp.Commands.AdminCommands
                 target.SendClientMessage(Color.Red, $"Reason: {reason}.");
             }
 
-            await RepositoriesInstances.AccountRepository.UpdateAsync(account);
-            await RepositoriesInstances.PlayerBanRepository.AddAsync(playerBan);
+            await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(account);
+            await new PlayerBanRepository(ConnectionFactory.GetConnection).AddAsync(playerBan);
 
             BasePlayer.SendClientMessageToAll(Color.LightGray,
                 $"{AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name} has banned {target.Name} for {days} day/s.");
@@ -113,7 +113,7 @@ namespace TruckingSharp.Commands.AdminCommands
         [Command("unban", Shortcut = "unban")]
         public static async void OnUnBanCommand(Player sender, string name)
         {
-            var playerBan = await RepositoriesInstances.PlayerBanRepository.FindAsync(name);
+            var playerBan = await new PlayerBanRepository(ConnectionFactory.GetConnection).FindAsync(name);
 
             if (playerBan == null)
             {
@@ -121,7 +121,7 @@ namespace TruckingSharp.Commands.AdminCommands
                 return;
             }
 
-            var wasDeletedSuccessfully = await RepositoriesInstances.PlayerBanRepository.DeleteAsync(playerBan);
+            var wasDeletedSuccessfully = await new PlayerBanRepository(ConnectionFactory.GetConnection).DeleteAsync(playerBan);
 
             if (wasDeletedSuccessfully > 0)
             {
@@ -291,7 +291,7 @@ namespace TruckingSharp.Commands.AdminCommands
         {
             var targetAccount = target.Account;
             targetAccount.Score = score;
-            await RepositoriesInstances.AccountRepository.UpdateAsync(targetAccount);
+            await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
 
             target.SendClientMessage(Color.GreenYellow, $"Your score has been set to {score} by {sender.Name}.");
             sender.SendClientMessage(Color.GreenYellow, $"You've set the score of {target.Name} to {score}.");
@@ -302,7 +302,7 @@ namespace TruckingSharp.Commands.AdminCommands
         {
             var targetAccount = target.Account;
             targetAccount.Money = money;
-            await RepositoriesInstances.AccountRepository.UpdateAsync(targetAccount);
+            await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
 
             target.SendClientMessage(Color.GreenYellow, $"Your money has been set to {money} by {sender.Name}.");
             sender.SendClientMessage(Color.GreenYellow, $"You've set the money of {target.Name} to {money}.");
@@ -313,7 +313,7 @@ namespace TruckingSharp.Commands.AdminCommands
         {
             var targetAccount = target.Account;
             targetAccount.TruckerLicense = 1;
-            await RepositoriesInstances.AccountRepository.UpdateAsync(targetAccount);
+            await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
 
             sender.SendClientMessage(Color.GreenYellow, $"You've given {target.Name} a trucker's license.");
             target.SendClientMessage(Color.GreenYellow,

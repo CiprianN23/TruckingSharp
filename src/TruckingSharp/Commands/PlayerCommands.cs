@@ -11,6 +11,7 @@ using TruckingSharp.Constants;
 using TruckingSharp.Data;
 using TruckingSharp.Database;
 using TruckingSharp.Database.Entities;
+using TruckingSharp.Database.Repositories;
 using TruckingSharp.Extensions.PlayersExtensions;
 using TruckingSharp.PlayerClasses.ClassesSpawn;
 using TruckingSharp.PlayerClasses.Data;
@@ -75,7 +76,7 @@ namespace TruckingSharp.Commands
 
                         var hash = PasswordHashingService.GetPasswordHash(e.InputText);
                         var newBankAccount = new PlayerBankAccount { Password = hash, PlayerId = sender.Account.Id };
-                        await RepositoriesInstances.PlayerBankAccountRepository.AddAsync(newBankAccount);
+                        await new PlayerBankAccountRepository(ConnectionFactory.GetConnection).AddAsync(newBankAccount);
 
                         sender.SendClientMessage(Color.GreenYellow, Messages.BankAccountCreatedSuccessfully);
                     };
@@ -161,7 +162,7 @@ namespace TruckingSharp.Commands
 
                         var account = sender.Account;
                         account.Password = PasswordHashingService.GetPasswordHash(e.InputText);
-                        await RepositoriesInstances.AccountRepository.UpdateAsync(account);
+                        await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(account);
 
                         sender.SendClientMessage(Color.GreenYellow, Messages.PasswordChangedSuccessfully);
                     };
@@ -529,7 +530,7 @@ namespace TruckingSharp.Commands
                 var account = sender.Account;
                 account.RulesRead = 1;
 
-                await RepositoriesInstances.AccountRepository.UpdateAsync(account);
+                await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(account);
 
                 sender.SendClientMessage(Color.FromInteger(65280, ColorFormat.RGB),
                     "You have earned {FFFF00}$5000{00FF00} for accepting the rules");

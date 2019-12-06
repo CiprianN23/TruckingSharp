@@ -9,9 +9,9 @@ namespace TruckingSharp.Database.Repositories
 {
     public sealed class SpeedCameraRepository
     {
-        private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
+        private readonly IDatabaseConnection _databaseConnectionFactory;
 
-        public SpeedCameraRepository(IDatabaseConnectionFactory databaseConnectionFactory) => _databaseConnectionFactory = databaseConnectionFactory;
+        public SpeedCameraRepository(IDatabaseConnection databaseConnectionFactory) => _databaseConnectionFactory = databaseConnectionFactory;
 
         #region Async
 

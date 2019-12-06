@@ -16,9 +16,9 @@ namespace TruckingSharp.Controllers
     [Controller]
     public class PlayerAccountController : IEventListener
     {
-        private static PlayerAccountRepository _accountRepository => RepositoriesInstances.AccountRepository;
+        private static PlayerBankAccountRepository6 _accountRepository => new PlayerBankAccountRepository6(ConnectionFactory.GetConnection);
 
-        private PlayerBanRepository _banRepository => RepositoriesInstances.PlayerBanRepository;
+        private PlayerBanRepository _banRepository => new PlayerBanRepository(ConnectionFactory.GetConnection);
 
         public void RegisterEvents(BaseMode gameMode)
         {

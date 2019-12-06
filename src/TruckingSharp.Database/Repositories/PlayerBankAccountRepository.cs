@@ -9,9 +9,9 @@ namespace TruckingSharp.Database.Repositories
 {
     public sealed class PlayerBankAccountRepository
     {
-        private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
+        private readonly IDatabaseConnection _databaseConnectionFactory;
 
-        public PlayerBankAccountRepository(IDatabaseConnectionFactory databaseConnectionFactory) => _databaseConnectionFactory = databaseConnectionFactory;
+        public PlayerBankAccountRepository(IDatabaseConnection databaseConnectionFactory) => _databaseConnectionFactory = databaseConnectionFactory;
 
         public PlayerBankAccount Find(int id)
         {

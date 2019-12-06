@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 
 namespace TruckingSharp.Database
 {
-    public class PostgresConnectionFactory : IDatabaseConnectionFactory
+    public class PostgresConnection : IDatabaseConnection
     {
         private readonly string _connectionString;
 
-        public PostgresConnectionFactory() => _connectionString = DapperConnection.ConnectionString;
+        public PostgresConnection() => _connectionString = DapperConnection.ConnectionString;
 
         public async Task<IDbConnection> CreateConnectionAsync()
         {

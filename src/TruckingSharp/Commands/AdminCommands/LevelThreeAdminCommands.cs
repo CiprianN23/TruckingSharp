@@ -36,7 +36,7 @@ namespace TruckingSharp.Commands.AdminCommands
 
             var targetAccount = target.Account;
             targetAccount.AdminLevel = (byte)level;
-            await RepositoriesInstances.AccountRepository.UpdateAsync(targetAccount);
+            await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
 
             target.SendClientMessage(Color.GreenYellow,
                 $"Your admin level have been seted to {level} by {sender.Name}.");
@@ -99,7 +99,7 @@ namespace TruckingSharp.Commands.AdminCommands
 
             target.SendClientMessage(Color.Red, $"Reason: {reason}.");
 
-            await RepositoriesInstances.AccountRepository.UpdateAsync(targetAccount);
+            await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
         }
 
         [Command("createcamera", Shortcut = "createcamera")]

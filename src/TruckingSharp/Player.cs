@@ -9,8 +9,8 @@ using System;
 using System.Threading.Tasks;
 using TruckingSharp.Constants;
 using TruckingSharp.Data;
-using TruckingSharp.Database;
 using TruckingSharp.Database.Entities;
+using TruckingSharp.Database.Repositories;
 using TruckingSharp.Missions.BusDriver;
 using TruckingSharp.Missions.Convoy;
 using TruckingSharp.Missions.Data;
@@ -23,9 +23,9 @@ namespace TruckingSharp
     {
         public PlayerClassType PlayerClass;
 
-        public PlayerAccount Account => RepositoriesInstances.AccountRepository.Find(Name);
+        public PlayerAccount Account => new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).Find(Name);
 
-        public PlayerBankAccount BankAccount => RepositoriesInstances.PlayerBankAccountRepository.Find(Account.Id);
+        public PlayerBankAccount BankAccount => new PlayerBankAccountRepository(ConnectionFactory.GetConnection).Find(Account.Id);
 
         public bool IsLoggedIn { get; set; }
         public bool IsLoggedInBankAccount { get; set; }
@@ -129,7 +129,7 @@ namespace TruckingSharp
             Money = account.Money;
             Score = account.Score;
 
-            await RepositoriesInstances.AccountRepository.UpdateAsync(account).ConfigureAwait(false);
+            await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(account).ConfigureAwait(false);
         }
 
         public async void SetWantedLevel(int wantedLevel)
@@ -137,7 +137,7 @@ namespace TruckingSharp
             var account = Account;
             account.Wanted = wantedLevel;
             WantedLevel = wantedLevel;
-            await RepositoriesInstances.AccountRepository.UpdateAsync(account).ConfigureAwait(false);
+            await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(account).ConfigureAwait(false);
         }
 
         public override void OnClickPlayer(ClickPlayerEventArgs e)

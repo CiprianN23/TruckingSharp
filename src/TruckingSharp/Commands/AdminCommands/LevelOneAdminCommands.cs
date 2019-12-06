@@ -10,6 +10,7 @@ using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
 using TruckingSharp.Data;
 using TruckingSharp.Database;
+using TruckingSharp.Database.Repositories;
 using TruckingSharp.Extensions.PlayersExtensions;
 using TruckingSharp.Missions.Police;
 
@@ -19,7 +20,7 @@ namespace TruckingSharp.Commands.AdminCommands
     public class LevelOneAdminCommands
     {
         [Command("jail", Shortcut = "jail")]
-        public static async void OnJailCommand(Player sender, Player target, int seconds, string reason)
+        public static void OnJailCommand(Player sender, Player target, int seconds, string reason)
         {
             if (!target.IsLoggedIn)
             {
@@ -76,7 +77,7 @@ namespace TruckingSharp.Commands.AdminCommands
 
             var targetAccount = target.Account;
             targetAccount.Jailed = 0;
-            await RepositoriesInstances.AccountRepository.UpdateAsync(targetAccount);
+            await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
 
             PoliceController.ReleasePlayerFromJail(target);
 
@@ -401,7 +402,7 @@ namespace TruckingSharp.Commands.AdminCommands
             var account = target.Account;
             account.Muted = currentTime.AddMinutes(duration);
 
-            await RepositoriesInstances.AccountRepository.UpdateAsync(account);
+            await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(account);
 
             target.SendClientMessage(Color.Red,
                 $"You have been muted by {{FFFF00}}{sender.Name} {{FF0000}}for {{FFFF00}}{reason}");
@@ -434,7 +435,7 @@ namespace TruckingSharp.Commands.AdminCommands
             var account = target.Account;
             account.Muted = DateTime.Now;
 
-            await RepositoriesInstances.AccountRepository.UpdateAsync(account);
+            await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(account);
 
             target.SendClientMessage(Color.GreenYellow, $"You have been un-muted by {{FFFF00}}{sender.Name}");
 

@@ -15,7 +15,7 @@ namespace TruckingSharp.Missions.Pilot
     [Controller]
     public class PilotController : IEventListener
     {
-        private PlayerAccountRepository AccountRepository => RepositoriesInstances.AccountRepository;
+        private PlayerBankAccountRepository6 AccountRepository => new PlayerBankAccountRepository6(ConnectionFactory.GetConnection);
 
         public static void EndMission(Player player)
         {

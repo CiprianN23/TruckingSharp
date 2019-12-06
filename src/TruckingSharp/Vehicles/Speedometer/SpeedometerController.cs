@@ -14,7 +14,7 @@ namespace TruckingSharp.Vehicles.Speedometer
     [Controller]
     public class SpeedometerController : IEventListener
     {
-        private PlayerAccountRepository _playerAccountRepository => RepositoriesInstances.AccountRepository;
+        private PlayerBankAccountRepository6 _playerAccountRepository => new PlayerBankAccountRepository6(ConnectionFactory.GetConnection);
 
         public void RegisterEvents(BaseMode gameMode)
         {
