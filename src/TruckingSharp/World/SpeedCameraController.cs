@@ -3,7 +3,7 @@ using SampSharp.GameMode.Controllers;
 using SampSharp.GameMode.SAMP;
 using System;
 using System.Linq;
-using TruckingSharp.Database;
+using System.Threading.Tasks;
 using TruckingSharp.Database.Entities;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Missions.Police;
@@ -20,12 +20,12 @@ namespace TruckingSharp.World
             gameMode.Initialized += SpeedCamera_GamemodeInitialized;
         }
 
-        private void SpeedCamera_GamemodeInitialized(object sender, EventArgs e)
+        private async void SpeedCamera_GamemodeInitialized(object sender, EventArgs e)
         {
-            LoadSpeedCameras();
+            await LoadSpeedCamerasAsync();
         }
 
-        public static async void CreateSpeedCamera(Vector3 position, float angle, int maxSpeed)
+        public static async Task CreateSpeedCameraAsync(Vector3 position, float angle, int maxSpeed)
         {
             for (var camId = 1; camId < SpeedCameraData.SpeedCameras.Length; camId++)
             {
@@ -50,7 +50,7 @@ namespace TruckingSharp.World
             }
         }
 
-        public static async void LoadSpeedCameras()
+        public static async Task LoadSpeedCamerasAsync()
         {
             var speedCameras = await SpeedCameraRepository.GetAllAsync();
             var camerasCount = speedCameras.Select(camera => new SpeedCameraData(camera.Id,
@@ -59,7 +59,7 @@ namespace TruckingSharp.World
             Console.WriteLine($"Speed cameras loaded: {camerasCount}.");
         }
 
-        public static async void RemoveSpeedCamera(int camId)
+        public static async Task RemoveSpeedCameraAsync(int camId)
         {
             if (SpeedCameraData.SpeedCameras[camId] == null)
                 return;
@@ -73,7 +73,7 @@ namespace TruckingSharp.World
             SpeedCameraData.SpeedCameras[camId] = null;
         }
 
-        public static void SpeedometerTimer_Tick(object sender, EventArgs e, Player player)
+        public static async void SpeedometerTimer_Tick(object sender, EventArgs e, Player player)
         {
             for (var camId = 1; camId < SpeedCameraData.SpeedCameras.Length; camId++)
             {
@@ -93,7 +93,7 @@ namespace TruckingSharp.World
                     continue;
 
                 player.TimeSincePlayerCaughtSpeedingInSeconds = 40;
-                player.SetWantedLevel(player.Account.Wanted + 1);
+                await player.SetWantedLevelAsync(player.Account.Wanted + 1);
                 player.SendClientMessage(Color.Red, "You've been caught by a speedtrap, slow down!");
 
                 PoliceController.SendMessage(Color.GreenYellow, $"Player {{FFFF00}}{player.Name}{{00FF00}} is caught speeding, pursue and fine him.");

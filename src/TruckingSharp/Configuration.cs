@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace TruckingSharp
 {
@@ -91,7 +92,7 @@ namespace TruckingSharp
 
         public int WarnSecondsBeforeJail { get; set; }
 
-        public static async void LoadConfigurationFromFileAsync()
+        public static async Task LoadConfigurationFromFileAsync()
         {
             try
             {
@@ -107,7 +108,7 @@ namespace TruckingSharp
             }
         }
 
-        public static async void SaveConfigurationToFileAsync()
+        public static async Task SaveConfigurationToFileAsync()
         {
             try
             {
@@ -123,7 +124,7 @@ namespace TruckingSharp
             }
         }
 
-        public static async void LoadDefaultConfigurationFromFileAsync()
+        public static async Task LoadDefaultConfigurationFromFileAsync()
         {
             try
             {

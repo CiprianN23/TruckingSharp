@@ -6,17 +6,15 @@ using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.World;
 using System;
 using TruckingSharp.Constants;
-using TruckingSharp.Database;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Missions.Bonus;
-using TruckingSharp.Missions.Trucker;
 
 namespace TruckingSharp.Missions.Convoy
 {
     [Controller]
     public class ConvoyController : IEventListener
     {
-        private static PlayerBankAccountRepository6 AccountRepository => new PlayerBankAccountRepository6(ConnectionFactory.GetConnection);
+        private static PlayerAccountRepository AccountRepository => new PlayerAccountRepository(ConnectionFactory.GetConnection);
 
         public void RegisterEvents(BaseMode gameMode)
         {
@@ -194,13 +192,13 @@ namespace TruckingSharp.Missions.Convoy
 
                     foreach (var member in convoy.Members)
                     {
-                        member.Reward(payment, 5);
+                        await member.RewardAsync(payment, 5);
 
                         var memberAccount = member.Account;
                         memberAccount.ConvoyJobs++;
                         await AccountRepository.UpdateAsync(memberAccount);
 
-                        MissionsController.ClassEndMission(member);
+                        await MissionsController.ClassEndMissionAsync(member);
 
                         member.SendClientMessage(Color.White,
                             $"{{00FF00}}You finished the convoy and earned ${payment}");
@@ -220,16 +218,16 @@ namespace TruckingSharp.Missions.Convoy
             }
         }
 
-        private void Convoy_PlayerDied(object sender, DeathEventArgs e)
+        private async void Convoy_PlayerDied(object sender, DeathEventArgs e)
         {
             var player = sender as Player;
-            MissionConvoy.PlayerLeaveConvoy(player);
+            await MissionConvoy.PlayerLeaveConvoyAsync(player);
         }
 
-        private void Convoy_PlayerDisconnected(object sender, DisconnectEventArgs e)
+        private async void Convoy_PlayerDisconnected(object sender, DisconnectEventArgs e)
         {
             var player = sender as Player;
-            MissionConvoy.PlayerLeaveConvoy(player);
+            await MissionConvoy.PlayerLeaveConvoyAsync(player);
         }
     }
 }

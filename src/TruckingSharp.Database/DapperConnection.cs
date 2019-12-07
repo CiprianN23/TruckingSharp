@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TruckingSharp.Database
+﻿namespace TruckingSharp.Database
 {
     public static class DapperConnection
     {

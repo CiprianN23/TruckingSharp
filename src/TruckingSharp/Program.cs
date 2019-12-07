@@ -1,6 +1,6 @@
 ﻿using SampSharp.Core;
 using Serilog;
-using System;
+using System.Threading.Tasks;
 
 namespace TruckingSharp
 {
@@ -12,7 +12,7 @@ namespace TruckingSharp
                 .Use<GameMode>()
                 .Run();
 
-            Configuration.LoadConfigurationFromFileAsync();
+            Task.Run(() => Configuration.LoadConfigurationFromFileAsync());
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()

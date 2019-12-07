@@ -2,9 +2,9 @@
 using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.SAMP.Commands;
 using SampSharp.GameMode.World;
+using System.Threading.Tasks;
 using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
-using TruckingSharp.Database;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.World;
 
@@ -14,7 +14,7 @@ namespace TruckingSharp.Commands.AdminCommands
     public class LevelThreeAdminCommands
     {
         [Command("setadmin", Shortcut = "setadmin")]
-        public static async void OnSetAdminCommand(BasePlayer sender, Player target, int level)
+        public static async void OnSetAdminCommandAsync(BasePlayer sender, Player target, int level)
         {
             if (!target.IsLoggedIn)
             {
@@ -36,15 +36,14 @@ namespace TruckingSharp.Commands.AdminCommands
 
             var targetAccount = target.Account;
             targetAccount.AdminLevel = (byte)level;
-            await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
+            await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
 
             target.SendClientMessage(Color.GreenYellow,
                 $"Your admin level have been seted to {level} by {sender.Name}.");
         }
 
         [Command("resetplayer", Shortcut = "resetplayer")]
-        public static async void OnResetPlayerCommand(BasePlayer sender, Player target, int money, int score, int stats,
-            string reason)
+        public static async void OnResetPlayerCommandAsync(BasePlayer sender, Player target, int money, int score, int stats, string reason)
         {
             if (!target.IsLoggedIn)
             {
@@ -99,20 +98,20 @@ namespace TruckingSharp.Commands.AdminCommands
 
             target.SendClientMessage(Color.Red, $"Reason: {reason}.");
 
-            await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
+            await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
         }
 
         [Command("createcamera", Shortcut = "createcamera")]
-        public static void OnCreateCameraCommand(Player sender, int maxSpeed)
+        public static async void OnCreateCameraCommandAsync(Player sender, int maxSpeed)
         {
-            SpeedCameraController.CreateSpeedCamera(sender.Position + Vector3.Down, sender.Angle, maxSpeed);
+            await SpeedCameraController.CreateSpeedCameraAsync(sender.Position + Vector3.Down, sender.Angle, maxSpeed);
             sender.Position += Vector3.One;
         }
 
         [Command("deletecamera", Shortcut = "deletecamera")]
-        public static void OnDeleteCameraCommand(Player sender, int camId)
+        public static async void OnDeleteCameraCommandAsync(Player sender, int camId)
         {
-            SpeedCameraController.RemoveSpeedCamera(camId);
+            await SpeedCameraController.RemoveSpeedCameraAsync(camId);
         }
     }
 }

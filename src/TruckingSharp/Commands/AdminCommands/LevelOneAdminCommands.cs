@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
 using TruckingSharp.Data;
-using TruckingSharp.Database;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Extensions.PlayersExtensions;
 using TruckingSharp.Missions.Police;
@@ -20,7 +19,7 @@ namespace TruckingSharp.Commands.AdminCommands
     public class LevelOneAdminCommands
     {
         [Command("jail", Shortcut = "jail")]
-        public static void OnJailCommand(Player sender, Player target, int seconds, string reason)
+        public static async void OnJailCommand(Player sender, Player target, int seconds, string reason)
         {
             if (!target.IsLoggedIn)
             {
@@ -46,7 +45,7 @@ namespace TruckingSharp.Commands.AdminCommands
                 return;
             }
 
-            PoliceController.JailPlayer(target, seconds);
+            await PoliceController.JailPlayerAsync(target, seconds);
 
             target.SendClientMessage(Color.Red, $"You have been jailed by {AdminRanks.AdminLevelNames[sender.Account.AdminLevel]} {sender.Name} for {seconds} seconds.");
             target.SendClientMessage(Color.Red, $"Reason: {reason}.");
@@ -55,7 +54,7 @@ namespace TruckingSharp.Commands.AdminCommands
         }
 
         [Command("unjail", Shortcut = "unjail")]
-        public static async void OnUnJailCommand(Player sender, Player target)
+        public static async void OnUnJailCommandAsync(Player sender, Player target)
         {
             if (!target.IsLoggedIn)
             {
@@ -77,7 +76,7 @@ namespace TruckingSharp.Commands.AdminCommands
 
             var targetAccount = target.Account;
             targetAccount.Jailed = 0;
-            await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
+            await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
 
             PoliceController.ReleasePlayerFromJail(target);
 
@@ -87,7 +86,7 @@ namespace TruckingSharp.Commands.AdminCommands
         }
 
         [Command("kick", Shortcut = "kick")]
-        public static async void OnKickCommand(Player sender, Player target, string reason)
+        public static async void OnKickCommandAsync(Player sender, Player target, string reason)
         {
             if (!target.IsLoggedIn)
             {
@@ -248,7 +247,7 @@ namespace TruckingSharp.Commands.AdminCommands
         }
 
         [Command("warn", Shortcut = "warn")]
-        public static async void OnWarnCommand(Player sender, Player target, string reason)
+        public static async void OnWarnCommandAsync(Player sender, Player target, string reason)
         {
             if (!target.IsLoggedIn)
             {
@@ -369,7 +368,7 @@ namespace TruckingSharp.Commands.AdminCommands
         }
 
         [Command("mute", Shortcut = "mute")]
-        public static async void OnMuteCommand(BasePlayer sender, Player target, int duration, string reason)
+        public static async void OnMuteCommandAsync(BasePlayer sender, Player target, int duration, string reason)
         {
             if (!target.IsLoggedIn)
             {
@@ -402,7 +401,7 @@ namespace TruckingSharp.Commands.AdminCommands
             var account = target.Account;
             account.Muted = currentTime.AddMinutes(duration);
 
-            await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(account);
+            await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(account);
 
             target.SendClientMessage(Color.Red,
                 $"You have been muted by {{FFFF00}}{sender.Name} {{FF0000}}for {{FFFF00}}{reason}");
@@ -412,7 +411,7 @@ namespace TruckingSharp.Commands.AdminCommands
         }
 
         [Command("unmute", Shortcut = "unmute")]
-        public static async void OnUnMuteCommand(BasePlayer sender, Player target)
+        public static async void OnUnMuteCommandAsync(BasePlayer sender, Player target)
         {
             if (!target.IsLoggedIn)
             {
@@ -435,7 +434,7 @@ namespace TruckingSharp.Commands.AdminCommands
             var account = target.Account;
             account.Muted = DateTime.Now;
 
-            await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(account);
+            await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(account);
 
             target.SendClientMessage(Color.GreenYellow, $"You have been un-muted by {{FFFF00}}{sender.Name}");
 
@@ -643,7 +642,7 @@ namespace TruckingSharp.Commands.AdminCommands
         }
 
         [Command("setwanted", Shortcut = "setwanted")]
-        public static void OnSetWantedCommand(BasePlayer sender, Player target, int wanted)
+        public static async void OnSetWantedCommandAsync(BasePlayer sender, Player target, int wanted)
         {
             if (!target.IsLoggedIn)
             {
@@ -663,7 +662,7 @@ namespace TruckingSharp.Commands.AdminCommands
                 return;
             }
 
-            target.SetWantedLevel(wanted);
+            await target.SetWantedLevelAsync(wanted);
             target.SendClientMessage(Color.Blue, "Your wanted level has been set by an admin.");
         }
 

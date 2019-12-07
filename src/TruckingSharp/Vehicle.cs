@@ -20,9 +20,8 @@ namespace TruckingSharp
             Driver?.RemoveFromVehicle();
         }
 
-        protected override async void Initialize()
+        protected override void Initialize()
         {
-            await Task.Delay(100);
             Fuel = Configuration.Instance.MaximumFuel;
             base.Initialize();
         }

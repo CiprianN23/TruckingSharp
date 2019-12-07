@@ -62,7 +62,7 @@ namespace TruckingSharp.Missions.Convoy
         }
 
         [Command("convoykick", Shortcut = "convoykick")]
-        public static void OnConvoyKickCommand(Player sender, Player target)
+        public static async void OnConvoyKickCommand(Player sender, Player target)
         {
             if (!sender.IsInConvoy)
             {
@@ -87,7 +87,7 @@ namespace TruckingSharp.Missions.Convoy
 
             if (target.IsInConvoy && target.Convoy == convoy)
             {
-                MissionConvoy.PlayerLeaveConvoy(target);
+                await MissionConvoy.PlayerLeaveConvoyAsync(target);
 
                 sender.SendClientMessage(Color.GreenYellow,
                     $"You've kicked {{0000FF}}{target.Name}{{00FF00}} from the convoy.");
@@ -101,7 +101,7 @@ namespace TruckingSharp.Missions.Convoy
         }
 
         [Command("convoyleave", Shortcut = "convoyleave")]
-        public static void OnConvoyLeaveCommand(Player sender)
+        public static async void OnConvoyLeaveCommand(Player sender)
         {
             if (!sender.IsInConvoy)
             {
@@ -109,12 +109,12 @@ namespace TruckingSharp.Missions.Convoy
                 return;
             }
 
-            MissionConvoy.PlayerLeaveConvoy(sender);
+            await MissionConvoy.PlayerLeaveConvoyAsync(sender);
             sender.SendClientMessage(Color.GreenYellow, "You left the convoy.");
         }
 
         [Command("convoycancel", Shortcut = "convoycancel")]
-        public static void OnConvoyCancelCommand(Player sender)
+        public static async void OnConvoyCancelCommand(Player sender)
         {
             if (!sender.IsInConvoy)
             {
@@ -131,7 +131,7 @@ namespace TruckingSharp.Missions.Convoy
                 return;
             }
 
-            MissionConvoy.CancelConvoy(convoy);
+            await MissionConvoy.CancelConvoyAsync(convoy);
         }
 
         [Command("convoymembers", Shortcut = "convoymembers")]

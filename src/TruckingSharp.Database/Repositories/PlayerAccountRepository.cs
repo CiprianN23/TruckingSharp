@@ -7,11 +7,11 @@ using TruckingSharp.Database.Entities;
 
 namespace TruckingSharp.Database.Repositories
 {
-    public sealed class PlayerBankAccountRepository6
+    public sealed class PlayerAccountRepository
     {
         private readonly IDatabaseConnection _databaseConnectionFactory;
 
-        public PlayerBankAccountRepository6(IDatabaseConnection databaseConnectionFactory) => _databaseConnectionFactory = databaseConnectionFactory;
+        public PlayerAccountRepository(IDatabaseConnection databaseConnectionFactory) => _databaseConnectionFactory = databaseConnectionFactory;
 
         public PlayerAccount Find(string name)
         {

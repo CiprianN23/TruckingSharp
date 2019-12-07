@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
 using TruckingSharp.Data;
-using TruckingSharp.Database;
 using TruckingSharp.Database.Entities;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Extensions.PlayersExtensions;
@@ -47,7 +46,7 @@ namespace TruckingSharp.Commands.AdminCommands
         }
 
         [Command("ban", Shortcut = "ban")]
-        public static async void OnBanCommand(Player sender, Player target, int days, string reason)
+        public static async void OnBanCommandAsync(Player sender, Player target, int days, string reason)
         {
             if (!target.IsLoggedIn)
             {
@@ -100,7 +99,7 @@ namespace TruckingSharp.Commands.AdminCommands
                 target.SendClientMessage(Color.Red, $"Reason: {reason}.");
             }
 
-            await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(account);
+            await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(account);
             await new PlayerBanRepository(ConnectionFactory.GetConnection).AddAsync(playerBan);
 
             BasePlayer.SendClientMessageToAll(Color.LightGray,
@@ -111,7 +110,7 @@ namespace TruckingSharp.Commands.AdminCommands
         }
 
         [Command("unban", Shortcut = "unban")]
-        public static async void OnUnBanCommand(Player sender, string name)
+        public static async void OnUnBanCommandAsync(Player sender, string name)
         {
             var playerBan = await new PlayerBanRepository(ConnectionFactory.GetConnection).FindAsync(name);
 
@@ -196,7 +195,7 @@ namespace TruckingSharp.Commands.AdminCommands
         }
 
         [Command("cleanupallvehicles", Shortcut = "cleanupallvehicles")]
-        public static async void OnCleanupAllVehiclesCommand(BasePlayer sender)
+        public static async void OnCleanupAllVehiclesCommandAsync(BasePlayer sender)
         {
             foreach (var baseVehicle in Vehicle.All)
             {
@@ -232,7 +231,7 @@ namespace TruckingSharp.Commands.AdminCommands
         }
 
         [Command("ipban", Shortcut = "ipban")]
-        public static async void OnIPBanCommand(Player sender, Player target, string reason)
+        public static async void OnIPBanCommandAsync(Player sender, Player target, string reason)
         {
             if (!target.IsLoggedIn)
             {
@@ -287,11 +286,11 @@ namespace TruckingSharp.Commands.AdminCommands
         }
 
         [Command("setscore", Shortcut = "setscore")]
-        public static async void OnSetScoreCommand(Player sender, Player target, int score)
+        public static async void OnSetScoreCommandAsync(Player sender, Player target, int score)
         {
             var targetAccount = target.Account;
             targetAccount.Score = score;
-            await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
+            await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
 
             target.SendClientMessage(Color.GreenYellow, $"Your score has been set to {score} by {sender.Name}.");
             sender.SendClientMessage(Color.GreenYellow, $"You've set the score of {target.Name} to {score}.");
@@ -302,18 +301,18 @@ namespace TruckingSharp.Commands.AdminCommands
         {
             var targetAccount = target.Account;
             targetAccount.Money = money;
-            await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
+            await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
 
             target.SendClientMessage(Color.GreenYellow, $"Your money has been set to {money} by {sender.Name}.");
             sender.SendClientMessage(Color.GreenYellow, $"You've set the money of {target.Name} to {money}.");
         }
 
         [Command("givelicense", Shortcut = "givelicense")]
-        public static async void OnGiveLicenseCommand(BasePlayer sender, Player target)
+        public static async void OnGiveLicenseCommandAsync(BasePlayer sender, Player target)
         {
             var targetAccount = target.Account;
             targetAccount.TruckerLicense = 1;
-            await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
+            await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
 
             sender.SendClientMessage(Color.GreenYellow, $"You've given {target.Name} a trucker's license.");
             target.SendClientMessage(Color.GreenYellow,

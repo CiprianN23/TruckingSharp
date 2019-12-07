@@ -9,7 +9,6 @@ using System.Text;
 using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
 using TruckingSharp.Data;
-using TruckingSharp.Database;
 using TruckingSharp.Database.Entities;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Extensions.PlayersExtensions;
@@ -162,7 +161,7 @@ namespace TruckingSharp.Commands
 
                         var account = sender.Account;
                         account.Password = PasswordHashingService.GetPasswordHash(e.InputText);
-                        await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(account);
+                        await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(account);
 
                         sender.SendClientMessage(Color.GreenYellow, Messages.PasswordChangedSuccessfully);
                     };
@@ -525,12 +524,12 @@ namespace TruckingSharp.Commands
                     return;
                 }
 
-                sender.Reward(5000);
+                await sender.RewardAsync(5000);
 
                 var account = sender.Account;
                 account.RulesRead = 1;
 
-                await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(account);
+                await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(account);
 
                 sender.SendClientMessage(Color.FromInteger(65280, ColorFormat.RGB),
                     "You have earned {FFFF00}$5000{00FF00} for accepting the rules");
@@ -538,7 +537,7 @@ namespace TruckingSharp.Commands
         }
 
         [Command("givecash", Shortcut = "givecash")]
-        public static void OnGiveCashCommand(Player sender, Player target, int money)
+        public static async void OnGiveCashCommandAsync(Player sender, Player target, int money)
         {
             if (sender == target)
             {
@@ -564,8 +563,8 @@ namespace TruckingSharp.Commands
                 return;
             }
 
-            sender.Reward(-money);
-            target.Reward(money);
+            await sender.RewardAsync(-money);
+            await target.RewardAsync(money);
 
             target.SendClientMessage(
                 $"{{00FF00}}You have received {{FFFF00}}${money}{{00FF00}} from {{FFFF00}}{sender.Name}");

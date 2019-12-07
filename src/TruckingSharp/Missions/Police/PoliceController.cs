@@ -4,7 +4,7 @@ using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.Tools;
 using SampSharp.GameMode.World;
 using System;
-using TruckingSharp.Database;
+using System.Threading.Tasks;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.PlayerClasses.Data;
 
@@ -13,7 +13,7 @@ namespace TruckingSharp.Missions.Police
     [Controller]
     public class PoliceController : IEventListener
     {
-        private static PlayerBankAccountRepository6 AccountRepository => new PlayerBankAccountRepository6(ConnectionFactory.GetConnection);
+        private static PlayerAccountRepository AccountRepository => new PlayerAccountRepository(ConnectionFactory.GetConnection);
 
         public static void EndMission(Player player)
         {
@@ -33,7 +33,7 @@ namespace TruckingSharp.Missions.Police
             }
         }
 
-        public static async void JailPlayer(Player finedPlayer, int jailSeconds)
+        public static async Task JailPlayerAsync(Player finedPlayer, int jailSeconds)
         {
             var finedPlayerAccount = finedPlayer.Account;
 
@@ -50,10 +50,10 @@ namespace TruckingSharp.Missions.Police
 
             if (finedPlayer.IsDoingMission)
             {
-                MissionsController.ClassEndMission(finedPlayer);
+                await MissionsController.ClassEndMissionAsync(finedPlayer);
 
                 finedPlayer.GameText($"~w~You ~r~failed~w~ your mission. You lost ~y~${Configuration.Instance.FailedMissionPrice}~w~ to cover expenses.", 5000, 4);
-                finedPlayer.Reward(-Configuration.Instance.FailedMissionPrice);
+                await finedPlayer.RewardAsync(-Configuration.Instance.FailedMissionPrice);
             }
         }
 
@@ -103,16 +103,16 @@ namespace TruckingSharp.Missions.Police
             gameMode.PlayerSpawned += Police_PlayerSpawned;
         }
 
-        private void Police_PlayerSpawned(object sender, SampSharp.GameMode.Events.SpawnEventArgs e)
+        private async void Police_PlayerSpawned(object sender, SampSharp.GameMode.Events.SpawnEventArgs e)
         {
             if (!(sender is Player player))
                 return;
 
             if (player.Account.Jailed != 0)
-                JailPlayer(player, player.Account.Jailed);
+                await JailPlayerAsync(player, player.Account.Jailed);
         }
 
-        private void Police_PlayerDied(object sender, SampSharp.GameMode.Events.DeathEventArgs e)
+        private async void Police_PlayerDied(object sender, SampSharp.GameMode.Events.DeathEventArgs e)
         {
             if (!(sender is Player victim))
                 return;
@@ -122,7 +122,7 @@ namespace TruckingSharp.Missions.Police
 
             if (killer != null && killer.PlayerClass != PlayerClassType.Police)
             {
-                killer.SetWantedLevel(killer.Account.Wanted + 1);
+                await killer.SetWantedLevelAsync(killer.Account.Wanted + 1);
                 killer.SendClientMessage(Color.Red, $"You've killed {{FFFF00}}{victim.Name}{{FF0000}}, you're wanted by the police now.");
 
                 SendMessage(Color.GreenYellow, $"Player {{FFFF00}}{killer.Name}{{00FF00}} killed {{FFFF00}}{victim.Name}{{00FF00}}, pursue and fine him.");
@@ -196,7 +196,7 @@ namespace TruckingSharp.Missions.Police
             }
         }
 
-        private void FineNearbyPlayers(Player player)
+        private async Task FineNearbyPlayersAsync(Player player)
         {
             foreach (var basePlayer in BasePlayer.All)
             {
@@ -212,7 +212,7 @@ namespace TruckingSharp.Missions.Police
                 {
                     if (player.IsInRangeOfPoint(10.0f, serverPlayer.Position))
                     {
-                        FinePlayer(player, serverPlayer);
+                        await FinePlayerAsync(player, serverPlayer);
                         return;
                     }
 
@@ -232,7 +232,7 @@ namespace TruckingSharp.Missions.Police
             }
         }
 
-        private async void FinePlayer(Player policePlayer, Player finedPlayer)
+        private async Task FinePlayerAsync(Player policePlayer, Player finedPlayer)
         {
             var policePlayerAccount = policePlayer.Account;
 
@@ -240,12 +240,12 @@ namespace TruckingSharp.Missions.Police
             {
                 var finedPlayerAccount = finedPlayer.Account;
                 var fine = finedPlayerAccount.Wanted * Configuration.Instance.FinePerWantedLevel;
-                finedPlayer.Reward(-fine);
+                await finedPlayer.RewardAsync(-fine);
                 finedPlayer.SendClientMessage(Color.Red, $"You have been caught by {policePlayer.Name} and payed a fine of ${fine}.");
 
                 BasePlayer.SendClientMessageToAll(Color.GreenYellow, $"Officer {policePlayer.Name} has fined {finedPlayer}.");
 
-                policePlayer.Reward(fine, finedPlayerAccount.Wanted);
+                await policePlayer.RewardAsync(fine, finedPlayerAccount.Wanted);
                 policePlayerAccount.PoliceFined++;
                 policePlayer.SendClientMessage(Color.GreenYellow, $"You have fined {finedPlayer.Name} and earned ${fine}.");
             }
@@ -253,24 +253,24 @@ namespace TruckingSharp.Missions.Police
             {
                 var finedPlayerAccount = finedPlayer.Account;
                 var fine = finedPlayerAccount.Wanted * Configuration.Instance.FinePerWantedLevel * 2;
-                finedPlayer.Reward(-fine);
+                await finedPlayer.RewardAsync(-fine);
                 finedPlayer.SendClientMessage(Color.Red, $"You have been jailed by {policePlayer.Name} for {Configuration.Instance.DefaultJailSeconds / 60} minutes.");
 
-                JailPlayer(finedPlayer, Configuration.Instance.DefaultJailSeconds);
+                await JailPlayerAsync(finedPlayer, Configuration.Instance.DefaultJailSeconds);
 
                 BasePlayer.SendClientMessageToAll(Color.GreenYellow, $"Officer {policePlayer.Name} has jailed {finedPlayer.Name} for {Configuration.Instance.DefaultJailSeconds / 60} minutes.");
 
-                policePlayer.Reward(fine, finedPlayerAccount.Wanted);
+                await policePlayer.RewardAsync(fine, finedPlayerAccount.Wanted);
                 policePlayerAccount.PoliceJailed++;
                 policePlayer.SendClientMessage(Color.GreenYellow, $"You have jailed {finedPlayer.Name} and earned ${fine}.");
             }
 
-            finedPlayer.SetWantedLevel(0);
+            await finedPlayer.SetWantedLevelAsync(0);
 
             await AccountRepository.UpdateAsync(policePlayerAccount);
         }
 
-        private void Police_PlayerKeyStateChanged(object sender, SampSharp.GameMode.Events.KeyStateChangedEventArgs e)
+        private async void Police_PlayerKeyStateChanged(object sender, SampSharp.GameMode.Events.KeyStateChangedEventArgs e)
         {
             if (!(sender is Player player))
                 return;
@@ -280,7 +280,7 @@ namespace TruckingSharp.Missions.Police
 
             if (KeyUtils.HasPressed(e.NewKeys, e.OldKeys, SampSharp.GameMode.Definitions.Keys.Aim) && player.Vehicle == null)
             {
-                FineNearbyPlayers(player);
+                await FineNearbyPlayersAsync(player);
                 return;
             }
 

@@ -5,7 +5,6 @@ using SampSharp.GameMode.Display;
 using SampSharp.GameMode.SAMP;
 using System;
 using System.Threading.Tasks;
-using TruckingSharp.Database;
 using TruckingSharp.Database.Entities;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Events;
@@ -16,7 +15,7 @@ namespace TruckingSharp.Controllers
     [Controller]
     public class PlayerAccountController : IEventListener
     {
-        private static PlayerBankAccountRepository6 _accountRepository => new PlayerBankAccountRepository6(ConnectionFactory.GetConnection);
+        private static PlayerAccountRepository _accountRepository => new PlayerAccountRepository(ConnectionFactory.GetConnection);
 
         private PlayerBanRepository _banRepository => new PlayerBanRepository(ConnectionFactory.GetConnection);
 

@@ -142,7 +142,7 @@ namespace TruckingSharp.Missions
         }
 
         [Command("stopwork", Shortcut = "stopwork")]
-        public static void OnEndMissionCommand(Player sender)
+        public static async void OnEndMissionCommandAsync(Player sender)
         {
             if (!sender.IsDoingMission)
             {
@@ -154,24 +154,25 @@ namespace TruckingSharp.Missions
                 return;
 
             if (sender.IsInConvoy)
-                MissionConvoy.PlayerLeaveConvoy(sender);
+                await MissionConvoy.PlayerLeaveConvoyAsync(sender);
 
             if (sender.MissionStep == 1)
             {
                 sender.SendClientMessage(Color.GreenYellow, "You ended your mission.");
-                MissionsController.ClassEndMission(sender);
+                await MissionsController.ClassEndMissionAsync(sender);
                 return;
             }
 
-            MissionsController.ClassEndMission(sender);
+            await MissionsController.ClassEndMissionAsync(sender);
 
             sender.SendClientMessage(Color.Red,
                 $"You {{FF0000}}failed{{FFFFFF}} your mission. You lost {{FFFF00}}${Configuration.Instance.FailedMissionPrice}{{FFFFFF}} to cover expenses.");
-            sender.Reward(-Configuration.Instance.FailedMissionPrice);
+
+            await sender.RewardAsync(-Configuration.Instance.FailedMissionPrice);
         }
 
         [Command("overload", Shortcut = "overload")]
-        public static void OnOverLoadCommand(Player sender)
+        public static async void OnOverLoadCommandAsync(Player sender)
         {
             if (sender.PlayerClass != PlayerClassType.TruckDriver)
             {
@@ -233,7 +234,7 @@ namespace TruckingSharp.Missions
                 return;
 
             sender.IsOverloaded = true;
-            sender.SetWantedLevel(sender.Account.Wanted + 2);
+            await sender.SetWantedLevelAsync(sender.Account.Wanted + 2);
             sender.SendClientMessage(Color.Yellow, "You have overloaded your truck, watch out for the police.");
             // TODO: Send message to police
         }

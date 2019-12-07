@@ -3,7 +3,6 @@ using SampSharp.GameMode.Display;
 using SampSharp.GameMode.Events;
 using SampSharp.GameMode.SAMP;
 using System;
-using TruckingSharp.Database;
 using TruckingSharp.Database.Repositories;
 
 namespace TruckingSharp.Extensions.PlayersExtensions
@@ -102,7 +101,7 @@ namespace TruckingSharp.Extensions.PlayersExtensions
 
             if (player.BankAccount.Money > 0)
             {
-                player.Reward(player.BankAccount.Money);
+                await player.RewardAsync(player.BankAccount.Money);
 
                 player.SendClientMessage(Color.GreenYellow,
                     "There was still some money in your bank account, it has been added to your account.");
@@ -167,7 +166,7 @@ namespace TruckingSharp.Extensions.PlayersExtensions
                     }
 
                     if (new PlayerBankAccountRepository(ConnectionFactory.GetConnection).Find(
-                            new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).Find(ev.InputText).Id) == null)
+                            new PlayerAccountRepository(ConnectionFactory.GetConnection).Find(ev.InputText).Id) == null)
                     {
                         player.SendClientMessage(Color.Red, "That player doesn't have a bank account.");
                         playerNameDialog.Show(player);
@@ -177,7 +176,7 @@ namespace TruckingSharp.Extensions.PlayersExtensions
                     var playerBankAccount = player.BankAccount;
                     var otherBankAccount =
                         new PlayerBankAccountRepository(ConnectionFactory.GetConnection).Find(
-                            new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).Find(ev.InputText).Id);
+                            new PlayerAccountRepository(ConnectionFactory.GetConnection).Find(ev.InputText).Id);
 
                     otherBankAccount.Money += transferMoney;
                     playerBankAccount.Money -= transferMoney;
@@ -227,7 +226,7 @@ namespace TruckingSharp.Extensions.PlayersExtensions
                 var playerBankAccount = player.BankAccount;
                 playerBankAccount.Money -= withdrawMoney;
 
-                player.Reward(withdrawMoney);
+                await player.RewardAsync(withdrawMoney);
 
                 await new PlayerBankAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(playerBankAccount);
 
@@ -271,7 +270,7 @@ namespace TruckingSharp.Extensions.PlayersExtensions
                 var playerBankAccount = player.BankAccount;
                 playerBankAccount.Money += depositMoney;
 
-                player.Reward(-depositMoney);
+                await player.RewardAsync(-depositMoney);
 
                 await new PlayerBankAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(playerBankAccount);
 

@@ -7,8 +7,8 @@ using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.World;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TruckingSharp.Constants;
-using TruckingSharp.Database;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Missions.Bonus;
 using TruckingSharp.Missions.Data;
@@ -20,14 +20,14 @@ namespace TruckingSharp.Missions.Trucker
     [Controller]
     public class TruckerController : IEventListener
     {
-        private static PlayerBankAccountRepository6 AccountRepository => new PlayerBankAccountRepository6(ConnectionFactory.GetConnection);
+        private static PlayerAccountRepository AccountRepository => new PlayerAccountRepository(ConnectionFactory.GetConnection);
 
         public void RegisterEvents(BaseMode gameMode)
         {
             gameMode.PlayerEnterCheckpoint += Trucker_PlayerEnterCheckpoint;
         }
 
-        public static void EndMission(Player player)
+        public static async Task EndMissionAsync(Player player)
         {
             if (!player.IsDoingMission)
                 return;
@@ -53,9 +53,9 @@ namespace TruckingSharp.Missions.Trucker
             player.MissionTextDraw.Text = Messages.NoMissionText;
 
             if (player.Account.Wanted >= 2)
-                player.SetWantedLevel(player.Account.Wanted - 2);
+                await player.SetWantedLevelAsync(player.Account.Wanted - 2);
             else
-                player.SetWantedLevel(0);
+                await player.SetWantedLevelAsync(0);
 
             if (!player.IsOverloaded)
                 return;
@@ -281,7 +281,7 @@ namespace TruckingSharp.Missions.Trucker
             return true;
         }
 
-        private void SetRandomOverload(Player player)
+        private async Task SetRandomOverloadAsync(Player player)
         {
             var playerTrailerModel = player.Vehicle?.Trailer?.Model;
 
@@ -298,9 +298,9 @@ namespace TruckingSharp.Missions.Trucker
                 return;
 
             player.IsOverloaded = true;
-            player.SetWantedLevel(player.Account.Wanted + 2);
+            await player.SetWantedLevelAsync(player.Account.Wanted + 2);
 
-            PoliceController.SendMessage(Color.GreenYellow ,$"Trucker {{FFFF00}}{player.Name}{{00FF00}} is overloaded, pursue and fine him.");
+            PoliceController.SendMessage(Color.GreenYellow, $"Trucker {{FFFF00}}{player.Name}{{00FF00}} is overloaded, pursue and fine him.");
         }
 
         private void Trucker_PlayerEnterCheckpoint(object sender, EventArgs e)
@@ -369,7 +369,7 @@ namespace TruckingSharp.Missions.Trucker
                     player.MissionStep = 2;
                     player.DisableCheckpoint();
 
-                    SetRandomOverload(player);
+                    await SetRandomOverloadAsync(player);
 
                     var routeText = string.Format(Messages.MissionTruckerHaulingToDeliverCargo,
                         player.MissionCargo.Name, player.FromLocation.Name, player.ToLocation.Name);
@@ -419,38 +419,38 @@ namespace TruckingSharp.Missions.Trucker
                             $"{{00BBFF}}Player {{FFBB00}}{player.Name}{{00BBFF}} has finished the bonus mission.");
                     }
 
-                    player.Reward(payment);
+                    await player.RewardAsync(payment);
                     player.SendClientMessage(Messages.MissionReward, payment);
 
                     if (player.IsOverloaded)
                     {
                         var bonus = payment * 25 / 100;
-                        player.Reward(bonus);
+                        await player.RewardAsync(bonus);
                         player.SendClientMessage(Messages.MissionTruckerBonusOverload, bonus);
                     }
 
                     if (player.IsMafiaLoaded)
                     {
                         var bonus = payment * 50 / 100;
-                        player.Reward(bonus);
+                        await player.RewardAsync(bonus);
                         player.SendClientMessage(Messages.MissionTruckerBonusMafia, bonus);
                     }
 
                     if (player.MissionVehicle.IsOwned)
                     {
                         var bonus = payment * 10 / 100;
-                        player.Reward(bonus);
+                        await player.RewardAsync(bonus);
                         player.SendClientMessage(Messages.MissionTruckerBonusOwnedVehicle, bonus);
                     }
 
-                    player.Reward(0, MissionsController.GetDistance(player.FromLocation, player.ToLocation) > 3000.0f ? 2 : 1);
+                    await player.RewardAsync(0, MissionsController.GetDistance(player.FromLocation, player.ToLocation) > 3000.0f ? 2 : 1);
 
                     var account = player.Account;
                     account.TruckerJobs++;
 
                     await AccountRepository.UpdateAsync(account);
 
-                    EndMission(player);
+                    await EndMissionAsync(player);
 
                     player.ToggleControllable(true);
                     break;

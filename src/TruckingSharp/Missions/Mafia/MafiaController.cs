@@ -3,8 +3,8 @@ using SampSharp.GameMode.Controllers;
 using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.World;
 using System;
+using System.Threading.Tasks;
 using TruckingSharp.Constants;
-using TruckingSharp.Database;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Missions.Data;
 using TruckingSharp.Missions.Police;
@@ -43,12 +43,12 @@ namespace TruckingSharp.Missions.Mafia
                     player.Vehicle.Respawn();
                 }
 
-                player.Reward(5000, 2);
+                await player.RewardAsync(5000, 2);
                 player.SendClientMessage(Color.GreenYellow, "You delivered a stolen mafia-load, you earned $5000.");
 
                 var playerAccount = player.Account;
                 playerAccount.MafiaStolen++;
-                await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(playerAccount);
+                await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(playerAccount);
 
                 player.MissionVehicle = null;
                 player.MissionTrailer = null;
@@ -104,7 +104,6 @@ namespace TruckingSharp.Missions.Mafia
 
                     var playerVehicle = (Vehicle)player.Vehicle;
                     var playerVehicleTrailer = (Vehicle)player.Vehicle.Trailer;
-                    
 
                     if (!player.MafiaLoadHijacked)
                     {
@@ -144,7 +143,7 @@ namespace TruckingSharp.Missions.Mafia
                     player.MissionTextDraw.Text = $"~w~Hauling ~b~{player.MissionCargo.Name}~w~ from {player.FromLocation.Name} to ~r~{player.ToLocation.Name}~w~";
 
                     player.SetCheckpoint(player.ToLocation.Position, 7.0f);
-                    player.SetWantedLevel(player.Account.Wanted + 4);
+                    await player.SetWantedLevelAsync(player.Account.Wanted + 4);
 
                     PoliceController.SendMessage(Color.GreenYellow, $"Mafia {{FFFF00}}{player.Name}{{00FF00}} is transporting illegal goods, pursue and fine him.");
 
@@ -156,22 +155,22 @@ namespace TruckingSharp.Missions.Mafia
                     BasePlayer.SendClientMessageToAll(Color.White, $"from {{00FF00}}{player.FromLocation.Name}{{FFFFFF}} to {{00FF00}}{player.ToLocation.Name}.");
 
                     var payment = MissionsController.CalculatePayment(player.FromLocation, player.ToLocation, player.MissionCargo);
-                    player.Reward(payment, 2);
+                    await player.RewardAsync(payment, 2);
 
                     player.SendClientMessage(Color.GreenYellow, $"You finished the mission and earned ${payment}.");
 
                     var playerAccount = player.Account;
                     playerAccount.MafiaJobs++;
-                    await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(playerAccount);
+                    await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(playerAccount);
 
-                    EndMission(player);
+                    await EndMissionAsync(player);
                     break;
             }
 
             player.ToggleControllable(true);
         }
 
-        public static void EndMission(Player player)
+        public static async Task EndMissionAsync(Player player)
         {
             player.CheckTimer?.Dispose();
 
@@ -198,9 +197,9 @@ namespace TruckingSharp.Missions.Mafia
                 player.MissionLoadingTimer?.Dispose();
 
                 if (player.Account.Wanted >= 4)
-                    player.SetWantedLevel(player.Account.Wanted - 4);
+                    await player.SetWantedLevelAsync(player.Account.Wanted - 4);
                 else
-                    player.SetWantedLevel(0);
+                    await player.SetWantedLevelAsync(0);
             }
 
             player.MissionVehicle = null;

@@ -5,6 +5,7 @@ using SampSharp.GameMode.Display;
 using SampSharp.GameMode.Events;
 using SampSharp.GameMode.SAMP;
 using System;
+using System.Threading.Tasks;
 using TruckingSharp.Constants;
 using TruckingSharp.Missions.BusDriver;
 using TruckingSharp.Missions.Convoy;
@@ -32,30 +33,33 @@ namespace TruckingSharp.Missions
             gameMode.PlayerSpawned += Mission_PlayerSpawned;
         }
 
-        public static void ClassEndMission(Player player)
+        public static async Task ClassEndMissionAsync(Player player)
         {
             switch (player.PlayerClass)
             {
                 case PlayerClassType.TruckDriver:
-                    TruckerController.EndMission(player);
+                    await TruckerController.EndMissionAsync(player);
                     break;
 
                 case PlayerClassType.BusDriver:
                     BusDriverController.EndMission(player);
                     break;
+
                 case PlayerClassType.Pilot:
                     PilotController.EndMission(player);
                     break;
+
                 case PlayerClassType.Police:
                     PoliceController.EndMission(player);
                     break;
+
                 case PlayerClassType.Mafia:
-                    MafiaController.EndMission(player);
+                    await MafiaController.EndMissionAsync(player);
                     break;
             }
         }
 
-        private void _missionTimer_Tick(object sender, EventArgs e)
+        private async void _missionTimer_Tick(object sender, EventArgs e)
         {
             foreach (var basePlayer in Player.All)
             {
@@ -83,7 +87,7 @@ namespace TruckingSharp.Missions
                         }
                         else
                         {
-                            PlayerFailMission(player);
+                            await PlayerFailMissionAsync(player);
                         }
 
                         break;
@@ -100,7 +104,7 @@ namespace TruckingSharp.Missions
                         }
                         else
                         {
-                            PlayerFailMission(player);
+                            await PlayerFailMissionAsync(player);
                         }
 
                         break;
@@ -132,23 +136,23 @@ namespace TruckingSharp.Missions
             };
         }
 
-        private void Mission_PlayerDied(object sender, DeathEventArgs e)
+        private async void Mission_PlayerDied(object sender, DeathEventArgs e)
         {
             if (!(sender is Player player))
                 return;
 
-            ClassEndMission(player);
+            await ClassEndMissionAsync(player);
 
             player.MissionTextDraw.Text = string.Empty;
             player.MissionTextDraw.Hide();
         }
 
-        private void Mission_PlayerDisconnected(object sender, DisconnectEventArgs e)
+        private async void Mission_PlayerDisconnected(object sender, DisconnectEventArgs e)
         {
             if (!(sender is Player player))
                 return;
 
-            ClassEndMission(player);
+            await ClassEndMissionAsync(player);
 
             player.MissionTextDraw.Dispose();
         }
@@ -184,14 +188,14 @@ namespace TruckingSharp.Missions
             player.MissionTextDraw.Show();
         }
 
-        private void PlayerFailMission(Player player)
+        private async Task PlayerFailMissionAsync(Player player)
         {
-            ClassEndMission(player);
-            MissionConvoy.PlayerLeaveConvoy(player);
+            await ClassEndMissionAsync(player);
+            await MissionConvoy.PlayerLeaveConvoyAsync(player);
 
             var message = string.Format(Messages.MissionFailed, Configuration.Instance.FailedMissionPrice);
             player.GameText(message, 5000, 4);
-            player.Reward(-Configuration.Instance.FailedMissionPrice);
+            await player.RewardAsync(-Configuration.Instance.FailedMissionPrice);
         }
 
         private void PlayerLeftVehicle(Player player)

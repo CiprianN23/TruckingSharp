@@ -6,7 +6,6 @@ using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.World;
 using System;
 using TruckingSharp.Constants;
-using TruckingSharp.Database;
 using TruckingSharp.Database.Repositories;
 
 namespace TruckingSharp.Missions.BusDriver
@@ -14,7 +13,7 @@ namespace TruckingSharp.Missions.BusDriver
     [Controller]
     public class BusDriverController : IEventListener
     {
-        private static PlayerBankAccountRepository6 AccountRepository => new PlayerBankAccountRepository6(ConnectionFactory.GetConnection);
+        private static PlayerAccountRepository AccountRepository => new PlayerAccountRepository(ConnectionFactory.GetConnection);
 
         public void RegisterEvents(BaseMode gameMode)
         {
@@ -73,7 +72,7 @@ namespace TruckingSharp.Missions.BusDriver
 
                 var depot = BusRoute.GetLocation(player.BusRoute.HomeDepot);
                 player.SetCheckpoint(depot.Position, 7.0f);
-                player.Reward(0, player.BusRoute.Score);
+                await player.RewardAsync(0, player.BusRoute.Score);
 
                 var playerAccount = player.Account;
                 playerAccount.BusDriverJobs++;
@@ -90,7 +89,7 @@ namespace TruckingSharp.Missions.BusDriver
             if (passangersGettingOffTheBus != 0)
             {
                 var payment = passangersGettingOffTheBus * 9;
-                player.Reward(payment);
+                await player.RewardAsync(payment);
                 player.GameText($"~g~You've earned ${payment}~w~", 3000, 4);
             }
         }
@@ -146,7 +145,7 @@ namespace TruckingSharp.Missions.BusDriver
             switch (e.ListItem)
             {
                 case 0:
-                    foreach(var busRoute in BusRoute.BusRoutes)
+                    foreach (var busRoute in BusRoute.BusRoutes)
                     {
                         selectRouteDialog.AddItem($"Line {busRoute.LineNumber} ({busRoute.Description})\n");
                     }
@@ -154,6 +153,7 @@ namespace TruckingSharp.Missions.BusDriver
                     selectRouteDialog.Show(player);
                     selectRouteDialog.Response += SelectRouteDialog_Response;
                     break;
+
                 case 1:
                     var random = new Random();
 

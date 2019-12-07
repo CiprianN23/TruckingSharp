@@ -43,7 +43,7 @@ namespace TruckingSharp.Vehicles.GasStation
             refuelTimer.Tick += (senderObject, ev) => RefuelVehicle(senderObject, ev, player);
         }
 
-        private void RefuelVehicle(object sender, EventArgs e, Player player)
+        private async void RefuelVehicle(object sender, EventArgs e, Player player)
         {
             var playerVehicle = (Vehicle)player.Vehicle;
             var fuelAmount = Configuration.Instance.MaximumFuel - playerVehicle.Fuel;
@@ -57,7 +57,7 @@ namespace TruckingSharp.Vehicles.GasStation
             }
 
             playerVehicle.Fuel = Configuration.Instance.MaximumFuel;
-            player.Reward(-refuelPrice);
+            await player.RewardAsync(-refuelPrice);
             player.SendClientMessage(Color.GreenYellow, $"You refuelled your vehicle for ${refuelPrice}.");
             player.ToggleControllable(true);
         }

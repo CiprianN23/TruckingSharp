@@ -4,6 +4,7 @@ using SampSharp.GameMode.Display;
 using SampSharp.GameMode.SAMP;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TruckingSharp.Constants;
 using TruckingSharp.Missions.Data;
 using TruckingSharp.PlayerClasses.Data;
@@ -124,7 +125,7 @@ namespace TruckingSharp.Missions.Convoy
             convoy.MemberText.Text = "Waiting for the leader to start a job.";
         }
 
-        public static void PlayerLeaveConvoy(Player player)
+        public static async Task PlayerLeaveConvoyAsync(Player player)
         {
             var convoy = player.Convoy;
 
@@ -133,7 +134,7 @@ namespace TruckingSharp.Missions.Convoy
 
             if (convoy.Members.Count == 1)
             {
-                CancelConvoy(convoy);
+                await CancelConvoyAsync(convoy);
                 return;
             }
 
@@ -156,7 +157,7 @@ namespace TruckingSharp.Missions.Convoy
             else
             {
                 convoy.Members.Remove(player);
-                MissionsController.ClassEndMission(player);
+                await MissionsController.ClassEndMissionAsync(player);
             }
         }
 
@@ -230,7 +231,7 @@ namespace TruckingSharp.Missions.Convoy
             }
         }
 
-        public static void CancelConvoy(MissionConvoy convoy)
+        public static async Task CancelConvoyAsync(MissionConvoy convoy)
         {
             foreach (var member in convoy.Members)
             {
@@ -240,7 +241,7 @@ namespace TruckingSharp.Missions.Convoy
                 convoy.MemberText.Hide(member);
                 convoy.LeaderText.Hide(member);
 
-                MissionsController.ClassEndMission(member);
+                await MissionsController.ClassEndMissionAsync(member);
 
                 member.SendClientMessage(Color.White, "{FF0000}The leader cancelled the convoy.");
             }

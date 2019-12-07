@@ -5,7 +5,6 @@ using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.World;
 using System;
 using TruckingSharp.Constants;
-using TruckingSharp.Database;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Extensions.PlayersExtensions;
 using TruckingSharp.Missions.Data;
@@ -15,7 +14,7 @@ namespace TruckingSharp.Missions.Pilot
     [Controller]
     public class PilotController : IEventListener
     {
-        private PlayerBankAccountRepository6 AccountRepository => new PlayerBankAccountRepository6(ConnectionFactory.GetConnection);
+        private PlayerAccountRepository AccountRepository => new PlayerAccountRepository(ConnectionFactory.GetConnection);
 
         public static void EndMission(Player player)
         {
@@ -114,7 +113,7 @@ namespace TruckingSharp.Missions.Pilot
                     BasePlayer.SendClientMessageToAll(Color.White, $"from {{00FF00}}{player.FromLocation.Name}{{FFFFFF}} to {{00FF00}}{player.ToLocation.Name}{{FFFFFF}}.");
 
                     var payment = MissionsController.CalculatePayment(player.FromLocation, player.ToLocation, player.MissionCargo);
-                    player.Reward(payment);
+                    await player.RewardAsync(payment);
 
                     player.SendClientMessage(Color.GreenYellow, $"You finished the mission and earned ${payment}.");
 

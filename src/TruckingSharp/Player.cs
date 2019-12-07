@@ -23,7 +23,7 @@ namespace TruckingSharp
     {
         public PlayerClassType PlayerClass;
 
-        public PlayerAccount Account => new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).Find(Name);
+        public PlayerAccount Account => new PlayerAccountRepository(ConnectionFactory.GetConnection).Find(Name);
 
         public PlayerBankAccount BankAccount => new PlayerBankAccountRepository(ConnectionFactory.GetConnection).Find(Account.Id);
 
@@ -119,7 +119,7 @@ namespace TruckingSharp
             return true;
         }
 
-        public async void Reward(int money, int score = 0)
+        public async Task RewardAsync(int money, int score = 0)
         {
             var account = Account;
 
@@ -129,15 +129,15 @@ namespace TruckingSharp
             Money = account.Money;
             Score = account.Score;
 
-            await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(account).ConfigureAwait(false);
+            await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(account).ConfigureAwait(false);
         }
 
-        public async void SetWantedLevel(int wantedLevel)
+        public async Task SetWantedLevelAsync(int wantedLevel)
         {
             var account = Account;
             account.Wanted = wantedLevel;
             WantedLevel = wantedLevel;
-            await new PlayerBankAccountRepository6(ConnectionFactory.GetConnection).UpdateAsync(account).ConfigureAwait(false);
+            await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(account).ConfigureAwait(false);
         }
 
         public override void OnClickPlayer(ClickPlayerEventArgs e)
