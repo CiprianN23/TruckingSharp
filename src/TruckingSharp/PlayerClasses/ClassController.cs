@@ -5,6 +5,7 @@ using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.World;
 using System;
 using TruckingSharp.Constants;
+using TruckingSharp.Missions.Assistance;
 using TruckingSharp.Missions.Mafia;
 using TruckingSharp.Missions.Police;
 using TruckingSharp.PlayerClasses.ClassesSpawn;
@@ -62,7 +63,7 @@ namespace TruckingSharp.PlayerClasses
 
                     player.CheckTimer?.Dispose();
                     player.CheckTimer = new Timer(TimeSpan.FromSeconds(1), true);
-                    player.CheckTimer.Tick += (senderObject, ev) => MafiaController.PoliceCheckTimer_Tick(senderObject, ev, player);
+                    player.CheckTimer.Tick += (senderObject, ev) => MafiaController.MafiaCheckTimer_Tick(senderObject, ev, player);
                     break;
 
                 case PlayerClassType.Courier:
@@ -71,6 +72,10 @@ namespace TruckingSharp.PlayerClasses
 
                 case PlayerClassType.Assistance:
                     player.Color = PlayerClassColor.AssistanceColor;
+
+                    player.CheckTimer?.Dispose();
+                    player.CheckTimer = new Timer(TimeSpan.FromSeconds(1), true);
+                    player.CheckTimer.Tick += (senderObject, ev) => AssistanceController.AssistanceCheckTimer_Tick(senderObject, ev, player);
                     break;
 
                 case PlayerClassType.RoadWorker:

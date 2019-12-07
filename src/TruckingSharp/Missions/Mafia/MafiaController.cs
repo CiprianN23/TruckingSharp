@@ -83,7 +83,7 @@ namespace TruckingSharp.Missions.Mafia
             }
         }
 
-        internal static void PoliceCheckTimer_Tick(object senderObject, EventArgs ev, Player player)
+        internal static void MafiaCheckTimer_Tick(object senderObject, EventArgs ev, Player player)
         {
             foreach (var basePlayer in BasePlayer.All)
             {
@@ -93,9 +93,9 @@ namespace TruckingSharp.Missions.Mafia
                     continue;
 
                 if (serverPlayer.IsMafiaLoaded)
-                    serverPlayer.SetPlayerMarker(player, Color.Red);
+                    player.SetPlayerMarker(serverPlayer, Color.Red);
                 else
-                    serverPlayer.SetPlayerMarker(player, PlayerClassColor.TruckerColor);
+                    player.SetPlayerMarker(serverPlayer, PlayerClassColor.TruckerColor);
 
                 if (!player.IsDoingMission)
                 {
@@ -181,7 +181,7 @@ namespace TruckingSharp.Missions.Mafia
                 if (!serverPlayer.IsLoggedIn || player.PlayerClass != PlayerClasses.Data.PlayerClassType.TruckDriver)
                     continue;
 
-                serverPlayer.SetPlayerMarker(player, PlayerClassColor.TruckerColor);
+                player.SetPlayerMarker(serverPlayer, PlayerClassColor.TruckerColor);
             }
 
             if (player.IsDoingMission)

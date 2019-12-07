@@ -7,6 +7,7 @@ using SampSharp.GameMode.SAMP;
 using System;
 using System.Threading.Tasks;
 using TruckingSharp.Constants;
+using TruckingSharp.Missions.Assistance;
 using TruckingSharp.Missions.BusDriver;
 using TruckingSharp.Missions.Convoy;
 using TruckingSharp.Missions.Data;
@@ -55,6 +56,9 @@ namespace TruckingSharp.Missions
 
                 case PlayerClassType.Mafia:
                     await MafiaController.EndMissionAsync(player);
+                    break;
+                case PlayerClassType.Assistance:
+                    AssistanceController.EndMission(player);
                     break;
             }
         }

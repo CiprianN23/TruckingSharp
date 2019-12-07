@@ -71,7 +71,7 @@ namespace TruckingSharp.Missions.Police
 
                 if (serverPlayer.Account.Wanted > 0)
                 {
-                    serverPlayer.SetPlayerMarker(player, Color.Red);
+                    player.SetPlayerMarker(serverPlayer, Color.Red);
                 }
                 else
                 {
@@ -163,35 +163,35 @@ namespace TruckingSharp.Missions.Police
             switch (serverPlayer.PlayerClass)
             {
                 case PlayerClassType.TruckDriver:
-                    serverPlayer.SetPlayerMarker(player, PlayerClassColor.TruckerColor);
+                    player.SetPlayerMarker(serverPlayer, PlayerClassColor.TruckerColor);
                     break;
 
                 case PlayerClassType.BusDriver:
-                    serverPlayer.SetPlayerMarker(player, PlayerClassColor.BusDriverColor);
+                    player.SetPlayerMarker(serverPlayer, PlayerClassColor.BusDriverColor);
                     break;
 
                 case PlayerClassType.Pilot:
-                    serverPlayer.SetPlayerMarker(player, PlayerClassColor.PilotColor);
+                    player.SetPlayerMarker(serverPlayer, PlayerClassColor.PilotColor);
                     break;
 
                 case PlayerClassType.Police:
-                    serverPlayer.SetPlayerMarker(player, PlayerClassColor.PoliceColor);
+                    player.SetPlayerMarker(serverPlayer, PlayerClassColor.PoliceColor);
                     break;
 
                 case PlayerClassType.Mafia:
-                    serverPlayer.SetPlayerMarker(player, PlayerClassColor.MafiaColor);
+                    player.SetPlayerMarker(serverPlayer, PlayerClassColor.MafiaColor);
                     break;
 
                 case PlayerClassType.Courier:
-                    serverPlayer.SetPlayerMarker(player, PlayerClassColor.CourierColor);
+                    player.SetPlayerMarker(serverPlayer, PlayerClassColor.CourierColor);
                     break;
 
                 case PlayerClassType.Assistance:
-                    serverPlayer.SetPlayerMarker(player, PlayerClassColor.AssistanceColor);
+                    player.SetPlayerMarker(serverPlayer, PlayerClassColor.AssistanceColor);
                     break;
 
                 case PlayerClassType.RoadWorker:
-                    serverPlayer.SetPlayerMarker(player, PlayerClassColor.RoadWorkerColor);
+                    player.SetPlayerMarker(serverPlayer, PlayerClassColor.RoadWorkerColor);
                     break;
             }
         }

@@ -11,6 +11,7 @@ using TruckingSharp.Missions.BusDriver;
 using TruckingSharp.Missions.Convoy;
 using TruckingSharp.Missions.Mafia;
 using TruckingSharp.Missions.Pilot;
+using TruckingSharp.Missions.Police;
 using TruckingSharp.Missions.Trucker;
 using TruckingSharp.PlayerClasses.Data;
 
@@ -150,7 +151,7 @@ namespace TruckingSharp.Missions
                 return;
             }
 
-            if (sender.PlayerClass == PlayerClassType.Police)
+            if (sender.PlayerClass == PlayerClassType.Police || sender.PlayerClass ==  PlayerClassType.Assistance)
                 return;
 
             if (sender.IsInConvoy)
@@ -236,7 +237,7 @@ namespace TruckingSharp.Missions
             sender.IsOverloaded = true;
             await sender.SetWantedLevelAsync(sender.Account.Wanted + 2);
             sender.SendClientMessage(Color.Yellow, "You have overloaded your truck, watch out for the police.");
-            // TODO: Send message to police
+            PoliceController.SendMessage(Color.GreenYellow, $"Trucker {{FFFF00}}{sender.Name}{{00FF00}} is overloaded, pursue and fine him.");
         }
 
         [Command("bonus", Shortcut = "bonus")]

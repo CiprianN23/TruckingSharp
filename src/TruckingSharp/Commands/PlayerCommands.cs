@@ -21,6 +21,51 @@ namespace TruckingSharp.Commands
     [CommandGroup("player", PermissionChecker = typeof(LoggedPermission))]
     public class PlayerCommands
     {
+        [Command("assist", Shortcut = "assist")]
+        public static async void OnAssistCommandAsync(Player sender)
+        {
+            if (!sender.IsDriving())
+            {
+                sender.SendClientMessage(Color.Red, Messages.CommandAllowedOnlyAsDriver);
+                return;
+            }
+
+            bool assistPlayerOnline = false;
+
+            foreach (var basePlayer in BasePlayer.All)
+            {
+                var serverPlayer = (Player)basePlayer;
+
+                if (!serverPlayer.IsLoggedIn)
+                    continue;
+
+                if (serverPlayer.PlayerClass == PlayerClassType.Assistance)
+                {
+                    assistPlayerOnline = true;
+                    serverPlayer.SendClientMessage(Color.GreenYellow, $"Player {{FFFF00}}{sender.Name}{{00FF00}} needs assistance, go help him.");
+                }
+            }
+
+            if (assistPlayerOnline)
+            {
+                sender.AssistanaceNeeded = true;
+                sender.SendClientMessage(Color.GreenYellow, "You called for assistance.");
+            }
+            else
+            {
+                if (sender.IsDriving())
+                {
+                    var senderVehicle = (Vehicle)sender.Vehicle;
+                    senderVehicle.Repair();
+                    senderVehicle.Fuel = Configuration.Instance.MaximumFuel;
+
+                    sender.SendClientMessage(Color.GreenYellow, $"Your vehicle has been auto-repaired and refuelled for {{FFFF00}}${Configuration.Instance.AutoAssistPrice} {{00FF00}}as there is no assistance player online.");
+
+                    await sender.RewardAsync(-Configuration.Instance.AutoAssistPrice);
+                }
+            }
+        }
+
         [Command("admins", Shortcut = "admins")]
         public static void OnAdminsCommand(BasePlayer sender)
         {

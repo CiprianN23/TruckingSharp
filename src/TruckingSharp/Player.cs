@@ -69,6 +69,7 @@ namespace TruckingSharp
         public int SecondsUntilPoliceCanJail { get; set; }
         public bool CanPoliceJail { get; set; }
         public bool MafiaLoadHijacked { get; set; }
+        public bool AssistanaceNeeded { get; set; }
 
         public bool CheckIfPlayerCanJoinPolice()
         {
@@ -171,29 +172,25 @@ namespace TruckingSharp
 
             e.Vehicle.Engine = false;
             e.Vehicle.Lights = false;
-
-            // TODO: Cancel pilot job
         }
 
         public override void OnKeyStateChanged(KeyStateChangedEventArgs e)
         {
             base.OnKeyStateChanged(e);
 
-            // TODO: Police fine/warn to stop
-            // TODO: Assistance repair vehicle/own vehicle
             // TODO: Tow vehicle with tow truck
         }
 
         public override async void OnRequestClass(RequestClassEventArgs e)
-        {
-            base.OnRequestClass(e);
-
+        { 
             if (IsLoggedIn)
                 return;
 
             SendClientMessage(Color.Red, Messages.FailedToLoginProperly);
             await Task.Delay(Configuration.Instance.KickDelay);
             Kick();
+
+            base.OnRequestClass(e);
         }
 
         public override void OnSpawned(SpawnEventArgs e)
