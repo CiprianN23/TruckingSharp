@@ -70,6 +70,7 @@ namespace TruckingSharp
         public bool CanPoliceJail { get; set; }
         public bool MafiaLoadHijacked { get; set; }
         public bool AssistanaceNeeded { get; set; }
+        public float MetersDriven { get; set; }
 
         public bool CheckIfPlayerCanJoinPolice()
         {
@@ -182,7 +183,7 @@ namespace TruckingSharp
         }
 
         public override async void OnRequestClass(RequestClassEventArgs e)
-        { 
+        {
             if (IsLoggedIn)
                 return;
 

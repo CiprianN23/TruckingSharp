@@ -77,9 +77,7 @@ namespace TruckingSharp.Vehicles.Speedometer
 
             player.Speed = playerVehicleSpeed;
 
-            var account = player.Account;
-            account.MetersDriven = (float)(account.MetersDriven + playerVehicleSpeed / 7.2);
-            await _playerAccountRepository.UpdateAsync(account);
+            player.MetersDriven = (float)(player.MetersDriven + (playerVehicleSpeed / 7.2));
 
             if (!player.VehicleNameTextDraw.IsDisposed)
                 player.VehicleNameTextDraw.Text = $"{playerVehicle.ModelInfo.Name}";

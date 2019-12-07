@@ -23,6 +23,17 @@ namespace TruckingSharp.Controllers
         {
             PlayerLogin += PlayerAccountController_PlayerLogin;
             gameMode.PlayerConnected += GameMode_PlayerConnected;
+            gameMode.PlayerDisconnected += GameMode_PlayerDisconnected;
+        }
+
+        private async void GameMode_PlayerDisconnected(object sender, SampSharp.GameMode.Events.DisconnectEventArgs e)
+        {
+            if (!(sender is Player player))
+                return;
+
+            var playerAccount = player.Account;
+            playerAccount.MetersDriven += player.MetersDriven;
+            await _accountRepository.UpdateAsync(playerAccount);
         }
 
         public event EventHandler<PlayerLoginEventArgs> PlayerLogin;
