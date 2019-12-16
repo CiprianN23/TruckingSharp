@@ -66,6 +66,130 @@ namespace TruckingSharp.Commands
             }
         }
 
+        [Command("cmds", Shortcut = "cmds")]
+        public static void OnCmdsCommand(Player sender)
+        {
+            var commandList = new ListDialog("Commands:", "Select", "Cancel");
+
+            commandList.AddItem("Player\nAdmin level 1\nAdmin level 2\nAdmin level 3");
+            commandList.Show(sender);
+            commandList.Response += (senderObject, e) =>
+            {
+                if (e.DialogButton != DialogButton.Left)
+                    return;
+
+                var commandMessageDialog = new MessageDialog("Commands:", "", "Back", "Cancel");
+                switch (e.ListItem)
+                {
+                    case 0:
+                        var playerCommands = new StringBuilder();
+
+                        playerCommands.AppendLine("/admins - Displays all online admins");
+                        playerCommands.AppendLine("/assist - Call for assistance to repair/refuel your vehicle");
+                        playerCommands.AppendLine("/bank - Register/login/manage your bank account");
+                        playerCommands.AppendLine("/bonus - Shows the current bonus mission (only for trucker class)");
+                        playerCommands.AppendLine("/changepassword - Allows the player to change his login password");
+                        playerCommands.AppendLine("/convoy - Lets you start or join a convoy");
+                        playerCommands.AppendLine("/convoycancel - Cancels the convoy you're in");
+                        playerCommands.AppendLine("/convoykick <Player> - Kicks a member from the convoy");
+                        playerCommands.AppendLine("/convoyleave - You leave the convoy");
+                        playerCommands.AppendLine("/convoymembers - Displays all convoy members");
+                        playerCommands.AppendLine("/detach - Detaches your trailer");
+                        playerCommands.AppendLine("/eject <Player> - Ejects a player from your vehicle");
+                        playerCommands.AppendLine("/engine - Toggle engine-status on or off");
+                        playerCommands.AppendLine("/flip - Flips your vehicle back onto it's wheels");
+                        playerCommands.AppendLine("/givecash <Player> <Amount> - Give money to a player");
+                        playerCommands.AppendLine("/gobase - Teleports you to a location where your class starts");
+                        playerCommands.AppendLine("/me <Action> - Just a silly command to repeat your text");
+                        playerCommands.AppendLine("/overload - Lets a trucker to overload his vehicle");
+                        playerCommands.AppendLine("/pm <Player> <Message> - Send a private message to a player");
+                        playerCommands.AppendLine("/reclass - Choose another class");
+                        playerCommands.AppendLine("/report <Player> <Message> - Report a player for breaking the rules");
+                        playerCommands.AppendLine("/rules - Display the rules and get a small gift (only once)");
+                        playerCommands.AppendLine("/radio <Message> - Say something to players that have same class as you");
+                        playerCommands.AppendLine("/stats - Displays statistics about yourself");
+                        playerCommands.AppendLine("/stopwork - Ends the current job");
+                        playerCommands.AppendLine("/work - Starts a job");
+
+                        commandMessageDialog.Message = playerCommands.ToString();
+                        break;
+
+                    case 1:
+                        var adminLevel1Commands = new StringBuilder();
+
+                        adminLevel1Commands.AppendLine("/achat - Admin-chat (this allows admins to chat privately)");
+                        adminLevel1Commands.AppendLine("/spawnvehicle <Vehicle> - Spawn the specified vehicle");
+                        adminLevel1Commands.AppendLine("/endspec - Stop spectating a player");
+                        adminLevel1Commands.AppendLine("/freeze <Player> <Duration> <Reason> - Freeze a player for a certain time in seconds");
+                        adminLevel1Commands.AppendLine("/unfreeze <Player> - Unfreeze a player");
+                        adminLevel1Commands.AppendLine("/fuel - Refuels your vehicle for free");
+                        adminLevel1Commands.AppendLine("/get <Player> - Teleports a player to your location");
+                        adminLevel1Commands.AppendLine("/jail <Player> <Duration> <Reason> - Jails a player for a certain time in seconds");
+                        adminLevel1Commands.AppendLine("/unjail <Player> - Unjail a player");
+                        adminLevel1Commands.AppendLine("/kick <Player> <Reason> - Kick a player");
+                        adminLevel1Commands.AppendLine("/mute <Player> <Duration> <Reason> - Mute a player for x minutes");
+                        adminLevel1Commands.AppendLine("/muted - Display muted players");
+                        adminLevel1Commands.AppendLine("/nos - Adds nitro to your vehicle");
+                        adminLevel1Commands.AppendLine("/port <Player> - Teleport yourself to a player");
+                        adminLevel1Commands.AppendLine("/portloc <x> <y> <z> - Teleport yourself to the given coordinates");
+                        adminLevel1Commands.AppendLine("/portvehicle <Vehicle ID> - Teleport yourself to a vehicle");
+                        adminLevel1Commands.AppendLine("/reports - Show the last 50 reports in a dialog");
+                        adminLevel1Commands.AppendLine("/repair - Repairs your vehicle for free");
+                        adminLevel1Commands.AppendLine("/respawnvehicle <Vehicle ID> - Forces a vehicle to respawn");
+                        adminLevel1Commands.AppendLine("/spec <Player> - Spectate a player");
+                        adminLevel1Commands.AppendLine("/tele <Player 1> <Player 2> - Teleport a player to an other player");
+                        adminLevel1Commands.AppendLine("/unmute <Player> - Un-mutes a player");
+                        adminLevel1Commands.AppendLine("/warn <Player> <Reason> - Warn a player");
+                        adminLevel1Commands.AppendLine("/announce <Style (0-6)> <Duration> <Message> - Shows a message on player's screen");
+
+                        commandMessageDialog.Message = adminLevel1Commands.ToString();
+                        break;
+
+                    case 2:
+                        var adminLevel2Commands = new StringBuilder();
+
+                        adminLevel2Commands.AppendLine("/setwanted <Player> <Stars (0-6)> - Set a player's wanted level");
+                        adminLevel2Commands.AppendLine("/ban <Player> <Days> <Reason> - Ban a player for a certain time");
+                        adminLevel2Commands.AppendLine("/caroption - Changes some options for your vehicle");
+                        adminLevel2Commands.AppendLine("/cleanupallvehicles - Removes all admin spawned vehicles from the map");
+                        adminLevel2Commands.AppendLine("/cleanupvehicle <Vehicle ID> - Deletes a vehicle spawned by an admin");
+                        adminLevel2Commands.AppendLine("/fly - Equips yourself with a jetpack");
+                        adminLevel2Commands.AppendLine("/fuelall - Fuel all vehicles for free");
+                        adminLevel2Commands.AppendLine("/givelicense <Player> - Gives a free trucker license to a player");
+                        adminLevel2Commands.AppendLine("/healall - Heals all the players");
+                        adminLevel2Commands.AppendLine("/ipban <Player> <Reason> - Ban a player's IP");
+                        adminLevel2Commands.AppendLine("/loc - Display your current location");
+                        adminLevel2Commands.AppendLine("/rangeban <Player> <Reason> - Ban a player's entire IP-range");
+                        adminLevel2Commands.AppendLine("/repairall - Repair all vehicles for free");
+                        adminLevel2Commands.AppendLine("/setscore <Player> <Amount> - Sets a player's score to the given value");
+                        adminLevel2Commands.AppendLine("/unban <Player> - Unban a player");
+                        adminLevel2Commands.AppendLine("/setskin <Player> <Skin ID (0-311)> - Changes a player's skin-id");
+                        adminLevel2Commands.AppendLine("/weather - Changes the weather");
+
+                        commandMessageDialog.Message = adminLevel2Commands.ToString();
+                        break;
+
+                    case 3:
+                        var adminLevel3Comamnds = new StringBuilder();
+
+                        adminLevel3Comamnds.AppendLine("/createcamera <Max Speed> - Create s speedcamera at your location");
+                        adminLevel3Comamnds.AppendLine("/deletecamera - Delete a speedcamera");
+                        adminLevel3Comamnds.AppendLine("/resetplayer <Player> <Money (0/1)> <Score (0/1)> <Stats (0/1)> <Reason> - Reset a player's money, score, stats");
+                        adminLevel3Comamnds.AppendLine("/setadmin <Player> <Admin Level (0-3)> - Changes a player's admin-level");
+
+                        commandMessageDialog.Message = adminLevel3Comamnds.ToString();
+                        break;
+                }
+
+                commandMessageDialog.Show(sender);
+                commandMessageDialog.Response += (objectSender, ev) =>
+                {
+                    if (ev.DialogButton == DialogButton.Left)
+                        commandList.Show(sender);
+                };
+            };
+        }
+
         [Command("admins", Shortcut = "admins")]
         public static void OnAdminsCommand(BasePlayer sender)
         {
