@@ -1,6 +1,5 @@
 ﻿using SampSharp.GameMode.Pools;
 using SampSharp.GameMode.World;
-using System.Threading.Tasks;
 
 namespace TruckingSharp
 {

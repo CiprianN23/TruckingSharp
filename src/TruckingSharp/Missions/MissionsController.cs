@@ -57,6 +57,7 @@ namespace TruckingSharp.Missions
                 case PlayerClassType.Mafia:
                     await MafiaController.EndMissionAsync(player);
                     break;
+
                 case PlayerClassType.Assistance:
                     AssistanceController.EndMission(player);
                     break;

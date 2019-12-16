@@ -151,7 +151,7 @@ namespace TruckingSharp.Missions
                 return;
             }
 
-            if (sender.PlayerClass == PlayerClassType.Police || sender.PlayerClass ==  PlayerClassType.Assistance)
+            if (sender.PlayerClass == PlayerClassType.Police || sender.PlayerClass == PlayerClassType.Assistance)
                 return;
 
             if (sender.IsInConvoy)

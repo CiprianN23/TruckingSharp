@@ -78,8 +78,10 @@ namespace TruckingSharp.Extensions.PlayersExtensions
                     case 3:
                         var hasMoneyMessage = string.Empty;
                         if (player.BankAccount.Money > 0)
+                        {
                             hasMoneyMessage =
                                 $"{{FFFFFF}}Your bank account has {{00FF00}}${player.BankAccount.Money}{{FFFFFF}} in it\n{{FFFFFF}}Your bank funds will be returned to you when you cancel your bank account\n";
+                        }
 
                         message = $"{hasMoneyMessage}{{FFFFFF}}Are you sure you want to cancel your bank account?";
 
