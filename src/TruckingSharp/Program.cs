@@ -1,6 +1,7 @@
 ﻿using SampSharp.Core;
 using Serilog;
 using System.Threading.Tasks;
+using TruckingSharp.Database;
 
 namespace TruckingSharp
 {
@@ -13,6 +14,8 @@ namespace TruckingSharp
                 .Run();
 
             Task.Run(() => Configuration.LoadConfigurationFromFileAsync());
+
+            DapperConnection.LoadConnectionStringFromSystem();
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
