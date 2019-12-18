@@ -13,7 +13,7 @@ namespace TruckingSharp
                 .Use<GameMode>()
                 .Run();
 
-            Task.Run(() => Configuration.LoadConfigurationFromFileAsync());
+            Task.Run(() => Configuration.LoadConfigurationFromFileAsync()).Wait();
 
             DapperConnection.LoadConnectionStringFromSystem();
 
