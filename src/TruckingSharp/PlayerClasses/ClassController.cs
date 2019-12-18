@@ -4,11 +4,12 @@ using SampSharp.GameMode.Events;
 using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.World;
 using System;
+using System.Linq;
 using TruckingSharp.Constants;
+using TruckingSharp.Database.Repositories;
 using TruckingSharp.Missions.Assistance;
 using TruckingSharp.Missions.Mafia;
 using TruckingSharp.Missions.Police;
-using TruckingSharp.PlayerClasses.ClassesSpawn;
 using TruckingSharp.PlayerClasses.Data;
 
 namespace TruckingSharp.PlayerClasses
@@ -89,36 +90,32 @@ namespace TruckingSharp.PlayerClasses
             if (!(sender is Player player))
                 return;
 
-            var randomIndex = new Random();
-            int index;
+            var random = new Random();
             var angle = 0.0f;
             var position = Vector3.Zero;
+
+            var spawns = new ClassSpawnRepository(ConnectionFactory.GetConnection).GetAllByClassType((int)player.PlayerClass);
+            var index = random.Next(0, spawns.Count());
 
             switch (player.PlayerClass)
             {
                 case PlayerClassType.TruckDriver:
-                    index = randomIndex.Next(0, TruckerSpawn.TruckerSpawns.Length);
-
-                    position = TruckerSpawn.TruckerSpawns[index].Position;
-                    angle = TruckerSpawn.TruckerSpawns[index].Angle;
+                    position = new Vector3(spawns.ElementAt(index).PositionX, spawns.ElementAt(index).PositionY, spawns.ElementAt(index).PositionZ);
+                    angle = spawns.ElementAt(index).Angle;
 
                     BasePlayer.SendClientMessageToAll(Messages.PlayerJoinedTruckerClass, player.Name);
                     break;
 
                 case PlayerClassType.BusDriver:
-                    index = randomIndex.Next(0, BusDriverSpawn.BusDriverSpawns.Length);
-
-                    position = BusDriverSpawn.BusDriverSpawns[index].Position;
-                    angle = BusDriverSpawn.BusDriverSpawns[index].Angle;
+                    position = new Vector3(spawns.ElementAt(index).PositionX, spawns.ElementAt(index).PositionY, spawns.ElementAt(index).PositionZ);
+                    angle = spawns.ElementAt(index).Angle;
 
                     BasePlayer.SendClientMessageToAll(Messages.PlayerJoinedBusDriverClass, player.Name);
                     break;
 
                 case PlayerClassType.Pilot:
-                    index = randomIndex.Next(0, PilotSpawn.PilotSpawns.Length);
-
-                    position = PilotSpawn.PilotSpawns[index].Position;
-                    angle = PilotSpawn.PilotSpawns[index].Angle;
+                    position = new Vector3(spawns.ElementAt(index).PositionX, spawns.ElementAt(index).PositionY, spawns.ElementAt(index).PositionZ);
+                    angle = spawns.ElementAt(index).Angle;
 
                     BasePlayer.SendClientMessageToAll(Messages.PlayerJoinedPilotClass, player.Name);
                     break;
@@ -142,52 +139,41 @@ namespace TruckingSharp.PlayerClasses
                     if (player.Account.Wanted > 0)
                     {
                         player.GameText("You are not allowed to choose police class when you're wanted", 5000, 4);
-                        player.SendClientMessage(Color.Red,
-                            "You are not allowed to choose police class when you're wanted");
+                        player.SendClientMessage(Color.Red, "You are not allowed to choose police class when you're wanted");
                         e.PreventSpawning = true;
                         return;
                     }
 
-                    index = randomIndex.Next(0, PoliceSpawn.PoliceSpawns.Length);
-
-                    position = PoliceSpawn.PoliceSpawns[index].Position;
-                    angle = PoliceSpawn.PoliceSpawns[index].Angle;
+                    position = new Vector3(spawns.ElementAt(index).PositionX, spawns.ElementAt(index).PositionY, spawns.ElementAt(index).PositionZ);
+                    angle = spawns.ElementAt(index).Angle;
 
                     BasePlayer.SendClientMessageToAll(Messages.PlayerJoinedPoliceClass, player.Name);
                     break;
 
                 case PlayerClassType.Mafia:
-                    index = randomIndex.Next(0, MafiaSpawn.MafiaSpawns.Length);
-
-                    position = MafiaSpawn.MafiaSpawns[index].Position;
-                    angle = MafiaSpawn.MafiaSpawns[index].Angle;
+                    position = new Vector3(spawns.ElementAt(index).PositionX, spawns.ElementAt(index).PositionY, spawns.ElementAt(index).PositionZ);
+                    angle = spawns.ElementAt(index).Angle;
 
                     BasePlayer.SendClientMessageToAll(Messages.PlayerJoinedMafiaClass, player.Name);
                     break;
 
                 case PlayerClassType.Courier:
-                    index = randomIndex.Next(0, CourierSpawn.CourierSpawns.Length);
-
-                    position = CourierSpawn.CourierSpawns[index].Position;
-                    angle = CourierSpawn.CourierSpawns[index].Angle;
+                    position = new Vector3(spawns.ElementAt(index).PositionX, spawns.ElementAt(index).PositionY, spawns.ElementAt(index).PositionZ);
+                    angle = spawns.ElementAt(index).Angle;
 
                     BasePlayer.SendClientMessageToAll(Messages.PlayerJoinedCourierClass, player.Name);
                     break;
 
                 case PlayerClassType.Assistance:
-                    index = randomIndex.Next(0, AssistanceSpawn.AssistanceSpawns.Length);
-
-                    position = AssistanceSpawn.AssistanceSpawns[index].Position;
-                    angle = AssistanceSpawn.AssistanceSpawns[index].Angle;
+                    position = new Vector3(spawns.ElementAt(index).PositionX, spawns.ElementAt(index).PositionY, spawns.ElementAt(index).PositionZ);
+                    angle = spawns.ElementAt(index).Angle;
 
                     BasePlayer.SendClientMessageToAll(Messages.PlayerJoinedAssistanceClass, player.Name);
                     break;
 
                 case PlayerClassType.RoadWorker:
-                    index = randomIndex.Next(0, RoadWorkerSpawn.RoadWorkerSpawns.Length);
-
-                    position = RoadWorkerSpawn.RoadWorkerSpawns[index].Position;
-                    angle = RoadWorkerSpawn.RoadWorkerSpawns[index].Angle;
+                    position = new Vector3(spawns.ElementAt(index).PositionX, spawns.ElementAt(index).PositionY, spawns.ElementAt(index).PositionZ);
+                    angle = spawns.ElementAt(index).Angle;
 
                     BasePlayer.SendClientMessageToAll(Messages.PlayerJoinedRoadWorkerClass, player.Name);
                     break;

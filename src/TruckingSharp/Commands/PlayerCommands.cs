@@ -5,6 +5,7 @@ using SampSharp.GameMode.Events;
 using SampSharp.GameMode.SAMP;
 using SampSharp.GameMode.SAMP.Commands;
 using SampSharp.GameMode.World;
+using System.Linq;
 using System.Text;
 using TruckingSharp.Commands.Permissions;
 using TruckingSharp.Constants;
@@ -12,7 +13,6 @@ using TruckingSharp.Data;
 using TruckingSharp.Database.Entities;
 using TruckingSharp.Database.Repositories;
 using TruckingSharp.Extensions.PlayersExtensions;
-using TruckingSharp.PlayerClasses.ClassesSpawn;
 using TruckingSharp.PlayerClasses.Data;
 using TruckingSharp.Services;
 
@@ -472,56 +472,17 @@ namespace TruckingSharp.Commands
 
             var dialogSpawns = new ListDialog("Select your spawn", "Select", "Cancel");
 
+            var spawns = new ClassSpawnRepository(ConnectionFactory.GetConnection).GetAllByClassType((int)sender.PlayerClass);
+
             switch (sender.PlayerClass)
             {
-                case PlayerClassType.TruckDriver:
-                    dialogSpawns.AddItem("Fallen Tree Depot");
-                    dialogSpawns.AddItem("Flint Trucking Depot");
-                    dialogSpawns.AddItem("LVA Freight Depot");
-                    dialogSpawns.AddItem("Doherty Depot");
-                    dialogSpawns.AddItem("El Corona Depot");
-                    dialogSpawns.AddItem("Las Payasdas Depot");
-                    dialogSpawns.AddItem("Quarry Top");
-                    dialogSpawns.AddItem("Shady Creek Depot");
+                default:
+                    foreach (var spawn in spawns)
+                    {
+                        dialogSpawns.AddItem($"{spawn.Name}");
+                    }
 
-                    dialogSpawns.Response += (senderObject, e) =>
-                        DialogSpawns_Response(senderObject, e, PlayerClassType.TruckDriver);
-                    break;
-
-                case PlayerClassType.BusDriver:
-                    dialogSpawns.AddItem("Los Santos");
-                    dialogSpawns.AddItem("San Fierro");
-                    dialogSpawns.AddItem("Las Venturas");
-
-                    dialogSpawns.Response += (senderObject, e) =>
-                        DialogSpawns_Response(senderObject, e, PlayerClassType.BusDriver);
-                    break;
-
-                case PlayerClassType.Pilot:
-                    dialogSpawns.AddItem("Los Santos");
-                    dialogSpawns.AddItem("San Fierro");
-                    dialogSpawns.AddItem("Las Venturas");
-
-                    dialogSpawns.Response += (senderObject, e) =>
-                        DialogSpawns_Response(senderObject, e, PlayerClassType.Pilot);
-                    break;
-
-                case PlayerClassType.Police:
-                    dialogSpawns.AddItem("Los Santos");
-                    dialogSpawns.AddItem("San Fierro");
-                    dialogSpawns.AddItem("Las Venturas");
-
-                    dialogSpawns.Response += (senderObject, e) =>
-                        DialogSpawns_Response(senderObject, e, PlayerClassType.Police);
-                    break;
-
-                case PlayerClassType.Courier:
-                    dialogSpawns.AddItem("Los Santos");
-                    dialogSpawns.AddItem("San Fierro");
-                    dialogSpawns.AddItem("Las Venturas");
-
-                    dialogSpawns.Response += (senderObject, e) =>
-                        DialogSpawns_Response(senderObject, e, PlayerClassType.Courier);
+                    dialogSpawns.Response += (senderObject, e) => DialogSpawns_Response(senderObject, e, sender.PlayerClass);
                     break;
             }
 
@@ -700,8 +661,7 @@ namespace TruckingSharp.Commands
 
                 await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(account);
 
-                sender.SendClientMessage(Color.FromInteger(65280, ColorFormat.RGB),
-                    "You have earned {FFFF00}$5000{00FF00} for accepting the rules");
+                sender.SendClientMessage(Color.FromInteger(65280, ColorFormat.RGB), "You have earned {FFFF00}$5000{00FF00} for accepting the rules");
             };
         }
 
@@ -735,8 +695,7 @@ namespace TruckingSharp.Commands
             await sender.RewardAsync(-money);
             await target.RewardAsync(money);
 
-            target.SendClientMessage(
-                $"{{00FF00}}You have received {{FFFF00}}${money}{{00FF00}} from {{FFFF00}}{sender.Name}");
+            target.SendClientMessage($"{{00FF00}}You have received {{FFFF00}}${money}{{00FF00}} from {{FFFF00}}{sender.Name}");
             sender.SendClientMessage($"{{00FF00}}You gave {{FFFF00}}${money}{{00FF00}} to {{FFFF00}}{target.Name}");
         }
 
@@ -745,43 +704,15 @@ namespace TruckingSharp.Commands
             if (e.DialogButton != DialogButton.Left)
                 return;
 
-            var player = e.Player;
+            if (!(e.Player is Player player))
+                return;
+
+            var spawns = new ClassSpawnRepository(ConnectionFactory.GetConnection).GetAllByClassType((int)classId);
 
             switch (classId)
             {
-                case PlayerClassType.TruckDriver:
-                    player.Position = e.ListItem switch
-                    {
-                        _ => TruckerSpawn.TruckerSpawns[e.ListItem].Position,
-                    };
-                    break;
-
-                case PlayerClassType.BusDriver:
-                    player.Position = e.ListItem switch
-                    {
-                        _ => BusDriverSpawn.BusDriverSpawns[e.ListItem].Position,
-                    };
-                    break;
-
-                case PlayerClassType.Pilot:
-                    player.Position = e.ListItem switch
-                    {
-                        _ => PilotSpawn.PilotSpawns[e.ListItem].Position,
-                    };
-                    break;
-
-                case PlayerClassType.Police:
-                    player.Position = e.ListItem switch
-                    {
-                        _ => PoliceSpawn.PoliceSpawns[e.ListItem].Position,
-                    };
-                    break;
-
-                case PlayerClassType.Courier:
-                    player.Position = e.ListItem switch
-                    {
-                        _ => CourierSpawn.CourierSpawns[e.ListItem].Position,
-                    };
+                default:
+                    player.Position = new Vector3(spawns.ElementAt(e.ListItem).PositionX, spawns.ElementAt(e.ListItem).PositionY, spawns.ElementAt(e.ListItem).PositionZ);
                     break;
             }
         }
