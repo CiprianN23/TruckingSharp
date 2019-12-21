@@ -125,36 +125,28 @@ namespace TruckingSharp.Missions.Assistance
         {
             switch (serverPlayer.PlayerClass)
             {
-                case PlayerClasses.Data.PlayerClassType.TruckDriver:
+                case PlayerClassType.TruckDriver:
                     player.SetPlayerMarker(serverPlayer, PlayerClassColor.TruckerColor);
                     break;
 
-                case PlayerClasses.Data.PlayerClassType.BusDriver:
+                case PlayerClassType.BusDriver:
                     player.SetPlayerMarker(serverPlayer, PlayerClassColor.BusDriverColor);
                     break;
 
-                case PlayerClasses.Data.PlayerClassType.Pilot:
+                case PlayerClassType.Pilot:
                     player.SetPlayerMarker(serverPlayer, PlayerClassColor.PilotColor);
                     break;
 
-                case PlayerClasses.Data.PlayerClassType.Police:
+                case PlayerClassType.Police:
                     player.SetPlayerMarker(serverPlayer, PlayerClassColor.PoliceColor);
                     break;
 
-                case PlayerClasses.Data.PlayerClassType.Mafia:
+                case PlayerClassType.Mafia:
                     player.SetPlayerMarker(serverPlayer, PlayerClassColor.MafiaColor);
                     break;
 
-                case PlayerClasses.Data.PlayerClassType.Courier:
-                    player.SetPlayerMarker(serverPlayer, PlayerClassColor.CourierColor);
-                    break;
-
-                case PlayerClasses.Data.PlayerClassType.Assistance:
+                case PlayerClassType.Assistance:
                     player.SetPlayerMarker(serverPlayer, PlayerClassColor.AssistanceColor);
-                    break;
-
-                case PlayerClasses.Data.PlayerClassType.RoadWorker:
-                    player.SetPlayerMarker(serverPlayer, PlayerClassColor.RoadWorkerColor);
                     break;
             }
         }

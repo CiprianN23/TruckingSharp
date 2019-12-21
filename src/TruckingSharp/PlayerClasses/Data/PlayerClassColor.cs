@@ -9,8 +9,6 @@ namespace TruckingSharp.PlayerClasses.Data
         public static Color PilotColor { get; } = Color.FromInteger(32896, ColorFormat.RGB);
         public static Color PoliceColor { get; } = Color.FromInteger(255, ColorFormat.RGB);
         public static Color MafiaColor { get; } = Color.FromInteger(8388863, ColorFormat.RGB);
-        public static Color CourierColor { get; } = Color.FromInteger(16711808, ColorFormat.RGB);
         public static Color AssistanceColor { get; } = Color.FromInteger(8453888, ColorFormat.RGB);
-        public static Color RoadWorkerColor { get; } = Color.FromInteger(16777088, ColorFormat.RGB);
     }
 }

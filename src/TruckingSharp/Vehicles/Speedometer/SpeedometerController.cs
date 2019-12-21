@@ -63,7 +63,7 @@ namespace TruckingSharp.Vehicles.Speedometer
             player.SpeedometerTimer.Tick += (senderObject, ev) => SpeedCameraController.SpeedometerTimer_Tick(senderObject, ev, player);
         }
 
-        private async void SpeedometerTimer_Tick(object sender, EventArgs e, Player player)
+        private void SpeedometerTimer_Tick(object sender, EventArgs e, Player player)
         {
             if (player.Vehicle == null)
                 return;

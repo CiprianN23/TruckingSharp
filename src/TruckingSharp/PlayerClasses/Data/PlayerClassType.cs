@@ -8,8 +8,6 @@
         Pilot,
         Police,
         Mafia,
-        Courier,
-        Assistance,
-        RoadWorker
+        Assistance
     }
 }

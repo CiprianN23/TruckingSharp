@@ -82,7 +82,6 @@ namespace TruckingSharp.Missions
                 switch (player.PlayerClass)
                 {
                     case PlayerClassType.TruckDriver:
-                    case PlayerClassType.RoadWorker:
                         if (player.MissionVehicleTime != 0)
                         {
                             if (oldVehicle == newVehicle && oldTrailer == newTrailer)
@@ -99,7 +98,6 @@ namespace TruckingSharp.Missions
 
                     case PlayerClassType.BusDriver:
                     case PlayerClassType.Mafia:
-                    case PlayerClassType.Courier:
                         if (player.MissionVehicleTime != 0)
                         {
                             if (oldVehicle == newVehicle)
@@ -172,8 +170,6 @@ namespace TruckingSharp.Missions
                 case PlayerClassType.TruckDriver:
                 case PlayerClassType.BusDriver:
                 case PlayerClassType.Pilot:
-                case PlayerClassType.Courier:
-                case PlayerClassType.RoadWorker:
                     player.MissionTextDraw.Text = Messages.NoMissionText;
                     break;
 
@@ -223,10 +219,6 @@ namespace TruckingSharp.Missions
 
                 case PlayerClassType.Mafia:
                     player.SendClientMessage(Color.Red, Messages.MissionMafiaMustEnterVehicle);
-                    break;
-
-                case PlayerClassType.RoadWorker:
-                    player.SendClientMessage(Color.Red, Messages.MissionRoadWorkerMustEnterVehicle);
                     break;
             }
         }

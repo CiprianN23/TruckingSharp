@@ -8,55 +8,10 @@ using System.Reflection;
 using TruckingSharp.Controllers;
 using TruckingSharp.Missions.Data;
 
-// Contains BaseMode class
-// Contains ControllerCollection class
-
 namespace TruckingSharp
 {
     public class GameMode : BaseMode
     {
-        private void CreateClasses()
-        {
-            //Trucker
-            AddPlayerClass(133, Vector3.Zero, 0.0f);
-            AddPlayerClass(201, Vector3.Zero, 0.0f);
-            AddPlayerClass(202, Vector3.Zero, 0.0f);
-            AddPlayerClass(234, Vector3.Zero, 0.0f);
-            AddPlayerClass(258, Vector3.Zero, 0.0f);
-            AddPlayerClass(261, Vector3.Zero, 0.0f);
-            AddPlayerClass(206, Vector3.Zero, 0.0f);
-            AddPlayerClass(34, Vector3.Zero, 0.0f);
-
-            //Bus driver
-            AddPlayerClass(255, Vector3.Zero, 0.0f);
-            AddPlayerClass(253, Vector3.Zero, 0.0f);
-
-            //Pilot
-            AddPlayerClass(61, Vector3.Zero, 0.0f);
-
-            //Police
-            AddPlayerClass(280, Vector3.Zero, 0.0f);
-            AddPlayerClass(282, Vector3.Zero, 0.0f);
-            AddPlayerClass(283, Vector3.Zero, 0.0f);
-
-            //Mafia
-            AddPlayerClass(111, Vector3.Zero, 0.0f);
-            AddPlayerClass(112, Vector3.Zero, 0.0f);
-            AddPlayerClass(113, Vector3.Zero, 0.0f);
-
-            //Courier
-            AddPlayerClass(250, Vector3.Zero, 0.0f);
-            AddPlayerClass(193, Vector3.Zero, 0.0f);
-
-            //Assistance
-            AddPlayerClass(50, Vector3.Zero, 0.0f);
-
-            //Roadworker
-            AddPlayerClass(16, Vector3.Zero, 0.0f);
-            AddPlayerClass(27, Vector3.Zero, 0.0f);
-            AddPlayerClass(260, Vector3.Zero, 0.0f);
-        }
-
         private void SpawnTrucks()
         {
             #region Fallen Tree Depot
@@ -625,108 +580,6 @@ namespace TruckingSharp
                 new Vector3(220.0, -1.0, 2.6), 270.0f, -1, -1, 300));
         }
 
-        private void SpawnCourierVehicles()
-        {
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Burrito,
-                new Vector3(784.0, -610.0, 16.4), 0.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Burrito,
-                new Vector3(794.0, -610.0, 16.4), 0.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Burrito,
-                new Vector3(804.0, -610.0, 16.4), 0.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Burrito,
-                new Vector3(814.0, -610.0, 16.4), 0.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Burrito,
-                new Vector3(824.0, -610.0, 16.4), 0.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Faggio,
-                new Vector3(789.0, -610.0, 16.4), 0.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Faggio,
-                new Vector3(799.0, -610.0, 16.4), 0.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Faggio,
-                new Vector3(809.0, -610.0, 16.4), 0.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Faggio,
-                new Vector3(819.0, -610.0, 16.4), 0.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Faggio,
-                new Vector3(829.0, -610.0, 16.4), 0.0f, -1, -1, 300));
-
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Burrito,
-                new Vector3(-1851.0, -142.5, 12.0), 0.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Burrito,
-                new Vector3(-1856.0, -142.5, 12.0), 0.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Burrito,
-                new Vector3(-1861.0, -142.5, 12.0), 0.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Burrito,
-                new Vector3(-1866.0, -142.5, 12.0), 0.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Burrito,
-                new Vector3(-1871.0, -142.5, 12.0), 0.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Faggio,
-                new Vector3(-1851.0, -129.5, 12.0), 180.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Faggio,
-                new Vector3(-1856.0, -129.5, 12.0), 180.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Faggio,
-                new Vector3(-1861.0, -129.5, 12.0), 180.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Faggio,
-                new Vector3(-1866.0, -129.5, 12.0), 180.0f, -1, -1, 300));
-
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Burrito,
-                new Vector3(1052.5, 1915.25, 10.9), 0.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Burrito,
-                new Vector3(1062.5, 1915.25, 10.9), 0.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Burrito,
-                new Vector3(1072.5, 1915.25, 10.9), 0.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Burrito,
-                new Vector3(1082.5, 1915.25, 10.9), 0.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Burrito,
-                new Vector3(1092.5, 1915.25, 10.9), 0.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Faggio,
-                new Vector3(1057.5, 1915.25, 10.9), 0.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Faggio,
-                new Vector3(1067.5, 1915.25, 10.9), 0.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Faggio,
-                new Vector3(1077.5, 1915.25, 10.9), 0.0f, -1, -1, 300));
-            MissionVehicles.CourierJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Faggio,
-                new Vector3(1087.5, 1915.25, 10.9), 0.0f, -1, -1, 300));
-        }
-
-        private void SpawnRoadworkerVehicles()
-        {
-            MissionVehicles.RoadworkerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.UtilityVan,
-                new Vector3(-1895.0, -1705.0, 21.5), 180.0f, -1, -1, 300));
-            MissionVehicles.RoadworkerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.UtilityVan,
-                new Vector3(-1900.0, -1705.0, 21.5), 180.0f, -1, -1, 300));
-            MissionVehicles.RoadworkerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.UtilityVan,
-                new Vector3(-1905.0, -1705.0, 21.5), 180.0f, -1, -1, 300));
-            MissionVehicles.RoadworkerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.UtilityVan,
-                new Vector3(-1910.0, -1705.0, 21.5), 180.0f, -1, -1, 300));
-            MissionVehicles.RoadworkerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.UtilityVan,
-                new Vector3(-1915.0, -1705.0, 21.5), 180.0f, -1, -1, 300));
-            MissionVehicles.RoadworkerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.UtilityVan,
-                new Vector3(-1920.0, -1705.0, 21.5), 180.0f, -1, -1, 300));
-            MissionVehicles.RoadworkerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.UtilityTrailer,
-                new Vector3(-1895.0, -1700.0, 21.5), 180.0f, -1, -1, 300));
-            MissionVehicles.RoadworkerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.UtilityTrailer,
-                new Vector3(-1900.0, -1700.0, 21.5), 180.0f, -1, -1, 300));
-            MissionVehicles.RoadworkerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.UtilityTrailer,
-                new Vector3(-1905.0, -1700.0, 21.5), 180.0f, -1, -1, 300));
-            MissionVehicles.RoadworkerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.UtilityTrailer,
-                new Vector3(-1910.0, -1700.0, 21.5), 180.0f, -1, -1, 300));
-            MissionVehicles.RoadworkerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.UtilityTrailer,
-                new Vector3(-1915.0, -1700.0, 21.5), 180.0f, -1, -1, 300));
-            MissionVehicles.RoadworkerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.UtilityTrailer,
-                new Vector3(-1920.0, -1700.0, 21.5), 180.0f, -1, -1, 300));
-            MissionVehicles.RoadworkerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Towtruck,
-                new Vector3(-1866.5, -1731.75, 21.7), 30.0f, -1, -1, 300));
-            MissionVehicles.RoadworkerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Towtruck,
-                new Vector3(-1870.5, -1734.25, 21.7), 30.0f, -1, -1, 300));
-            MissionVehicles.RoadworkerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Towtruck,
-                new Vector3(-1874.5, -1736.75, 21.7), 30.0f, -1, -1, 300));
-            MissionVehicles.RoadworkerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Towtruck,
-                new Vector3(-1878.5, -1739.25, 21.7), 30.0f, -1, -1, 300));
-            MissionVehicles.RoadworkerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Towtruck,
-                new Vector3(-1882.5, -1741.75, 21.7), 30.0f, -1, -1, 300));
-            MissionVehicles.RoadworkerJobVehicles.Add(BaseVehicle.CreateStatic(VehicleModelType.Towtruck,
-                new Vector3(-1886.5, -1744.25, 21.7), 30.0f, -1, -1, 300));
-        }
-
         private void CreateBusStops()
         {
             new DynamicObject(1257, new Vector3(-2571.25, 2316.0, 5.2), new Vector3(0.0, 0.0, 180.0));
@@ -754,7 +607,6 @@ namespace TruckingSharp
         protected override void OnInitialized(EventArgs e)
         {
             // TODO: Spawn pickups
-            CreateClasses();
             SpawnTrucks();
             SpawnBuses();
             CreateBusStops();
@@ -762,8 +614,6 @@ namespace TruckingSharp
             SpawnMafiaCars();
             SpawnPilotPlanes();
             SpawnAssistanceVehicles();
-            SpawnCourierVehicles();
-            SpawnRoadworkerVehicles();
 
             ShowPlayerMarkers(PlayerMarkersMode.Global);
             ShowNameTags(true);
@@ -773,8 +623,6 @@ namespace TruckingSharp
             UsePlayerPedAnimations();
 
             SetGameModeText($"v {Assembly.GetExecutingAssembly().GetName().Version}");
-
-            // TODO: Timer for global timer
 
             base.OnInitialized(e);
         }

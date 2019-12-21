@@ -182,16 +182,8 @@ namespace TruckingSharp.Missions.Police
                     player.SetPlayerMarker(serverPlayer, PlayerClassColor.MafiaColor);
                     break;
 
-                case PlayerClassType.Courier:
-                    player.SetPlayerMarker(serverPlayer, PlayerClassColor.CourierColor);
-                    break;
-
                 case PlayerClassType.Assistance:
                     player.SetPlayerMarker(serverPlayer, PlayerClassColor.AssistanceColor);
-                    break;
-
-                case PlayerClassType.RoadWorker:
-                    player.SetPlayerMarker(serverPlayer, PlayerClassColor.RoadWorkerColor);
                     break;
             }
         }

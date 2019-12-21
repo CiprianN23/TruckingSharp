@@ -555,16 +555,8 @@ namespace TruckingSharp.Commands
                     className = Messages.MafiaClass;
                     break;
 
-                case PlayerClassType.Courier:
-                    className = Messages.CourierClass;
-                    break;
-
                 case PlayerClassType.Assistance:
                     className = Messages.AssistanceClass;
-                    break;
-
-                case PlayerClassType.RoadWorker:
-                    className = Messages.RoadWorkerClass;
                     break;
             }
 

@@ -22,6 +22,43 @@ namespace TruckingSharp.PlayerClasses
             gameMode.PlayerRequestClass += Class_PlayerRequestClass;
             gameMode.PlayerRequestSpawn += Class_PlayerRequestSpawn;
             gameMode.PlayerSpawned += Class_PlayerSpawned;
+            gameMode.Initialized += Class_Initialized;
+        }
+
+        private void Class_Initialized(object sender, EventArgs e)
+        {
+            if (!(sender is GameMode gameMode))
+                return;
+
+            //Trucker
+            gameMode.AddPlayerClass(133, Vector3.Zero, 0.0f);
+            gameMode.AddPlayerClass(201, Vector3.Zero, 0.0f);
+            gameMode.AddPlayerClass(202, Vector3.Zero, 0.0f);
+            gameMode.AddPlayerClass(234, Vector3.Zero, 0.0f);
+            gameMode.AddPlayerClass(258, Vector3.Zero, 0.0f);
+            gameMode.AddPlayerClass(261, Vector3.Zero, 0.0f);
+            gameMode.AddPlayerClass(206, Vector3.Zero, 0.0f);
+            gameMode.AddPlayerClass(34, Vector3.Zero, 0.0f);
+
+            //Bus driver
+            gameMode.AddPlayerClass(255, Vector3.Zero, 0.0f);
+            gameMode.AddPlayerClass(253, Vector3.Zero, 0.0f);
+
+            //Pilot
+            gameMode.AddPlayerClass(61, Vector3.Zero, 0.0f);
+
+            //Police
+            gameMode.AddPlayerClass(280, Vector3.Zero, 0.0f);
+            gameMode.AddPlayerClass(282, Vector3.Zero, 0.0f);
+            gameMode.AddPlayerClass(283, Vector3.Zero, 0.0f);
+
+            //Mafia
+            gameMode.AddPlayerClass(111, Vector3.Zero, 0.0f);
+            gameMode.AddPlayerClass(112, Vector3.Zero, 0.0f);
+            gameMode.AddPlayerClass(113, Vector3.Zero, 0.0f);
+
+            //Assistance
+            gameMode.AddPlayerClass(50, Vector3.Zero, 0.0f);
         }
 
         private void Class_PlayerSpawned(object sender, SpawnEventArgs e)
@@ -67,20 +104,12 @@ namespace TruckingSharp.PlayerClasses
                     player.CheckTimer.Tick += (senderObject, ev) => MafiaController.MafiaCheckTimer_Tick(senderObject, ev, player);
                     break;
 
-                case PlayerClassType.Courier:
-                    player.Color = PlayerClassColor.CourierColor;
-                    break;
-
                 case PlayerClassType.Assistance:
                     player.Color = PlayerClassColor.AssistanceColor;
 
                     player.CheckTimer?.Dispose();
                     player.CheckTimer = new Timer(TimeSpan.FromSeconds(1), true);
                     player.CheckTimer.Tick += (senderObject, ev) => AssistanceController.AssistanceCheckTimer_Tick(senderObject, ev, player);
-                    break;
-
-                case PlayerClassType.RoadWorker:
-                    player.Color = PlayerClassColor.RoadWorkerColor;
                     break;
             }
         }
@@ -157,25 +186,11 @@ namespace TruckingSharp.PlayerClasses
                     BasePlayer.SendClientMessageToAll(Messages.PlayerJoinedMafiaClass, player.Name);
                     break;
 
-                case PlayerClassType.Courier:
-                    position = new Vector3(spawns.ElementAt(index).PositionX, spawns.ElementAt(index).PositionY, spawns.ElementAt(index).PositionZ);
-                    angle = spawns.ElementAt(index).Angle;
-
-                    BasePlayer.SendClientMessageToAll(Messages.PlayerJoinedCourierClass, player.Name);
-                    break;
-
                 case PlayerClassType.Assistance:
                     position = new Vector3(spawns.ElementAt(index).PositionX, spawns.ElementAt(index).PositionY, spawns.ElementAt(index).PositionZ);
                     angle = spawns.ElementAt(index).Angle;
 
                     BasePlayer.SendClientMessageToAll(Messages.PlayerJoinedAssistanceClass, player.Name);
-                    break;
-
-                case PlayerClassType.RoadWorker:
-                    position = new Vector3(spawns.ElementAt(index).PositionX, spawns.ElementAt(index).PositionY, spawns.ElementAt(index).PositionZ);
-                    angle = spawns.ElementAt(index).Angle;
-
-                    BasePlayer.SendClientMessageToAll(Messages.PlayerJoinedRoadWorkerClass, player.Name);
                     break;
             }
 
@@ -233,21 +248,8 @@ namespace TruckingSharp.PlayerClasses
                     break;
 
                 case 17:
-                case 18:
-                    player.GameText(Messages.CourierClass, 3000, 4);
-                    player.PlayerClass = PlayerClassType.Courier;
-                    break;
-
-                case 19:
                     player.GameText(Messages.AssistanceClass, 3000, 4);
                     player.PlayerClass = PlayerClassType.Assistance;
-                    break;
-
-                case 20:
-                case 21:
-                case 22:
-                    player.GameText(Messages.RoadWorkerClass, 3000, 4);
-                    player.PlayerClass = PlayerClassType.RoadWorker;
                     break;
             }
         }
