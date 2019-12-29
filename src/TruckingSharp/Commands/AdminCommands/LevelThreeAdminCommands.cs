@@ -86,9 +86,7 @@ namespace TruckingSharp.Commands.AdminCommands
                 targetAccount.MafiaJobs = 0;
                 targetAccount.PoliceFined = 0;
                 targetAccount.PoliceJailed = 0;
-                targetAccount.CourierJobs = 0;
                 targetAccount.AssistanceJobs = 0;
-                targetAccount.RoadWorkerJobs = 0;
                 targetAccount.MetersDriven = 0;
 
                 target.SendClientMessage(Color.Red, $"Your stats have been reset by {sender.Name}.");

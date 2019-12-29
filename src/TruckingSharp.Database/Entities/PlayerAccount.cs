@@ -28,7 +28,5 @@ namespace TruckingSharp.Database.Entities
         public int PoliceFined { get; set; }
         public int PoliceJailed { get; set; }
         public int AssistanceJobs { get; set; }
-        public int CourierJobs { get; set; }
-        public int RoadWorkerJobs { get; set; }
     }
 }

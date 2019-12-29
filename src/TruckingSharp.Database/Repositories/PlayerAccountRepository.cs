@@ -80,8 +80,7 @@ namespace TruckingSharp.Database.Repositories
                     "SET name = @Name, password = @Password, money = @Money, score = @Score, admin_level = @AdminLevel, rules_read = @RulesRead, muted = @Muted, jailed = @Jailed," +
                     " wanted = @Wanted, bans = @Bans, trucker_license = @TruckerLicense, bus_license = @BusLicense, meters_driven = @MetersDriven, trucker_jobs = @TruckerJobs," +
                     " convoy_jobs = @ConvoyJobs, busdriver_jobs = @BusDriverJobs," +
-                    " pilot_jobs = @PilotJobs, mafia_jobs = @MafiaJobs, mafia_stolen = @MafiaStolen, police_fined = @PoliceFined, police_jailed = @PoliceJailed, assistance_jobs = @AssistanceJobs," +
-                    " courier_jobs = @CourierJobs, roadworker_jobs = @RoadWorkerJobs WHERE id = @Id;";
+                    " pilot_jobs = @PilotJobs, mafia_jobs = @MafiaJobs, mafia_stolen = @MafiaStolen, police_fined = @PoliceFined, police_jailed = @PoliceJailed, assistance_jobs = @AssistanceJobs WHERE id = @Id;";
 
                 using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
                 {
@@ -109,8 +108,6 @@ namespace TruckingSharp.Database.Repositories
                         entity.PoliceFined,
                         entity.PoliceJailed,
                         entity.AssistanceJobs,
-                        entity.CourierJobs,
-                        entity.RoadWorkerJobs,
                         entity.Id
                     });
                 }

@@ -2,8 +2,8 @@
   "profiles": {
     "TruckingSharp": {
       "commandName": "Executable",
-      "executablePath": "E:\\C#Projects\\SAMP\\env\\samp-server.exe",
-      "workingDirectory": "E:\\C#Projects\\SAMP\\env"
+      "executablePath": "..\\env\\samp-server.exe",
+      "workingDirectory": "..\\..\\env"
     }
   }
 }
