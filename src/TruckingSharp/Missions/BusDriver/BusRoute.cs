@@ -13,7 +13,7 @@ namespace TruckingSharp.Missions.BusDriver
             new BusRoute(64, 301, 2, "Las Barrancas - Bayside", new[] { 108, 107, 105, 103, 104, 108, -1}),
             new BusRoute(64, 302, 2, "Las Barrancas - Bayside", new[] { 103, 104, 106, 109, 105, 103, -1}),
             new BusRoute(64, 303, 2, "Fort Carson - El Quebrados", new[] { 112, 108, 105, 106, 108, 111, 112, -1}),
-            new BusRoute(64, 401, 2, "Palomino Creek - Dillimore", new[] { 116, 117, 120, 118, 115, 116, -1}),
+            new BusRoute(64, 401, 2, "Palomino Creek - Dillimore", new[] { 116, 117, 120, 118, 115, 116, -1})
         };
 
         public int[] Locations;

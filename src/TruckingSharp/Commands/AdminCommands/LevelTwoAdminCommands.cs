@@ -54,6 +54,12 @@ namespace TruckingSharp.Commands.AdminCommands
                 return;
             }
 
+            if (target.Account.AdminLevel > 0)
+            {
+                sender.SendClientMessage(Color.Red, "You can't use this command on admins.");
+                return;
+            }
+
             if (target == sender)
             {
                 sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedOnSelf);
@@ -135,13 +141,13 @@ namespace TruckingSharp.Commands.AdminCommands
         }
 
         [Command("jetpack", Shortcut = "jetpack")]
-        public static void OnJetpackComamnd(BasePlayer sender)
+        public static void OnJetpackCommand(BasePlayer sender)
         {
             sender.SpecialAction = SpecialAction.Usejetpack;
         }
 
         [Command("caroption", Shortcut = "caroption")]
-        public static void OnCaroptionCommand(BasePlayer sender)
+        public static void OnCarOptionCommand(BasePlayer sender)
         {
             if (!sender.IsDriving())
             {
@@ -239,6 +245,12 @@ namespace TruckingSharp.Commands.AdminCommands
                 return;
             }
 
+            if (target.Account.AdminLevel > 0)
+            {
+                sender.SendClientMessage(Color.Red, "You can't use this command on admins.");
+                return;
+            }
+
             if (target == sender)
             {
                 sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedOnSelf);
@@ -261,6 +273,12 @@ namespace TruckingSharp.Commands.AdminCommands
             if (!target.IsLoggedIn)
             {
                 sender.SendClientMessage(Color.Red, Messages.PlayerNotLoggedIn);
+                return;
+            }
+
+            if (target.Account.AdminLevel > 0)
+            {
+                sender.SendClientMessage(Color.Red, "You can't use this command on admins.");
                 return;
             }
 
@@ -288,6 +306,12 @@ namespace TruckingSharp.Commands.AdminCommands
         [Command("setscore", Shortcut = "setscore")]
         public static async void OnSetScoreCommandAsync(Player sender, Player target, int score)
         {
+            if (target.Account.AdminLevel > 0)
+            {
+                sender.SendClientMessage(Color.Red, "You can't use this command on admins.");
+                return;
+            }
+
             var targetAccount = target.Account;
             targetAccount.Score = score;
             await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
@@ -299,6 +323,12 @@ namespace TruckingSharp.Commands.AdminCommands
         [Command("setmoeny", Shortcut = "setmoeny")]
         public static async void OnSetMoneyCommand(Player sender, Player target, int money)
         {
+            if (target.Account.AdminLevel > 0)
+            {
+                sender.SendClientMessage(Color.Red, "You can't use this command on admins.");
+                return;
+            }
+
             var targetAccount = target.Account;
             targetAccount.Money = money;
             await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
@@ -310,6 +340,12 @@ namespace TruckingSharp.Commands.AdminCommands
         [Command("givelicense", Shortcut = "givelicense")]
         public static async void OnGiveLicenseCommandAsync(BasePlayer sender, Player target)
         {
+            if (target.Account.AdminLevel > 0)
+            {
+                sender.SendClientMessage(Color.Red, "You can't use this command on admins.");
+                return;
+            }
+
             var targetAccount = target.Account;
             targetAccount.TruckerLicense = 1;
             await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);

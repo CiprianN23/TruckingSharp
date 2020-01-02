@@ -44,10 +44,6 @@ namespace TruckingSharp.Missions.Bonus
                         case MissionCargoVehicleType.NoTrailer:
                             isMissionSet = true;
                             break;
-
-                        default:
-                            isMissionSet = false;
-                            break;
                     }
                 }
 

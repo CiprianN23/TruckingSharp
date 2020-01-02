@@ -19,20 +19,19 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                const string command = "INSERT INTO speedcameras (id, position_x, position_y, position_z, angle, speed) VALUES (@Id, @PositionX, @PositionY, @PositionZ, @Angle, @Speed);";
+                const string command = "INSERT INTO speed_cameras (id, position_x, position_y, position_z, angle, speed) VALUES (@Id, @PositionX, @PositionY, @PositionZ, @Angle, @Speed);";
 
-                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                using var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync();
+
+                return await sqlConnection.ExecuteAsync(command, new
                 {
-                    return await sqlConnection.ExecuteAsync(command, new
-                    {
-                        entity.Id,
-                        entity.PositionX,
-                        entity.PositionY,
-                        entity.PositionZ,
-                        entity.Angle,
-                        entity.Speed
-                    });
-                }
+                    entity.Id,
+                    entity.PositionX,
+                    entity.PositionY,
+                    entity.PositionZ,
+                    entity.Angle,
+                    entity.Speed
+                });
             }
             catch (Exception ex)
             {
@@ -45,15 +44,14 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                const string command = "DELETE FROM speedcameras WHERE id = @Id;";
+                const string command = "DELETE FROM speed_cameras WHERE id = @Id;";
 
-                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                using var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync();
+
+                return await sqlConnection.ExecuteAsync(command, new
                 {
-                    return await sqlConnection.ExecuteAsync(command, new
-                    {
-                        entity.Id
-                    });
-                }
+                    entity.Id
+                });
             }
             catch (Exception ex)
             {
@@ -66,15 +64,14 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                const string command = "SELECT * FROM speedcameras WHERE id = @Id;";
+                const string command = "SELECT * FROM speed_cameras WHERE id = @Id;";
 
-                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                using var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync();
+
+                return await sqlConnection.QueryFirstOrDefaultAsync<SpeedCamera>(command, new
                 {
-                    return await sqlConnection.QueryFirstOrDefaultAsync<SpeedCamera>(command, new
-                    {
-                        Id = id
-                    });
-                }
+                    Id = id
+                });
             }
             catch (Exception ex)
             {
@@ -87,12 +84,11 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                const string command = "SELECT * FROM speedcameras;";
+                const string command = "SELECT * FROM speed_cameras;";
 
-                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
-                {
-                    return await sqlConnection.QueryAsync<SpeedCamera>(command);
-                }
+                using var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync();
+
+                return await sqlConnection.QueryAsync<SpeedCamera>(command);
             }
             catch (Exception ex)
             {
@@ -105,21 +101,20 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                const string command = "UPDATE speedcameras SET id = @Id, position_x = @PositionX, position_y = @PositionY, position_z = @PositionZ, angle = @Angle, speed = @Speed WHERE id = @Id1;";
+                const string command = "UPDATE speed_cameras SET id = @Id, position_x = @PositionX, position_y = @PositionY, position_z = @PositionZ, angle = @Angle, speed = @Speed WHERE id = @Id1;";
 
-                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                using var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync();
+
+                return await sqlConnection.ExecuteAsync(command, new
                 {
-                    return await sqlConnection.ExecuteAsync(command, new
-                    {
-                        entity.Id,
-                        entity.PositionX,
-                        entity.PositionY,
-                        entity.PositionZ,
-                        entity.Angle,
-                        entity.Speed,
-                        Id1 = entity.Id
-                    });
-                }
+                    entity.Id,
+                    entity.PositionX,
+                    entity.PositionY,
+                    entity.PositionZ,
+                    entity.Angle,
+                    entity.Speed,
+                    Id1 = entity.Id
+                });
             }
             catch (Exception ex)
             {

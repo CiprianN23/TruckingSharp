@@ -96,10 +96,9 @@ namespace TruckingSharp
         {
             try
             {
-                using (var file = File.OpenRead(@"scriptfiles\serverconfig.json"))
-                {
-                    Instance = await JsonSerializer.DeserializeAsync<Configuration>(file);
-                }
+                await using var file = File.OpenRead(@"scriptfiles\serverconfig.json");
+
+                Instance = await JsonSerializer.DeserializeAsync<Configuration>(file);
             }
             catch (Exception ex)
             {
@@ -112,10 +111,9 @@ namespace TruckingSharp
         {
             try
             {
-                using (var file = File.Create(@"scriptfiles\serverconfig.json"))
-                {
-                    await JsonSerializer.SerializeAsync(file, Instance);
-                }
+                await using var file = File.Create(@"scriptfiles\serverconfig.json");
+
+                await JsonSerializer.SerializeAsync(file, Instance);
             }
             catch (Exception ex)
             {
@@ -128,10 +126,9 @@ namespace TruckingSharp
         {
             try
             {
-                using (var file = File.OpenRead(@"scriptfiles\defaultserverconfig.json"))
-                {
-                    Instance = await JsonSerializer.DeserializeAsync<Configuration>(file);
-                }
+                await using var file = File.OpenRead(@"scriptfiles\defaultserverconfig.json");
+
+                Instance = await JsonSerializer.DeserializeAsync<Configuration>(file);
             }
             catch (Exception ex)
             {

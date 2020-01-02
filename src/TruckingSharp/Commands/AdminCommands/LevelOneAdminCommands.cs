@@ -27,6 +27,12 @@ namespace TruckingSharp.Commands.AdminCommands
                 return;
             }
 
+            if (target.Account.AdminLevel > 0)
+            {
+                sender.SendClientMessage(Color.Red, "You can't use this command on admins.");
+                return;
+            }
+
             if (target == sender)
             {
                 sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedOnSelf);
@@ -91,6 +97,12 @@ namespace TruckingSharp.Commands.AdminCommands
             if (!target.IsLoggedIn)
             {
                 sender.SendClientMessage(Color.Red, Messages.PlayerNotLoggedIn);
+                return;
+            }
+
+            if (target.Account.AdminLevel > 0)
+            {
+                sender.SendClientMessage(Color.Red, "You can't use this command on admins.");
                 return;
             }
 
@@ -255,6 +267,12 @@ namespace TruckingSharp.Commands.AdminCommands
                 return;
             }
 
+            if (target.Account.AdminLevel > 0)
+            {
+                sender.SendClientMessage(Color.Red, "You can't use this command on admins.");
+                return;
+            }
+
             if (sender == target)
             {
                 sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedOnSelf);
@@ -376,6 +394,12 @@ namespace TruckingSharp.Commands.AdminCommands
                 return;
             }
 
+            if (target.Account.AdminLevel > 0)
+            {
+                sender.SendClientMessage(Color.Red, "You can't use this command on admins.");
+                return;
+            }
+
             if (sender == target)
             {
                 sender.SendClientMessage(Color.Red, Messages.CommandNotAllowedOnSelf);
@@ -468,6 +492,12 @@ namespace TruckingSharp.Commands.AdminCommands
             if (!target.IsLoggedIn)
             {
                 sender.SendClientMessage(Color.Red, Messages.PlayerNotLoggedIn);
+                return;
+            }
+
+            if (target.Account.AdminLevel > 0)
+            {
+                sender.SendClientMessage(Color.Red, "You can't use this command on admins.");
                 return;
             }
 
@@ -647,6 +677,12 @@ namespace TruckingSharp.Commands.AdminCommands
             if (!target.IsLoggedIn)
             {
                 sender.SendClientMessage(Color.Red, Messages.PlayerNotLoggedIn);
+                return;
+            }
+
+            if (target.Account.AdminLevel > 0)
+            {
+                sender.SendClientMessage(Color.Red, "You can't use this command on admins.");
                 return;
             }
 

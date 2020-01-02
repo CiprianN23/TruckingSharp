@@ -43,7 +43,7 @@ namespace TruckingSharp.Missions.Assistance
                 if (!serverPlayer.IsLoggedIn)
                     return;
 
-                if (!serverPlayer.AssistanaceNeeded)
+                if (!serverPlayer.AssistanceNeeded)
                     return;
 
                 if (!serverPlayer.IsDriving())
@@ -52,7 +52,7 @@ namespace TruckingSharp.Missions.Assistance
                 if (!player.IsInRangeOfPoint(5.0f, serverPlayer.Position))
                     return;
 
-                serverPlayer.AssistanaceNeeded = false;
+                serverPlayer.AssistanceNeeded = false;
                 var serverPlayerVehicle = (Vehicle)serverPlayer.Vehicle;
 
                 var payment = (int)((1000.0f - serverPlayerVehicle.Health) * 1.0f);
@@ -64,7 +64,6 @@ namespace TruckingSharp.Missions.Assistance
                 serverPlayer.SendClientMessage(Color.GreenYellow, $"Your vehicle has been repaired for {{FFFF00}}${payment}{{00FF00}} by \"{{FFFF00}}{player.Name}{{00FF00}}\"");
                 player.SendClientMessage(Color.GreenYellow, $"You have repaired {{FFFF00}}{serverPlayer.Name}{{00FF00}}'s vehicle and earned {{FFFF00}}${payment * 2}.");
 
-                payment = 0;
                 var fuel = Configuration.Instance.MaximumFuel - serverPlayerVehicle.Fuel;
 
                 if (fuel > 0)
@@ -95,7 +94,7 @@ namespace TruckingSharp.Missions.Assistance
                 if (!serverPlayer.IsLoggedIn)
                     continue;
 
-                if (serverPlayer.AssistanaceNeeded)
+                if (serverPlayer.AssistanceNeeded)
                 {
                     player.SetPlayerMarker(serverPlayer, Color.Red);
                 }

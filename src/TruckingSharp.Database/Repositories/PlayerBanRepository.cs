@@ -19,18 +19,17 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                const string command = "INSERT INTO playerbans (reason, duration, admin_id, owner_id) VALUES (@Reason, @Duration, @AdminId, @OwnerId);";
+                const string command = "INSERT INTO player_bans (reason, duration, admin_id, owner_id) VALUES (@Reason, @Duration, @AdminId, @OwnerId);";
 
-                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                using var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync();
+
+                return await sqlConnection.ExecuteAsync(command, new
                 {
-                    return await sqlConnection.ExecuteAsync(command, new
-                    {
-                        entity.Reason,
-                        entity.Duration,
-                        entity.AdminId,
-                        entity.OwnerId
-                    });
-                }
+                    entity.Reason,
+                    entity.Duration,
+                    entity.AdminId,
+                    entity.OwnerId
+                });
             }
             catch (Exception ex)
             {
@@ -43,15 +42,14 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                const string command = "DELETE FROM playerbans WHERE id = @Id;";
+                const string command = "DELETE FROM player_bans WHERE id = @Id;";
 
-                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                using var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync();
+
+                return await sqlConnection.ExecuteAsync(command, new
                 {
-                    return await sqlConnection.ExecuteAsync(command, new
-                    {
-                        entity.Id
-                    });
-                }
+                    entity.Id
+                });
             }
             catch (Exception ex)
             {
@@ -64,15 +62,14 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                const string command = "SELECT * FROM playerbans WHERE owner_id = @Id;";
+                const string command = "SELECT * FROM player_bans WHERE owner_id = @Id;";
 
-                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                using var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync();
+
+                return await sqlConnection.QueryFirstOrDefaultAsync<PlayerBan>(command, new
                 {
-                    return await sqlConnection.QueryFirstOrDefaultAsync<PlayerBan>(command, new
-                    {
-                        Id = id
-                    });
-                }
+                    Id = id
+                });
             }
             catch (Exception ex)
             {
@@ -85,15 +82,14 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                const string command = "SELECT playerbans.* FROM playerbans LEFT JOIN playeraccounts ON playerbans.owner_id = playeraccounts.id WHERE playeraccounts.name = @Name;";
+                const string command = "SELECT player_bans.* FROM player_bans LEFT JOIN player_accounts ON player_bans.owner_id = player_accounts.id WHERE player_accounts.name = @Name;";
 
-                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                using var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync();
+
+                return await sqlConnection.QueryFirstOrDefaultAsync<PlayerBan>(command, new
                 {
-                    return await sqlConnection.QueryFirstOrDefaultAsync<PlayerBan>(command, new
-                    {
-                        Name = name
-                    });
-                }
+                    Name = name
+                });
             }
             catch (Exception ex)
             {
@@ -106,12 +102,11 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                const string command = "SELECT * FROM playerbans;";
+                const string command = "SELECT * FROM player_bans;";
 
-                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
-                {
-                    return await sqlConnection.QueryAsync<PlayerBan>(command);
-                }
+                using var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync();
+
+                return await sqlConnection.QueryAsync<PlayerBan>(command);
             }
             catch (Exception ex)
             {
@@ -124,19 +119,18 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                const string command = "UPDATE playerbans SET reason = @Reason, duration = @Duration, admin_id = @AdminId, owner_id = @OwnerId WHERE id = @Id;";
+                const string command = "UPDATE player_bans SET reason = @Reason, duration = @Duration, admin_id = @AdminId, owner_id = @OwnerId WHERE id = @Id;";
 
-                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                using var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync();
+
+                return await sqlConnection.ExecuteAsync(command, new
                 {
-                    return await sqlConnection.ExecuteAsync(command, new
-                    {
-                        entity.Reason,
-                        entity.Duration,
-                        entity.AdminId,
-                        entity.OwnerId,
-                        entity.Id
-                    });
-                }
+                    entity.Reason,
+                    entity.Duration,
+                    entity.AdminId,
+                    entity.OwnerId,
+                    entity.Id
+                });
             }
             catch (Exception ex)
             {

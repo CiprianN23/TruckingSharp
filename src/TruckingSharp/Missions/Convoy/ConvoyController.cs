@@ -69,6 +69,7 @@ namespace TruckingSharp.Missions.Convoy
                         convoy.ConvoyTrailerModel = leader.Vehicle?.Trailer?.Model ?? 0;
 
                         if (convoy.ConvoyTrailerModel != 0)
+                        {
                             foreach (var member in convoy.Members)
                             {
                                 if (member == leader)
@@ -95,24 +96,22 @@ namespace TruckingSharp.Missions.Convoy
 
                                 isSameTrailer = false;
                             }
+                        }
                         else
+                        {
                             foreach (var member in convoy.Members)
                             {
                                 if (member == leader)
                                     continue;
 
-                                switch (member.Vehicle?.Model)
-                                {
-                                    case VehicleModelType.Flatbed:
-                                    case VehicleModelType.DFT30:
-                                        isSameTrailer = true;
-                                        break;
+                                if (member.Vehicle?.Model == VehicleModelType.DFT30 &&
+                                    member.Vehicle?.Model == VehicleModelType.Flatbed)
+                                    continue;
 
-                                    default:
-                                        member.MissionTextDraw.Text = Messages.MissionConvoyNoTrailerVehicleNeeded;
-                                        break;
-                                }
+                                isSameTrailer = false;
+                                member.MissionTextDraw.Text = Messages.MissionConvoyNoTrailerVehicleNeeded;
                             }
+                        }
 
                         if (isSameTrailer)
                         {

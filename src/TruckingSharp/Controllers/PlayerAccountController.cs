@@ -15,7 +15,7 @@ namespace TruckingSharp.Controllers
     [Controller]
     public class PlayerAccountController : IEventListener
     {
-        private static PlayerAccountRepository _accountRepository => new PlayerAccountRepository(ConnectionFactory.GetConnection);
+        private static PlayerAccountRepository AccountRepository => new PlayerAccountRepository(ConnectionFactory.GetConnection);
 
         private PlayerBanRepository _banRepository => new PlayerBanRepository(ConnectionFactory.GetConnection);
 
@@ -33,7 +33,7 @@ namespace TruckingSharp.Controllers
 
             var playerAccount = player.Account;
             playerAccount.MetersDriven += player.MetersDriven;
-            await _accountRepository.UpdateAsync(playerAccount);
+            await AccountRepository.UpdateAsync(playerAccount);
         }
 
         public event EventHandler<PlayerLoginEventArgs> PlayerLogin;
@@ -140,7 +140,7 @@ namespace TruckingSharp.Controllers
 
                     var newAccount = new PlayerAccount { Name = player.Name, Password = hash };
 
-                    await _accountRepository.AddAsync(newAccount);
+                    await AccountRepository.AddAsync(newAccount);
 
                     LoginPlayer(player);
                 }

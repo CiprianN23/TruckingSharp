@@ -69,56 +69,49 @@ namespace TruckingSharp
         public int SecondsUntilPoliceCanJail { get; set; }
         public bool CanPoliceJail { get; set; }
         public bool MafiaLoadHijacked { get; set; }
-        public bool AssistanaceNeeded { get; set; }
+        public bool AssistanceNeeded { get; set; }
         public float MetersDriven { get; set; }
 
         public bool CheckIfPlayerCanJoinPolice()
         {
             var normalPlayers = 0;
             var policePlayers = 0;
-            bool canSpawnAsCop;
 
-            if (Configuration.Instance.PlayersBeforePolice > 0)
+            if (Configuration.Instance.PlayersBeforePolice <= 0)
+                return true;
+
+            foreach (var basePlayer in All)
             {
-                foreach (var basePlayer in All)
+                var player = (Player)basePlayer;
+
+                if (player == this)
+                    continue;
+
+                if (player.Interior == 14)
+                    continue;
+
+                if (!IsLoggedIn)
+                    continue;
+
+                switch (player.PlayerClass)
                 {
-                    var player = (Player)basePlayer;
+                    case PlayerClassType.Police:
+                        policePlayers++;
+                        break;
 
-                    if (player == this)
-                        continue;
-
-                    if (player.Interior == 14)
-                        continue;
-
-                    if (!IsLoggedIn)
-                        continue;
-
-                    switch (player.PlayerClass)
-                    {
-                        case PlayerClassType.Police:
-                            policePlayers++;
-                            break;
-
-                        default:
-                            normalPlayers++;
-                            break;
-                    }
-                }
-
-                if (policePlayers < (normalPlayers / Configuration.Instance.PlayersBeforePolice))
-                    canSpawnAsCop = true; // There are less police players than allowed, so the player can choose this class
-                else
-                    canSpawnAsCop = false;
-
-                if (!canSpawnAsCop)
-                {
-                    GameText("Maximum amount of cops already reached", 5000, 4);
-                    SendClientMessage(Color.Red, "The maximum amount of cops has been reached already, please select another class");
-                    return false;
+                    default:
+                        normalPlayers++;
+                        break;
                 }
             }
 
-            return true;
+            var canSpawnAsCop = policePlayers < (normalPlayers / Configuration.Instance.PlayersBeforePolice);
+
+            if (canSpawnAsCop) return true;
+
+            GameText("Maximum amount of cops already reached", 5000, 4);
+            SendClientMessage(Color.Red, "The maximum amount of cops has been reached already, please select another class");
+            return false;
         }
 
         public async Task RewardAsync(int money, int score = 0)

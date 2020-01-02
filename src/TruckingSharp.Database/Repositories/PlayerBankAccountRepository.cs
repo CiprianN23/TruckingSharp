@@ -17,16 +17,15 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                const string command = "SELECT * FROM playerbankaccounts WHERE player_id = @Id;";
+                const string command = "SELECT * FROM player_bank_accounts WHERE player_id = @Id;";
 
-                using (var sqlConnection = _databaseConnectionFactory.CreateConnection())
-                {
-                    return sqlConnection.QueryFirstOrDefault<PlayerBankAccount>(command, new { Id = id });
-                }
+                using var sqlConnection = _databaseConnectionFactory.CreateConnection();
+
+                return sqlConnection.QueryFirstOrDefault<PlayerBankAccount>(command, new { Id = id });
             }
             catch (Exception ex)
             {
-                Log.Error(ex, $"Failed to fwtch player bank account with id: {id}.");
+                Log.Error(ex, $"Failed to fetch player bank account with id: {id}.");
                 throw;
             }
         }
@@ -37,12 +36,11 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                const string command = "SELECT * FROM playerbankaccounts;";
+                const string command = "SELECT * FROM player_bank_accounts;";
 
-                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
-                {
-                    return await sqlConnection.QueryAsync<PlayerBankAccount>(command);
-                }
+                using var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync();
+
+                return await sqlConnection.QueryAsync<PlayerBankAccount>(command);
             }
             catch (Exception ex)
             {
@@ -55,16 +53,15 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                const string command = "INSERT INTO playerbankaccounts (password, player_id) VALUES (@Password, @PlayerId);";
+                const string command = "INSERT INTO player_bank_accounts (password, player_id) VALUES (@Password, @PlayerId);";
 
-                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                using var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync();
+
+                return await sqlConnection.ExecuteAsync(command, new
                 {
-                    return await sqlConnection.ExecuteAsync(command, new
-                    {
-                        entity.Password,
-                        entity.PlayerId
-                    });
-                }
+                    entity.Password,
+                    entity.PlayerId
+                });
             }
             catch (Exception ex)
             {
@@ -77,18 +74,17 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                const string command = "UPDATE playerbankaccounts SET password = @Password, money = @Money, player_id = @PlayerId WHERE id = @Id;";
+                const string command = "UPDATE player_bank_accounts SET password = @Password, money = @Money, player_id = @PlayerId WHERE id = @Id;";
 
-                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                using var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync();
+
+                return await sqlConnection.ExecuteAsync(command, new
                 {
-                    return await sqlConnection.ExecuteAsync(command, new
-                    {
-                        entity.Password,
-                        entity.Money,
-                        entity.PlayerId,
-                        entity.Id
-                    });
-                }
+                    entity.Password,
+                    entity.Money,
+                    entity.PlayerId,
+                    entity.Id
+                });
             }
             catch (Exception ex)
             {
@@ -101,15 +97,14 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                const string command = "DELETE FROM playerbankaccounts WHERE id = @Id;";
+                const string command = "DELETE FROM player_bank_accounts WHERE id = @Id;";
 
-                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                using var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync();
+
+                return await sqlConnection.ExecuteAsync(command, new
                 {
-                    return await sqlConnection.ExecuteAsync(command, new
-                    {
-                        entity.Id
-                    });
-                }
+                    entity.Id
+                });
             }
             catch (Exception ex)
             {
@@ -122,15 +117,14 @@ namespace TruckingSharp.Database.Repositories
         {
             try
             {
-                const string command = "SELECT * FROM playerbankaccounts WHERE player_id = @Id;";
+                const string command = "SELECT * FROM player_bank_accounts WHERE player_id = @Id;";
 
-                using (var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync())
+                using var sqlConnection = await _databaseConnectionFactory.CreateConnectionAsync();
+
+                return await sqlConnection.QueryFirstOrDefaultAsync(command, new
                 {
-                    return await sqlConnection.QueryFirstOrDefaultAsync(command, new
-                    {
-                        Id = id
-                    });
-                }
+                    Id = id
+                });
             }
             catch (Exception ex)
             {

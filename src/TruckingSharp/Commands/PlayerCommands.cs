@@ -39,30 +39,30 @@ namespace TruckingSharp.Commands
                 if (!serverPlayer.IsLoggedIn)
                     continue;
 
-                if (serverPlayer.PlayerClass == PlayerClassType.Assistance)
-                {
-                    assistPlayerOnline = true;
-                    serverPlayer.SendClientMessage(Color.GreenYellow, $"Player {{FFFF00}}{sender.Name}{{00FF00}} needs assistance, go help him.");
-                }
+                if (serverPlayer.PlayerClass != PlayerClassType.Assistance)
+                    continue;
+
+                assistPlayerOnline = true;
+                serverPlayer.SendClientMessage(Color.GreenYellow, $"Player {{FFFF00}}{sender.Name}{{00FF00}} needs assistance, go help him.");
             }
 
             if (assistPlayerOnline)
             {
-                sender.AssistanaceNeeded = true;
+                sender.AssistanceNeeded = true;
                 sender.SendClientMessage(Color.GreenYellow, "You called for assistance.");
             }
             else
             {
-                if (sender.IsDriving())
-                {
-                    var senderVehicle = (Vehicle)sender.Vehicle;
-                    senderVehicle.Repair();
-                    senderVehicle.Fuel = Configuration.Instance.MaximumFuel;
+                if (!sender.IsDriving())
+                    return;
 
-                    sender.SendClientMessage(Color.GreenYellow, $"Your vehicle has been auto-repaired and refuelled for {{FFFF00}}${Configuration.Instance.AutoAssistPrice} {{00FF00}}as there is no assistance player online.");
+                var senderVehicle = (Vehicle)sender.Vehicle;
+                senderVehicle.Repair();
+                senderVehicle.Fuel = Configuration.Instance.MaximumFuel;
 
-                    await sender.RewardAsync(-Configuration.Instance.AutoAssistPrice);
-                }
+                sender.SendClientMessage(Color.GreenYellow, $"Your vehicle has been auto-repaired and refuelled for {{FFFF00}}${Configuration.Instance.AutoAssistPrice} {{00FF00}}as there is no assistance player online.");
+
+                await sender.RewardAsync(-Configuration.Instance.AutoAssistPrice);
             }
         }
 

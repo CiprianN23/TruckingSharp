@@ -120,13 +120,13 @@ namespace TruckingSharp.Missions.Police
             if (!(e.Killer is Player killer))
                 return;
 
-            if (killer != null && killer.PlayerClass != PlayerClassType.Police)
-            {
-                await killer.SetWantedLevelAsync(killer.Account.Wanted + 1);
-                killer.SendClientMessage(Color.Red, $"You've killed {{FFFF00}}{victim.Name}{{FF0000}}, you're wanted by the police now.");
+            if (killer.PlayerClass == PlayerClassType.Police)
+                return;
 
-                SendMessage(Color.GreenYellow, $"Player {{FFFF00}}{killer.Name}{{00FF00}} killed {{FFFF00}}{victim.Name}{{00FF00}}, pursue and fine him.");
-            }
+            await killer.SetWantedLevelAsync(killer.Account.Wanted + 1);
+            killer.SendClientMessage(Color.Red, $"You've killed {{FFFF00}}{victim.Name}{{FF0000}}, you're wanted by the police now.");
+
+            SendMessage(Color.GreenYellow, $"Player {{FFFF00}}{killer.Name}{{00FF00}} killed {{FFFF00}}{victim.Name}{{00FF00}}, pursue and fine him.");
         }
 
         private static async void JailingTimer_Tick(object sender, EventArgs e, Player jailedPlayer)
@@ -200,27 +200,27 @@ namespace TruckingSharp.Missions.Police
                 if (serverPlayer == player)
                     continue;
 
-                if (serverPlayer.Account.Wanted > 0 && player.Speed < 30)
+                if (serverPlayer.Account.Wanted <= 0 || player.Speed >= 30)
+                    continue;
+
+                if (player.IsInRangeOfPoint(10.0f, serverPlayer.Position))
                 {
-                    if (player.IsInRangeOfPoint(10.0f, serverPlayer.Position))
-                    {
-                        await FinePlayerAsync(player, serverPlayer);
-                        return;
-                    }
-
-                    if (player.IsInRangeOfPoint(50.0f, serverPlayer.Position))
-                    {
-                        serverPlayer.GameText("~r~This is the police! Stop at once!~w~", 3000, 4);
-
-                        if (!serverPlayer.IsWarnedByPolice)
-                        {
-                            serverPlayer.IsWarnedByPolice = true;
-                            serverPlayer.SecondsUntilPoliceCanJail = Configuration.Instance.WarnSecondsBeforeJail;
-                            serverPlayer.TimerUntilPoliceCanJail = new Timer(TimeSpan.FromSeconds(5), true);
-                            serverPlayer.TimerUntilPoliceCanJail.Tick += (sender, e) => PoliceCanJailPlayer(sender, e, serverPlayer);
-                        }
-                    }
+                    await FinePlayerAsync(player, serverPlayer);
+                    return;
                 }
+
+                if (!player.IsInRangeOfPoint(50.0f, serverPlayer.Position))
+                    continue;
+
+                serverPlayer.GameText("~r~This is the police! Stop at once!~w~", 3000, 4);
+
+                if (serverPlayer.IsWarnedByPolice)
+                    continue;
+
+                serverPlayer.IsWarnedByPolice = true;
+                serverPlayer.SecondsUntilPoliceCanJail = Configuration.Instance.WarnSecondsBeforeJail;
+                serverPlayer.TimerUntilPoliceCanJail = new Timer(TimeSpan.FromSeconds(5), true);
+                serverPlayer.TimerUntilPoliceCanJail.Tick += (sender, e) => PoliceCanJailPlayer(sender, e, serverPlayer);
             }
         }
 
@@ -307,21 +307,21 @@ namespace TruckingSharp.Missions.Police
                 if (!serverPlayer.IsLoggedIn)
                     continue;
 
-                if (serverPlayer.Account.Wanted > 0 && serverPlayer != player)
-                {
-                    if (player.IsInRangeOfPoint(50.0f, serverPlayer.Position))
-                    {
-                        serverPlayer.GameText("~r~This is the police! Stop at once!~w~", 3000, 4);
+                if (serverPlayer.Account.Wanted <= 0 || serverPlayer == player)
+                    continue;
 
-                        if (!serverPlayer.IsWarnedByPolice)
-                        {
-                            serverPlayer.IsWarnedByPolice = true;
-                            serverPlayer.SecondsUntilPoliceCanJail = Configuration.Instance.WarnSecondsBeforeJail;
-                            serverPlayer.TimerUntilPoliceCanJail = new Timer(TimeSpan.FromSeconds(5), true);
-                            serverPlayer.TimerUntilPoliceCanJail.Tick += (sender, e) => PoliceCanJailPlayer(sender, e, serverPlayer);
-                        }
-                    }
-                }
+                if (!player.IsInRangeOfPoint(50.0f, serverPlayer.Position))
+                    continue;
+
+                serverPlayer.GameText("~r~This is the police! Stop at once!~w~", 3000, 4);
+
+                if (serverPlayer.IsWarnedByPolice)
+                    continue;
+
+                serverPlayer.IsWarnedByPolice = true;
+                serverPlayer.SecondsUntilPoliceCanJail = Configuration.Instance.WarnSecondsBeforeJail;
+                serverPlayer.TimerUntilPoliceCanJail = new Timer(TimeSpan.FromSeconds(5), true);
+                serverPlayer.TimerUntilPoliceCanJail.Tick += (sender, e) => PoliceCanJailPlayer(sender, e, serverPlayer);
             }
         }
     }

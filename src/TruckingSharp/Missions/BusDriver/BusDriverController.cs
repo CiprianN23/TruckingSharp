@@ -86,12 +86,12 @@ namespace TruckingSharp.Missions.BusDriver
 
             player.ToggleControllable(true);
 
-            if (passangersGettingOffTheBus != 0)
-            {
-                var payment = passangersGettingOffTheBus * 9;
-                await player.RewardAsync(payment);
-                player.GameText($"~g~You've earned ${payment}~w~", 3000, 4);
-            }
+            if (passangersGettingOffTheBus == 0)
+                return;
+
+            var payment = passangersGettingOffTheBus * 9;
+            await player.RewardAsync(payment);
+            player.GameText($"~g~You've earned ${payment}~w~", 3000, 4);
         }
 
         public static void StartMission(Player player, BusRoute busRoute)

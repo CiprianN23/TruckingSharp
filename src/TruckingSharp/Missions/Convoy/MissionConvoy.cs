@@ -4,6 +4,7 @@ using SampSharp.GameMode.Display;
 using SampSharp.GameMode.SAMP;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TruckingSharp.Constants;
 using TruckingSharp.Missions.Data;
@@ -60,6 +61,8 @@ namespace TruckingSharp.Missions.Convoy
         public Timer Timer { get; set; }
 
         public MissionLocation ToLocation { get; set; }
+
+        private static float FurthestMemberOldPosition { get; set; }
 
         public static bool IasPlayerAllowedToJoin(Player player)
         {
@@ -219,11 +222,8 @@ namespace TruckingSharp.Missions.Convoy
                 $"Members: ~g~{numberOfMembers}~w~, Furthest member: ~g~{furthestMemberName}~w~, Distance: ~r~{distanceFromLeader}~w~";
             LeaderText.Show(leader);
 
-            foreach (var member in Members)
+            foreach (var member in Members.Where(member => member != Members[0]))
             {
-                if (member == Members[0])
-                    continue;
-
                 distanceFromLeader = GetDistanceBetweenMembers(leader, member);
                 MemberText.Text =
                     $"Leader: ~r~{leader.Name}~w~, distance: ~r~{distanceFromLeader}~w~, members: ~r~{numberOfMembers}~w~";
@@ -265,7 +265,6 @@ namespace TruckingSharp.Missions.Convoy
 
         private Player GetFurthestMember()
         {
-            float oldDistance = 0;
             var leader = Members[0];
 
             foreach (var member in Members)
@@ -275,10 +274,10 @@ namespace TruckingSharp.Missions.Convoy
 
                 var newDistance = GetDistanceBetweenMembers(leader, member);
 
-                if (!(newDistance > oldDistance))
+                if (!(newDistance > FurthestMemberOldPosition))
                     continue;
 
-                oldDistance = newDistance;
+                FurthestMemberOldPosition = newDistance;
                 return member;
             }
 

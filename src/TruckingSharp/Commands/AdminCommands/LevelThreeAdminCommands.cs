@@ -38,7 +38,7 @@ namespace TruckingSharp.Commands.AdminCommands
             await new PlayerAccountRepository(ConnectionFactory.GetConnection).UpdateAsync(targetAccount);
 
             target.SendClientMessage(Color.GreenYellow,
-                $"Your admin level have been seted to {level} by {sender.Name}.");
+                $"Your admin level have been set to {level} by {sender.Name}.");
         }
 
         [Command("resetplayer", Shortcut = "resetplayer")]
@@ -47,6 +47,12 @@ namespace TruckingSharp.Commands.AdminCommands
             if (!target.IsLoggedIn)
             {
                 sender.SendClientMessage(Color.Red, Messages.PlayerNotLoggedIn);
+                return;
+            }
+
+            if (target.Account.AdminLevel > 0)
+            {
+                sender.SendClientMessage(Color.Red, "You can't use this command on admins.");
                 return;
             }
 

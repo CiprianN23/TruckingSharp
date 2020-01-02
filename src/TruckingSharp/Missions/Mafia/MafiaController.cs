@@ -92,43 +92,41 @@ namespace TruckingSharp.Missions.Mafia
                 if (!serverPlayer.IsLoggedIn)
                     continue;
 
-                if (serverPlayer.IsMafiaLoaded)
-                    player.SetPlayerMarker(serverPlayer, Color.Red);
-                else
-                    player.SetPlayerMarker(serverPlayer, PlayerClassColor.TruckerColor);
+                player.SetPlayerMarker(serverPlayer,
+                    serverPlayer.IsMafiaLoaded ? Color.Red : PlayerClassColor.TruckerColor);
 
-                if (!player.IsDoingMission)
+                if (player.IsDoingMission)
+                    continue;
+
+                if (player.Vehicle == null)
+                    return;
+
+                var playerVehicle = (Vehicle)player.Vehicle;
+                var playerVehicleTrailer = (Vehicle)player.Vehicle.Trailer;
+
+                if (!player.MafiaLoadHijacked)
                 {
-                    if (player.Vehicle == null)
-                        return;
-
-                    var playerVehicle = (Vehicle)player.Vehicle;
-                    var playerVehicleTrailer = (Vehicle)player.Vehicle.Trailer;
-
-                    if (!player.MafiaLoadHijacked)
+                    if (playerVehicle?.IsWantedByMafia == true || playerVehicleTrailer?.IsWantedByMafia == true)
                     {
-                        if (playerVehicle?.IsWantedByMafia == true || playerVehicleTrailer?.IsWantedByMafia == true)
-                        {
-                            player.MissionVehicle = playerVehicle;
-                            player.MissionTrailer = playerVehicleTrailer;
-                            player.MafiaLoadHijacked = true;
-                            player.SetCheckpoint(new Vector3(2867, 939, 10.8), 7.0f);
-                            player.MissionTextDraw.Text = "~w~Bring the ~b~stolen load~w~ to the ~r~mafia-hideout~w~";
-                        }
-                    }
-
-                    if (player.MafiaLoadHijacked)
-                    {
-                        if (player.MissionVehicle != playerVehicle || player.MissionTrailer != playerVehicleTrailer)
-                        {
-                            player.MissionVehicle = null;
-                            player.MissionTrailer = null;
-                            player.MafiaLoadHijacked = false;
-                            player.DisableCheckpoint();
-                            player.MissionTextDraw.Text = Messages.NoMissionTextMafia;
-                        }
+                        player.MissionVehicle = playerVehicle;
+                        player.MissionTrailer = playerVehicleTrailer;
+                        player.MafiaLoadHijacked = true;
+                        player.SetCheckpoint(new Vector3(2867, 939, 10.8), 7.0f);
+                        player.MissionTextDraw.Text = "~w~Bring the ~b~stolen load~w~ to the ~r~mafia-hideout~w~";
                     }
                 }
+
+                if (!player.MafiaLoadHijacked)
+                    continue;
+
+                if (player.MissionVehicle == playerVehicle && player.MissionTrailer == playerVehicleTrailer)
+                    continue;
+
+                player.MissionVehicle = null;
+                player.MissionTrailer = null;
+                player.MafiaLoadHijacked = false;
+                player.DisableCheckpoint();
+                player.MissionTextDraw.Text = Messages.NoMissionTextMafia;
             }
         }
 
@@ -178,7 +176,7 @@ namespace TruckingSharp.Missions.Mafia
             {
                 var serverPlayer = (Player)basePlayer;
 
-                if (!serverPlayer.IsLoggedIn || player.PlayerClass != PlayerClasses.Data.PlayerClassType.TruckDriver)
+                if (!serverPlayer.IsLoggedIn || player.PlayerClass != PlayerClassType.TruckDriver)
                     continue;
 
                 player.SetPlayerMarker(serverPlayer, PlayerClassColor.TruckerColor);
